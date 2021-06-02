@@ -1,0 +1,53 @@
+
+mx:
+  is_secure: true
+  credentials: [mx_observ]
+
+list:
+  is_secure: true
+  credentials: [[transaction_view,observ]]
+
+mxStatus:
+  is_secure: true
+  credentials: [mx_observ]
+  
+status:
+  is_secure: true
+  credentials: [observ]
+
+recharge:
+  is_secure: true
+  credentials: [observ]
+
+reMxCharge:
+  is_secure: true
+  credentials: [mx_observ]
+  
+reoutcome:
+  is_secure: true
+  credentials: [observ]
+  
+outcome:
+  is_secure: true
+  credentials: [observ]
+
+listExcel:
+  is_secure: true
+  credentials: [observ]
+
+callPayment:
+  is_secure: true
+  credentials: [call_payment_observ]
+
+callPaymentStatus:
+  is_secure: true
+  credentials: [call_payment_observ]  
+
+callPaymentExcel:
+  is_secure: true
+  credentials: [call_payment_observ]    
+
+reCallpaymentCharge:
+  is_secure: true
+  credentials: [call_payment_observ]
+  

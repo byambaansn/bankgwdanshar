@@ -1,0 +1,17 @@
+all:
+#  stylesheets:    [themes/metro/blue/jtable.min.css]
+  stylesheets:    [bankpayment.css,multiselect/jquery.multiselect.css]
+  javascripts:    [multiselect/jquery.multiselect.js]
+
+testSuccess:
+  stylesheets:    [jqgrid/ui.jqgrid-bootstrap.css,jqgrid/bootstrap.min.css,/js/facebox/facebox.css]
+  javascripts:    [jqgrid/jquery.jqGrid.min.js,jqgrid/i18n/grid.locale-en.js,jqgrid/bootstrap.min.js,facebox/facebox.js]
+  has_layout:     true
+  layout:         bankpayment
+
+mobinetPaymentListSuccess:
+  has_layout:     false
+  
+
+
+#    

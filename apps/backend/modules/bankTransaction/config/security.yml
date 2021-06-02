@@ -1,0 +1,12 @@
+all:
+  is_secure: true
+  credentials: [[transaction_payment,transaction_admin,transaction_payment_product,transaction_payment_dealer,transaction_payment_callpayment,transaction_payment_bag,transaction_payment_expense,transaction_payment_other,transaction_payment_mobifinance]]
+bankAccount:
+  is_secure: true
+  credentials: [transaction_bank_account]
+paymentType:
+  is_secure: true
+  credentials: [transaction_type]
+configAssignment:
+  is_secure: true
+  credentials: [transaction_config_assignment]

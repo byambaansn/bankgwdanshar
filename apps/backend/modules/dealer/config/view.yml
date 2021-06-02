@@ -1,0 +1,12 @@
+all:
+  metas:
+    title: BANK - Gateway - Dealer  
+  stylesheets:    [multiselect/jquery.multiselect.css]
+  javascripts:    [multiselect/jquery.multiselect.js]
+
+mergeReportSuccess:
+  stylesheets:    [https://unpkg.com/react-table@latest/react-table.css]
+  javascripts:    [https://unpkg.com/react-table@latest/react-table.js,https://unpkg.com/react-table@latest/react-table.min.js,app/dealer/index.js]
+
+
+#    

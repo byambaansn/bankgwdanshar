@@ -1,0 +1,5 @@
+logout:
+  is_secure: false
+info:
+  is_secure: true
+  credentials: [[candy_loan,admin,observ,mx_observ,call_payment_observ,transaction_payment,transaction_view,bankpayment_mobinet,bankpayment_cx]]

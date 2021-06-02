@@ -1,0 +1,490 @@
+# Candy loan routings
+bank_loyaltyapi_list:
+  url: /manage/loyaltyapi/list/:page.html
+  param: { module: candyLoan, action: list, page: 1 }
+bank_loyaltyapi_list_excel:
+  url: /manage/loyaltyapi/list-excel.html
+  param: { module: candyLoan, action: listExcel}
+bank_loyaltyapi_status:
+  url: /manage/loyaltyapi/status/:vendor_id/:id.html
+  param: { module: candyLoan, action: status }
+bank_loyaltyapi_change_number:
+  url: /manage/loyaltyapi/status/change
+  param: { module: candyLoan, action: changeNumber }
+bank_loyaltyapi_recharge:
+  url: /manage/loyaltyapi/recharge
+  param: { module: candyLoan, action: recharge }
+bank_loyaltyapi_recover:
+  url: /manage/loyaltyapi/recover
+  param: { module: candyLoan, action: recover }
+bank_loyaltyapi_reoutcome:
+  url: /manage/loyaltyapi/reoutcome
+  param: { module: candyLoan, action: reoutcome }
+bank_loyaltyapi_outcome_success:
+  url: /manage/loyaltyapi/outcomesuccess
+  param: { module: candyLoan, action: successOutcome }
+
+
+# Bankpayment
+bankpayment_ussd:
+  url: /manage/bankpayment/ussd
+  param: { module: bankpayment, action: ussdCharge }
+bankpayment_ussd_update:
+  url: /manage/bankpayment/ussd/update
+  param: { module: bankpayment, action: ussdUpdate }  
+bankpayment_mobinet_prepaid:
+  url: /manage/bankpayment/mobinet/prepaid/:page.html
+  param: { module: bankpayment, action: mobinetPrepaid, page: 1 }
+bankpayment_mobinet_payment:
+  url: /manage/bankpayment/mobinet/payment
+  param: { module: bankpayment, action: mobinetPrepaidPayment }
+bankpayment_mobinet_prepaid_update:
+  url: /manage/bankpayment/mobinet/prepaid/update
+  param: { module: bankpayment, action: mobinetPrepaidUpdate }  
+bankpayment_ulusnet:
+  url: /manage/bankpayment/ulusnet/:page.html
+  param: { module: bankpayment, action: ulusnet, page: 1 }
+bankpayment_ulusnet_payment:
+  url: /manage/bankpayment/ulusnet/payment
+  param: { module: bankpayment, action: ulusnetPayment }
+bankpayment_ulusnet_update:
+  url: /manage/bankpayment/ulusnet/update
+  param: { module: bankpayment, action: ulusnetUpdate }  
+bankpayment_ulusnet_card:
+  url: /manage/bankpayment/ulusnet/card
+  param: { module: bankpayment, action: ulusnetProduct }
+bankpayment_mobinet:
+  url: /manage/bankpayment/mobinetpayment/:page.html
+  param: { module: bankpayment, action: mobinetPayment, page: 1 }
+bankpayment_call_payment:
+  url: /manage/bankpayment/callpayment/:page.html
+  param: { module: bankpayment, action: callPayment, page: 1 }
+bankpayment_do_payment:
+  url: /manage/bankpayment/do/payment
+  param: { module: bankpayment, action: doPayment }
+bankpayment_update:
+  url: /manage/bankpayment/update
+  param: { module: bankpayment, action: update }
+  
+bankpayment_update_make_payment:
+  url: /manage/bankpayment/makepayment
+  param: { module: bankpayment, action: makePayment }
+  
+bankpayment_update_copy:
+  url: /manage/bankpayment/update/copy
+  param: { module: bankpayment, action: copy }
+  
+bankpayment_return:
+  url: /manage/bankpayment/return
+  param: { module: bankpayment, action: return }
+  
+bankpayment_block_date:
+  url: /manage/bankpayment/bankpayment-block-date
+  param: { module: bankpayment, action: blockDate }
+
+bankpayment_payment_report:
+  url: /manage/bankpayment/bankpayment-payment-report
+  param: { module: bankpayment, action: paymentReport }
+  
+# Transaction
+transaction_list:
+  url: /manage/transaction/list/:page.html
+  param: { module: bankTransaction, action: transaction, page: 1 }
+transaction_payment:
+  url: /manage/payment/
+  param: { module: bankTransaction, action: payment }
+transaction_uo:
+  url: /manage/uo/
+  param: { module: bankTransaction, action: uo }
+transaction_uo_update:
+  url: /manage/uo/update
+  param: { module: bankTransaction, action: uoUpdate }
+transaction_payment_list:
+  url: /manage/payment/list
+  param: { module: bankTransaction, action: paymentList }
+transaction_payment_update:
+  url: /manage/payment/update
+  param: { module: bankTransaction, action: paymentUpdate }
+transaction_update:
+  url: /manage/transaction/update/*
+  param: { module: bankTransaction, action: update }
+transaction_type:
+  url: /manage/transaction/type
+  param: { module: bankTransaction, action: paymentType }
+transaction_type_list:
+  url: /manage/transaction/type/list
+  param: { module: bankTransaction, action: paymentTypeList }
+transaction_bank_account:
+  url: /manage/transaction/bank/account
+  param: { module: bankTransaction, action: bankAccount }
+transaction_bank_account_list:
+  url: /manage/transaction/bank/account/list
+  param: { module: bankTransaction, action: ajaxAccountNumbers}
+transaction_config_assignment:
+  url: /manage/transaction/config_assignment
+  param: { module: bankTransaction, action: configAssignment }
+
+  
+to_bankpayment:
+  url: /manage/transaction/to_bankpayment
+  param: { module: bankTransaction, action: toBankpayment }
+  
+# Refund
+refund_list:
+  url: /manage/refund/list
+  param: { module: refund, action: list, page: 1 }
+  
+refund_list_excel:
+  url: /manage/refund/list-excel.html
+  param: { module: refund, action: listExcel}
+  
+# BANK Khaan
+bank_khaan_list:
+  url: /manage/khaan/list/:page.html
+  param: { module: khaan, action: list, page: 1 }
+bank_khaan_list_excel:
+  url: /manage/khaan/list-excel.html
+  param: { module: khaan, action: listExcel}
+bank_khaan_status:
+  url: /manage/khaan/status/:id.html
+  param: { module: khaan, action: status }
+bank_khaan_recharge:
+  url: /manage/khaan/recharge
+  param: { module: khaan, action: recharge }
+bank_khaan_recharge_callpayment:
+  url: /manage/khaan/recharge/callpayment
+  param: { module: khaan, action: rechargeCallpayment }
+bank_khaan_recover:
+  url: /manage/khaan/recover
+  param: { module: khaan, action: recover }
+bank_khaan_reoutcome:
+  url: /manage/khaan/reoutcome
+  param: { module: khaan, action: reoutcome }
+bank_khaan_outcome_success:
+  url: /manage/khaan/outcomesuccess
+  param: { module: khaan, action: successOutcome }
+bank_khaan_call_payment_list:
+  url: /manage/khaan/call/payment/list
+  param: { module: khaan, action: callPayment }
+bank_khaan_call_payment_status:
+  url: /manage/khaan/call/payment/status
+  param: { module: khaan, action: callPaymentStatus }
+bank_khaan_call_payment_excel:
+  url: /manage/khaan/call/payment/excel
+  param: { module: khaan, action: callPaymentExcel }
+# BANK GOLOMT
+bank_golomt_list:
+  url: /manage/golomt/list/:page.html
+  param: { module: golomt, action: list, page: 1 }
+bank_golomt_list_excel:
+  url: /manage/golomt/list-excel.html
+  param: { module: golomt, action: listExcel}
+bank_golomt_status:
+  url: /manage/golomt/status/:id.html
+  param: { module: golomt, action: status }
+bank_golomt_recharge:
+  url: /manage/golomt/recharge
+  param: { module: golomt, action: recharge }
+bank_golomt_recharge_callpayment:
+  url: /manage/golomt/recharge/callpayment
+  param: { module: golomt, action: rechargeCallpayment }
+bank_golomt_recover:
+  url: /manage/golomt/recover
+  param: { module: golomt, action: recover }
+bank_golomt_reoutcome:
+  url: /manage/golomt/reoutcome
+  param: { module: golomt, action: reoutcome }
+bank_golomt_outcome_success:
+  url: /manage/golomt/outcomesuccess
+  param: { module: golomt, action: successOutcome }
+bank_golomt_call_payment_list:
+  url: /manage/golomt/call/payment/list
+  param: { module: golomt, action: callPayment }
+bank_golomt_call_payment_status:
+  url: /manage/golomt/call/payment/status
+  param: { module: golomt, action: callPaymentStatus }
+bank_golomt_call_payment_excel:
+  url: /manage/golomt/call/payment/excel
+  param: { module: golomt, action: callPaymentExcel }
+ 
+# BANK MOBIXPRESS
+bank_mobixpress_list:
+  url: /manage/mobixpress/list/:page.html
+  param: { module: mobixpress, action: list, page: 1 }
+bank_mobixpress_status:
+  url: /manage/mobixpress/status/:id.html
+  param: { module: mobixpress, action: status }
+bank_mobixpress_change_number:
+  url: /manage/mobixpress/status/change
+  param: { module: mobixpress, action: changeNumber }
+bank_mobixpress_recharge:
+  url: /manage/mobixpress/recharge
+  param: { module: mobixpress, action: recharge }
+bank_mobixpress_list_excel:
+  url: /manage/mobixpress/list-excel.html
+  param: { module: mobixpress, action: listExcel}
+  
+# BANK CANDY
+bank_candy_list:
+  url: /manage/candy/list/:page.html
+  param: { module: candy, action: list, page: 1 }
+bank_candy_status:
+  url: /manage/candy/status/:id.html
+  param: { module: candy, action: status }
+bank_candy_change_number:
+  url: /manage/candy/status/change
+  param: { module: candy, action: changeNumber }
+bank_candy_recharge:
+  url: /manage/candy/recharge
+  param: { module: candy, action: recharge }
+bank_candy_list_excel:
+  url: /manage/candy/list-excel.html
+  param: { module: candy, action: listExcel}
+# BANK CANDY DEALER
+bank_candy_dealer:
+  url: /manage/candy/dealer/list/:page.html
+  param: { module: candy, action: dealer, page: 1 }
+bank_candy_dealer_status:
+  url: /manage/candy/dealer/status/:id.html
+  param: { module: candy, action: dealerStatus }
+bank_candy_dealer_change_number:
+  url: /manage/candy/dealer/status/change
+  param: { module: candy, action: dealerChangeNumber }
+bank_candy_dealer_recharge:
+  url: /manage/candy/dealer/recharge
+  param: { module: candy, action: dealerRecharge }
+bank_candy_dealer_list_excel:
+  url: /manage/candy/dealer/list-excel.html
+  param: { module: candy, action: dealerExcel}
+bank_candy_remain_show:
+  url: /manage/candy/remain/show/:isdn
+  param: { module: candy, action: remainShow}
+
+# BANK SAVINGS
+bank_savings_list:
+  url: /manage/savings/list/:page.html
+  param: { module: savings, action: list, page: 1 }
+bank_savings_mx_list:
+  url: /manage/savings/mx/list/:page.html
+  param: { module: savings, action: mx, page: 1 }
+bank_savings_list_excel:
+  url: /manage/savings/list-excel.html
+  param: { module: savings, action: listExcel}
+bank_savings_mx_list_excel:
+  url: /manage/savings/mx-list-excel.html
+  param: { module: savings, action: mxListExcel}
+bank_savings_status:
+  url: /manage/savings/status/:id.html
+  param: { module: savings, action: status }
+bank_savings_change_number:
+  url: /manage/savings/status/change
+  param: { module: savings, action: changeNumber }
+bank_savings_mx_status:
+  url: /manage/savings/mxstatus/:id.html
+  param: { module: savings, action: mxStatus }
+bank_savings_recharge:
+  url: /manage/savings/recharge
+  param: { module: savings, action: recharge }
+bank_savings_remx_charge:
+  url: /manage/savings/remxcharge
+  param: { module: savings, action: reMxCharge }  
+bank_savings_recover:
+  url: /manage/savings/recover
+  param: { module: savings, action: recover }
+bank_savings_reoutcome:
+  url: /manage/savings/reoutcome
+  param: { module: savings, action: reoutcome }
+bank_savings_outcome_success:
+  url: /manage/savings/outcomesuccess
+  param: { module: savings, action: successOutcome }
+bank_savings_call_payment_list:
+  url: /manage/savings/call/payment/list
+  param: { module: savings, action: callPayment }
+bank_savings_call_payment_status:
+  url: /manage/savings/call/payment/status
+  param: { module: savings, action: callPaymentStatus }
+bank_savings_call_payment_excel:
+  url: /manage/savings/call/payment/excel
+  param: { module: savings, action: callPaymentExcel }
+bank_savings_re_callpayment_charge:
+  url: /manage/savings/recallpaymentcharge
+  param: { module: savings, action: reCallpaymentCharge }
+
+# BANK Xac
+bank_xac_list:
+  url: /manage/xac/list/:page.html
+  param: { module: xac, action: list, page: 1 }
+bank_xac_list_excel:
+  url: /manage/xac/list-excel.html
+  param: { module: xac, action: listExcel}
+bank_xac_status:
+  url: /manage/xac/status/:id.html
+  param: { module: xac, action: status }
+bank_xac_recharge:
+  url: /manage/xac/recharge
+  param: { module: xac, action: recharge }
+bank_xac_recharge_callpayment:
+  url: /manage/xac/recharge/callpayment
+  param: { module: xac, action: rechargeCallpayment }
+bank_xac_recover:
+  url: /manage/xac/recover
+  param: { module: xac, action: recover }
+bank_xac_reoutcome:
+  url: /manage/xac/reoutcome
+  param: { module: xac, action: reoutcome }
+bank_xac_outcome_success:
+  url: /manage/xac/outcomesuccess
+  param: { module: xac, action: successOutcome }
+bank_xac_call_payment_list:
+  url: /manage/xac/call/payment/list
+  param: { module: xac, action: callPayment }
+bank_xac_call_payment_status:
+  url: /manage/xac/call/payment/status
+  param: { module: xac, action: callPaymentStatus }
+bank_xac_call_payment_excel:
+  url: /manage/xac/call/payment/excel
+  param: { module: xac, action: callPaymentExcel }  
+
+# BANK Capital
+bank_capital_list:
+  url: /manage/capital/list/:page.html
+  param: { module: capital, action: list, page: 1 }
+bank_capital_list_excel:
+  url: /manage/capital/list-excel.html
+  param: { module: capital, action: listExcel}
+bank_capital_status:
+  url: /manage/capital/status/:id.html
+  param: { module: capital, action: status }
+bank_capital_recharge:
+  url: /manage/capital/recharge
+  param: { module: capital, action: recharge }
+bank_capital_recharge_callpayment:
+  url: /manage/capital/recharge/callpayment
+  param: { module: capital, action: rechargeCallpayment }
+bank_capital_recover:
+  url: /manage/capital/recover
+  param: { module: capital, action: recover }
+bank_capital_reoutcome:
+  url: /manage/capital/reoutcome
+  param: { module: capital, action: reoutcome }
+bank_capital_outcome_success:
+  url: /manage/capital/outcomesuccess
+  param: { module: capital, action: successOutcome }
+bank_capital_call_payment_list:
+  url: /manage/capital/call/payment/list
+  param: { module: capital, action: callPayment }
+bank_capital_call_payment_status:
+  url: /manage/capital/call/payment/status
+  param: { module: capital, action: callPaymentStatus }
+bank_capital_call_payment_excel:
+  url: /manage/capital/call/payment/excel
+  param: { module: capital, action: callPaymentExcel }
+  # bank TDB
+bank_tdb_list:
+  url: /manage/tdb/list/:page.html
+  param: { module: tdb, action: list, page: 1 }
+bank_tdb_list_excel:
+  url: /manage/tdb/list-excel.html
+  param: { module: tdb, action: listExcel}
+bank_tdb_status:
+  url: /manage/tdb/status/:id.html
+  param: { module: tdb, action: status }
+bank_tdb_recharge:
+  url: /manage/tdb/recharge
+  param: { module: tdb, action: recharge }
+bank_tdb_recharge_callpayment:
+  url: /manage/tdb/recharge/callpayment
+  param: { module: tdb, action: rechargeCallpayment }
+bank_tdb_recover:
+  url: /manage/tdb/recover
+  param: { module: tdb, action: recover }
+bank_tdb_reoutcome:
+  url: /manage/tdb/reoutcome
+  param: { module: tdb, action: reoutcome }
+bank_tdb_outcome_success:
+  url: /manage/tdb/outcomesuccess
+  param: { module: tdb, action: successOutcome }  
+bank_tdb_call_payment_list:
+  url: /manage/tdb/call/payment/list
+  param: { module: tdb, action: callPayment }
+bank_tdb_call_payment_status:
+  url: /manage/tdb/call/payment/status
+  param: { module: tdb, action: callPaymentStatus }
+bank_tdb_call_payment_excel:
+  url: /manage/tdb/call/payment/excel
+  param: { module: tdb, action: callPaymentExcel }
+
+# BANK Capitron
+bank_capitron_list:
+  url: /manage/capitron/list/:page.html
+  param: { module: capitron, action: list, page: 1 }
+bank_capitron_list_excel:
+  url: /manage/capitron/list-excel.html
+  param: { module: capitron, action: listExcel}
+bank_capitron_status:
+  url: /manage/capitron/status/:id.html
+  param: { module: capitron, action: status }
+bank_capitron_recharge:
+  url: /manage/capitron/recharge
+  param: { module: capitron, action: recharge }
+bank_capitron_recharge_callpayment:
+  url: /manage/capitron/recharge/callpayment
+  param: { module: capitron, action: rechargeCallpayment }
+bank_capitron_recover:
+  url: /manage/capitron/recover
+  param: { module: capitron, action: recover }
+bank_capitron_reoutcome:
+  url: /manage/capitron/reoutcome
+  param: { module: capitron, action: reoutcome }
+bank_capitron_outcome_success:
+  url: /manage/capitron/outcomesuccess
+  param: { module: capitron, action: successOutcome }
+bank_capitron_call_payment_list:
+  url: /manage/capitron/call/payment/list
+  param: { module: capitron, action: callPayment }
+bank_capitron_call_payment_status:
+  url: /manage/capitron/call/payment/status
+  param: { module: capitron, action: callPaymentStatus }
+bank_capitron_call_payment_excel:
+  url: /manage/capitron/call/payment/excel
+  param: { module: capitron, action: callPaymentExcel }
+
+# buh bank dealer charge  
+bank_dealer_list:
+  url: /manage/dealer/list/:page.html
+  param: { module: dealer, action: list, page: 1 }
+bank_dealer_list_excel:
+  url: /manage/dealer/list-excel.html
+  param: { module: dealer, action: listExcel}
+bank_dealer_merge_amount:
+  url: /manage/dealer/merge/amount
+  param: { module: dealer, action: mergeAmount }
+bank_dealer_merge_report:
+  url: /manage/dealer/merge/report
+  param: { module: dealer, action: mergeReport }
+  
+# USER
+user_info:
+  url: /manage/user/info.html
+  param: { module: user, action: info }
+  
+login:
+  url: /manage/user/login.html
+  param: { module: user, action: login }
+
+logout:
+  url: /manage/user/logout.html
+  param: { module: user, action: logout }
+
+homepage:
+  url: /manage/
+  param: { module: user, action: info }
+
+# generic rules
+# please, remove them by adding more specific rules
+default_index:
+  url:   /:module
+  param: { action: index }
+
+default:
+  url:   /:module/:action/*

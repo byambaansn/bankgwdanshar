@@ -1,0 +1,19 @@
+# You can find more information about this file on the symfony website:
+# http://www.symfony-project.org/reference/1_4/en/11-App
+
+# default values
+all:
+  dealer:
+    tocXmlGw:
+      server: 192.168.12.12
+      port: 1205
+      username: 2000
+      password: 2000
+  bankpayment:
+    gsm_limit: 81000
+    nsl_limit: 1500
+  postgateway:
+    api: http://172.27.27.11:8080/Postgw/Postgw
+    #api: http://172.22.2.58:80/Postgw/Postgw
+    username: autobankpayment
+    password: 49kF0autobankpayment6xwON

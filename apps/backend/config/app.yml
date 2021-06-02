@@ -1,0 +1,17 @@
+# You can find more information about this file on the symfony website:
+# http://www.symfony-project.org/reference/1_4/en/11-App
+
+# default values
+all:
+  project:
+    id: 91
+  loyaltyapi:
+    api: http://10.64.10.246:28080/loyaltyapi/customer-cashin
+    agent: mobicom_agent
+    username: developer
+    password: Password1
+  postgateway:
+    api: http://172.27.27.11:8080/Postgw/Postgw
+    #api: http://172.22.2.58:80/Postgw/Postgw
+    username: autobankpayment
+    password: 49kF0autobankpayment6xwON

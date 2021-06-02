@@ -1,0 +1,9 @@
+all:
+  metas:
+    title: BANK - Gateway - Dealer  
+  stylesheets:    [multiselect/jquery.multiselect.css]
+  javascripts:    [multiselect/jquery.multiselect.js]
+
+
+
+#    

@@ -1,0 +1,37 @@
+list:
+  is_secure: true
+  credentials: [candy_loan]
+  
+status:
+  is_secure: true
+  credentials: [candy_loan]
+  
+recharge:
+  is_secure: true
+  credentials: [candy_loan]
+  
+dealer:
+  is_secure: true
+  credentials: [[transaction_view,observ]]
+  
+dealerExcel:
+  is_secure: true
+  credentials: [observ]  
+  
+dealerStatus:
+  is_secure: true
+  credentials: [[observ,transaction_view]]
+
+dealerRecharge:
+  is_secure: true
+  credentials: [observ]
+
+dealerChangeNumber:
+  is_secure: true
+  credentials: [observ]
+
+remainShow:
+  is_secure: true
+  credentials: [[bankpayment_cx]]
+
+

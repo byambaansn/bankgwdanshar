@@ -1,0 +1,7 @@
+* About to connect() to 192.168.202.57 port 8050 (#0)
+*   Trying 192.168.202.57... * connected
+* Connected to 192.168.202.57 (192.168.202.57) port 8050 (#0)
+* Initializing NSS with certpath: sql:/etc/pki/nssdb
+* Unable to load client cert -8018.
+* NSS error -8018
+* Closing connection #0

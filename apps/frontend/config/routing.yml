@@ -1,0 +1,19 @@
+# You can find more information about this file on the symfony website:
+# http://www.symfony-project.org/reference/1_4/en/10-Routing
+public:
+  url:   /:class_name.:sf_format
+  param: { module: public, action: index }
+  requirements: { sf_format: (xml|json) }
+   
+homepage:
+  url:   /
+  param: { module: public, action: error }
+
+# generic rules
+# please, remove them by adding more specific rules
+default_index:
+  url:   /:module
+  param: { action: index }
+
+default:
+  url:   /:module/:action/*

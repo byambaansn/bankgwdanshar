@@ -1,0 +1,7 @@
+all:
+#  stylesheets:    [themes/metro/blue/jtable.min.css]
+  stylesheets:    [themes/jqueryui/jtable_jqueryui.min.css,multiselect/jquery.multiselect.css]
+#  stylesheets:    [themes/lightcolor/blue/jtable.min.css]
+#  stylesheets:    [themes/basic/jtable_basic.min.css]
+  javascripts:    [jtable.2.4.0/jquery.jtable.min.js,jtable.2.4.0/extensions/jquery.jtable.footer.js,multiselect/jquery.multiselect.js]
+  

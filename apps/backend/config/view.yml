@@ -1,0 +1,24 @@
+# You can find more information about this file on the symfony website:
+# http://www.symfony-project.org/reference/1_4/en/13-View
+
+default:
+  http_metas:
+    content-type: text/html
+
+  metas:
+    title:        BANK - Gateway
+    #description:  symfony project
+    #keywords:     symfony, project
+    #language:     en
+    #robots:       index, follow
+
+  stylesheets:    [theme.css, style.css, pagination.css, redmond/jquery-ui-1.8.21.custom.css, /js/facebox/facebox.css]
+
+  javascripts:    [jquery.min.js, jquery-ui-1.8.21.custom.min.js, facebox/facebox.js, multiselect/jquery.multiselect.js, tools.js]
+
+  has_layout:     true
+  layout:         layout
+  
+  components:
+    mainmenu:     [sidebar, mainmenu]
+    submenu:      [sidebar, submenu]

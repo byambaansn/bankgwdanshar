@@ -1,0 +1,54 @@
+update:
+  is_secure: true
+  credentials: [[bankpayment_ulusnet,bankpayment_mobinet,bankpayment_cx]]
+makePayment:
+  is_secure: true
+  credentials: [bankpayment_cx]
+copy:
+  is_secure: true
+  credentials: [[bankpayment_ulusnet,bankpayment_mobinet,bankpayment_cx]]
+return:
+  is_secure: true
+  credentials: [bankpayment_refund]
+callPayment:
+  is_secure: true
+  credentials: [bankpayment_cx]
+mobinetPayment:
+  is_secure: true
+  credentials: [bankpayment_cx]
+doPayment:
+  is_secure: true
+  credentials: [bankpayment_cx]
+mobinetPrepaid:
+  is_secure: true
+  credentials: [bankpayment_mobinet]
+mobinetPrepaidUpdate:
+  is_secure: true
+  credentials: [bankpayment_mobinet]
+mobinetPrepaidPayment:
+  is_secure: true
+  credentials: [bankpayment_mobinet]
+ulusnetProduct:
+  is_secure: true
+  credentials: [bankpayment_ulusnet]
+ulusnetUpdate:
+  is_secure: true
+  credentials: [bankpayment_ulusnet]
+ulusnetPayment:
+  is_secure: true
+  credentials: [bankpayment_ulusnet]
+ulusnet:
+  is_secure: true
+  credentials: [bankpayment_ulusnet]
+ussdCharge:
+  is_secure: true
+  credentials: [bankpayment_ussd]
+ussdUpdate:
+  is_secure: true
+  credentials: [bankpayment_ussd]
+blockDate:
+  is_secure: true
+  credentials: [bankpayment_block_date]
+paymentReport:
+  is_secure: true
+  credentials: [bankpayment_cx]

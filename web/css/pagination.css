@@ -1,0 +1,10 @@
+/*DRUPAL*/
+.pagerDRUPAL{clear:both;font-size:12px;}
+.pagerDRUPAL a,.pagerDRUPAL strong.pagerDRUPAL-current{padding:0.5em;color:#333333;font-weight:bold;text-decoration:none;}
+.pagerDRUPAL{clear:both;padding:10px 0px 3px;}
+.pagerDRUPAL div{padding:0em;display:inline;}
+.pagerDRUPAL strong,.pagerDRUPAL a{
+padding:2px 5px;margin:0px 0.25em 0px 0.25em;background:#dfedf7;border:1px solid #90c2e1;-moz-border-radius:2px;
+}
+.pagerDRUPAL a:hover{text-decoration:underline;background:#eef7fc;}
+.pagerDRUPAL strong{background:#0174bb;color:#fff;}
