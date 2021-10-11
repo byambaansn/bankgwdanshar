@@ -2,3 +2,4 @@ log/
 cache/
 lib/vendor/
 config/
+/.idea
