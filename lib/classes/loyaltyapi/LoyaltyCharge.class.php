@@ -184,7 +184,7 @@ class LoyaltyCharge
             $preDes = "[$desc] " . $yml['all']['loyaltyapi']['loan_description'];
             $params['sender']['value'] = $yml['all']['loyaltyapi']['account_loan'];
         } else {
-            $preDes = $yml['all']['loyaltyapi']['cashin_description'];
+            $preDes = $yml['all']['loyaltyapi']['cashin_description'].', '.$desc;
             $params['sender']['value'] = $yml['all']['loyaltyapi']['account_cashin'];
         }
         $username = $yml['all']['loyaltyapi']['cashin_username'];
