@@ -40,7 +40,7 @@ function getMenu()
         $menus['tdb']['main'] = array('TDB', '@bank_tdb_list');
         $menus['tdb']['sub']['dealer'] = array('Дилер цэнэглэлт', '@bank_tdb_list', 'list');
         // candy
-        $menus['candy']['main'] = array('Candy', '@bank_candy_dealer');
+        $menus['candy']['main'] = array('MONPAY', '@bank_candy_dealer');
         $menus['candy']['sub']['dealer'] = array('Дилер цэнэглэлт', '@bank_candy_dealer', 'list');
     }
 
@@ -127,8 +127,8 @@ function getMenu()
         $menus['bankpayment']['sub']['ussd'] = array('USSD', '@bankpayment_ussd', 'list');
     }
     if (in_array('candy_loan', $credentials)) {
-        $menus['candy']['main'] = array('CANDY', '@bank_candy_list');
-        $menus['candy']['sub']['candy'] = array('CANDY цэнэглэлт', '@bank_candy_list', 'list');
+        $menus['candy']['main'] = array('MONPAY', '@bank_candy_list');
+        $menus['candy']['sub']['candy'] = array('MONPAY цэнэглэлт', '@bank_candy_list', 'list');
     }
     if (in_array('transaction_payment_mobifinance', $credentials)) {
         $menus['transaction']['main'] = array('Банк хуулга', '@transaction_list?bank_date=on');
