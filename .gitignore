@@ -3,3 +3,6 @@ cache/
 lib/vendor/
 config/
 /.idea
+.vscode/launch.json
+.gitignore
+.vscode/settings.json

@@ -159,6 +159,13 @@ class BankpaymentTable extends Doctrine_Table
      */
     public static function updateForCharge($type, $useOrder = null, $limit = 50)
     {
+        $whichLog = '';
+        if($account == array(self::TYPE_MOBINET_PREPAID)){
+            $whichLog = '/processPaymentMobinet/mobinetPrepaid_'.date('Y-m-d').'.log';
+        }else if($account == array(self::TYPE_MOBINET, self::TYPE_CALL_PAYMENT)){
+            $whichLog = '/Payment/payment_'.date('Y-m-d').'.log';
+        }
+        $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') .$whichLog));
         // FOR UPDATE ажиллахын тулд AUTO COMMIT идэвхгүй байх ёстой
         $pdo = Doctrine_Manager::connection()->getDbh();
         $pdo->setAttribute(PDO::ATTR_AUTOCOMMIT, 0);
@@ -173,6 +180,7 @@ class BankpaymentTable extends Doctrine_Table
             ->limit($limit)
             ->forUpdate(true)
             ->execute(array(), Doctrine_Core::HYDRATE_SINGLE_SCALAR);
+        $logger->log('=====updateForCharge Start==== $ids: ' . print_r($ids, true), sfFileLogger::INFO);    
         if ($ids) {
             Doctrine_Query::create()
                 ->update('Bankpayment')
@@ -187,6 +195,7 @@ class BankpaymentTable extends Doctrine_Table
             if ($useOrder) {
                 $qSelect->orderBy($useOrder);
             }
+            $logger->log('=====updateForCharge Query:  '. $qSelect->getSQLQuery(), sfFileLogger::INFO);
             return $qSelect->execute();
         } else {
             $pdo->commit();
@@ -206,7 +215,7 @@ class BankpaymentTable extends Doctrine_Table
      */
     public static function processPayment($bankpayment = null, $limit = 50)
     {
-        $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/Payment.log'));
+        $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/Payment/payment_'.date('Y-m-d').'.log'));
         $logger->log('============Started processPayment================', sfFileLogger::INFO);
         if ($bankpayment instanceof Bankpayment) {
             if ($bankpayment->canReCharge()) {
@@ -240,7 +249,13 @@ class BankpaymentTable extends Doctrine_Table
                     $paymentCode = BankpaymentTable::getPaymentCode($bankpayment['vendor_id'], $bankTransaction->getBankAccount());
                     if ($paymentCode) {
                         $pay = ($bankpayment['parent_id'] == 0) ? $bankTransaction['order_amount'] : $bankpayment['paid_amount'];
-                        $payment = PostGateway::doPayment($bankpayment['number'], $bankpayment['contract_number'], $pay, $bankTransaction['order_date'], $paymentCode);
+                        // for test dummy
+                        $payment = array();
+                        $payment['Code'] = '0';
+                        $payment['Info'] = 'Success';
+                        $payment['PaymentId'] = '123';
+
+                        // $payment = PostGateway::doPayment($bankpayment['number'], $bankpayment['contract_number'], $pay, $bankTransaction['order_date'], $paymentCode);
                         $logger->log($bankpayment->bank_order_id . ' $payment: '. print_r($payment, true), sfFileLogger::INFO);
                         if ($payment['Code'] === '0') {
                             $bankpayment->status = BankpaymentTable::STAT_SUCCESS;
@@ -413,7 +428,7 @@ class BankpaymentTable extends Doctrine_Table
             $bankPayment->save();
             return $bankPayment;
         } catch (Exception $exc) {
-            $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/bankpayment.log'));
+            $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/bankpaymentInsertError.log'));
             $logger->log("error on bankpayment insert: " . $exc->getMessage().', bank_order_id: '.$trans['bank_order_id'], sfFileLogger::ERR);
         }
     }
@@ -777,9 +792,9 @@ WHERE parent_id=$bankpaymentId";
      * @throws Doctrine_Manager_Exception
      * @throws Doctrine_Query_Exception
      */
-    public static function processPaymentMobinet($bankpaymentObject = null, $limit = 50)
+    public static function processPaymentMobinet($bankpaymentObject = null, $limit = 50) 
     {
-        $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/processPaymentMobinet.log'));
+        $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/processPaymentMobinet/mobinet_'.date('Y-m-d').'.log'));
         $logger->log('============Started processPaymentMobinet================', sfFileLogger::INFO);
         if ($bankpaymentObject instanceof Bankpayment) {
             if ($bankpaymentObject->canReCharge()) {
@@ -916,6 +931,8 @@ WHERE parent_id=$bankpaymentId";
      */
     public static function processVatNopayer($bankpayment = null, $limit = 50)
     {
+        $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/VatNopayer.log'));
+        $logger->log('============Started processVatNopayer================', sfFileLogger::INFO);
         if ($bankpayment instanceof Bankpayment) {
             if ($bankpayment->canReVat()) {
                 $bankpayment->status = self::STAT_NEW;
@@ -930,37 +947,48 @@ WHERE parent_id=$bankpaymentId";
         } else {
             $rows = BankpaymentVatTable::updateForCharge($limit);
         }
-        foreach ($rows as $bankpayment) {
-            try {
-                $bankpaymentVat = BankpaymentVatTable::retrieveByPK($bankpayment['id']);
-                $bankTransaction = BankpaymentTable::getBankTransaction($bankpayment['vendor_id'], $bankpayment['bank_order_id']);
-                if ($bankTransaction) {
-                    $productId = BaseSms::getProductIdByCycle($bankpayment['bill_cycle']);
-                    $outcomeUserId = BaseSms::CUSTOMER_CORPORATE;
-                    $outcomeGroupId = BaseSms::GROUP_CUSTOMER;
-                    $contract = $bankpayment['contract_number'];
-                    if ($productId) {
-                        if ($bankpayment['parent_id']) {
-                            $pay = $bankpayment['paid_amount'];
+        $logger->log('Total count: '.count($rows), sfFileLogger::INFO);
+        echo 'processVatNopayer count: '.count($rows);
+        $count = 0;
+        if(count($rows)>0){
+            foreach ($rows as $bankpayment) {
+                try {
+                    $count++;
+                    $bankpaymentVat = BankpaymentVatTable::retrieveByPK($bankpayment['id']);
+                    $bankTransaction = BankpaymentTable::getBankTransaction($bankpayment['vendor_id'], $bankpayment['bank_order_id']);
+                    $logger->log( $bankpayment['bank_order_id'].', $bankpaymentVat: '.print_r($bankpaymentVat, true), sfFileLogger::INFO);
+                    $logger->log( $bankpayment['bank_order_id'].', $bankTransaction: '.print_r($bankTransaction, true), sfFileLogger::INFO);
+                    if ($bankTransaction) {
+                        $productId = BaseSms::getProductIdByCycle($bankpayment['bill_cycle']);
+                        $outcomeUserId = BaseSms::CUSTOMER_CORPORATE;
+                        $outcomeGroupId = BaseSms::GROUP_CUSTOMER;
+                        $contract = $bankpayment['contract_number'];
+                        if ($productId) {
+                            if ($bankpayment['parent_id']) {
+                                $pay = $bankpayment['paid_amount'];
+                            } else {
+                                $pay = $bankTransaction['order_amount'];
+                            }
+                            $result = BaseSms::insertNoVatpayerApi($bankpayment['vendor_id'], $productId, $contract, $pay, 1, $outcomeUserId, $outcomeGroupId);
+                            $logger->log( $bankpayment['bank_order_id'].', BaseSms::insertNoVatpayerApi:$result: '.print_r($result, true), sfFileLogger::INFO);
+                            $bankpaymentVat->status = BankpaymentVatTable::STAT_SUCCESS;
                         } else {
-                            $pay = $bankTransaction['order_amount'];
+                            $bankpaymentVat->status = BankpaymentVatTable::STAT_FAILED;
                         }
-                        $result = BaseSms::insertNoVatpayerApi($bankpayment['vendor_id'], $productId, $contract, $pay, 1, $outcomeUserId, $outcomeGroupId);
-                        $bankpaymentVat->status = BankpaymentVatTable::STAT_SUCCESS;
+                        if ($result) {
+                            $bankpaymentVat->setOutcomeOrderId($result);
+                            $logger->log( $bankpayment['bank_order_id'].', BaseSms::insertNoVatpayerApi:$result: '.print_r($result, true), sfFileLogger::INFO);
+                        }
                     } else {
                         $bankpaymentVat->status = BankpaymentVatTable::STAT_FAILED;
                     }
-                    if ($result) {
-                        $bankpaymentVat->setOutcomeOrderId($result);
-                    }
-                } else {
-                    $bankpaymentVat->status = BankpaymentVatTable::STAT_FAILED;
+                    $bankpaymentVat->save();
+                    unset($bankpaymentVat);
+                    unset($bankpayment);
+                } catch (Exception $ex) {
+                    //log later
+                    $logger->log('-catch--=' . $ex->getMessage(), sfFileLogger::ERR);
                 }
-                $bankpaymentVat->save();
-                unset($bankpaymentVat);
-                unset($bankpayment);
-            } catch (Exception $ex) {
-                //log later
             }
         }
     }

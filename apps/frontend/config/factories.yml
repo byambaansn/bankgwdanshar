@@ -8,6 +8,13 @@ prod:
       level:   err
       loggers: ~
 
+dev:
+  logger:
+    class:   sfNoLogger
+    param:
+      level:   err
+      loggers: ~
+
 test:
   storage:
     class: sfSessionTestStorage

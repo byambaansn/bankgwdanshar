@@ -732,7 +732,7 @@ class TransactionTable extends Doctrine_Table
     public static function setAssignment($limit, $days)
     {
 
-        $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/my-setAssignment.log'));
+        $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/my-setAssignment/my-setAssignment_'.date('Y-m-d').'.log'));
         $logger->log('--setAssignment start--=', sfFileLogger::INFO);
 
         mb_internal_encoding('UTF-8');

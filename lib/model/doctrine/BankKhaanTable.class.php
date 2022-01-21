@@ -567,7 +567,7 @@ class BankKhaanTable extends Doctrine_Table
                     if (!$bankOrder) {
                         $bankOrder = BankKhaanTable::insert($param);
                     } else {
-                        $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/my-khaan-order.log'));
+                        $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/my-khaan-order/order_'.date('Y-m-d').'log'));
                         $logger->log('--DUPLICATED--=' . trim($param['JournalNo']), sfFileLogger::INFO);
                     }
                     // залруулга гүйлгээ
@@ -590,7 +590,7 @@ class BankKhaanTable extends Doctrine_Table
 
                 } catch (\Exception $exc) {
                     print_r("error");
-                    $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/my-khaan-order.log'));
+                    $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/my-khaan-order/order_'.date('Y-m-d').'log'));
                     $logger->log('--ERROR--=' . trim($param['JournalNo']), sfFileLogger::INFO);
                     die();
                 }
@@ -1409,11 +1409,18 @@ class BankKhaanTable extends Doctrine_Table
                     $contractNumber = isset($contractNumbers[0]) ? $contractNumbers[0] : 0;
                     if ($phoneNumber) {
                         $bankPaymentLogger->log($bankOrder->order_id .', PhoneNumber: ' . $phoneNumber, sfFileLogger::INFO);
-                        $bill = PostGateway::getBillInfo($phoneNumber);
+                        // $bill = PostGateway::getBillInfo($phoneNumber);
                     } else if ($contractNumber) {
                         $bankPaymentLogger->log($bankOrder->order_id .', ContractNumber: ' . $contractNumber, sfFileLogger::INFO);
-                        $bill = PostGateway::getBillInfo(0, $contractNumber);
+                        // $bill = PostGateway::getBillInfo(0, $contractNumber);
                     }
+                    $bill = array();
+                    $bill['Code'] = '0';
+                    $bill['Info'] = 'Success';
+                    $bill['AccessNo'] = '94301404';
+                    $bill['AccountNo'] = '40157270';
+                    $bill['BillCycleCode'] = '14';
+                    $bill['CurrentBalance'] = '15000';
                     $bankPaymentLogger->log($bankOrder->order_id .' $bill: ' . print_r($bill, true), sfFileLogger::INFO);
                     if ($bill) {
                         // Bill avch Postpaid hereglegch esehiig shalgah

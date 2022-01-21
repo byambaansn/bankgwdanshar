@@ -103,7 +103,7 @@ class cronActions extends sfActions
         if ($request->getParameter('limit')) {
             $limit = $request->getParameter('limit');
         }
-        $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/executeKhaanBank.log'));
+        $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/executeKhaanBank/executeKhaanBank_'.date('Y-m-d').'.log'));
         $logger->log('--INIT--=' . date('Y-m-d H:i:s').', IP: '.$_SERVER['REMOTE_ADDR'], sfFileLogger::INFO);
         BankKhaanTable::init();
         $logger->log('--bankPaymentTopupSapc--=' . date('Y-m-d H:i:s'), sfFileLogger::INFO);
@@ -141,12 +141,12 @@ class cronActions extends sfActions
         } catch (Exception $exc) {
             error_log($exc->getTraceAsString());
         }
-//        try {
-//            $logger->log('--bankPaymentHBB--', sfFileLogger::INFO);
-//            BankKhaanTable::bankPaymentHBB(null, null, $limit);
-//        } catch (Exception $exc) {
-//            error_log($exc->getTraceAsString());
-//        }
+        try {
+            $logger->log('--bankPaymentHBB--', sfFileLogger::INFO);
+            BankKhaanTable::bankPaymentHBB(null, null, $limit);
+        } catch (Exception $exc) {
+            error_log($exc->getTraceAsString());
+        }
         echo '<br/><br/>Done : ' . date('Y-m-d H:i:s');
         return sfView::NONE;
     }
@@ -241,7 +241,7 @@ class cronActions extends sfActions
         if ($request->getParameter('limit')) {
             $limit = $request->getParameter('limit');
         }
-        $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/executeXacBank.log'));
+        $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/executeXacBank/executeXacBank_'.date('Y-m-d').'.log'));
         $logger->log('--start--=' . date('Y-m-d H:i:s').', IP: '.$_SERVER['REMOTE_ADDR'], sfFileLogger::INFO);
         BankXacTable::init();
         $logger->log('--end init--=' . date('Y-m-d H:i:s'), sfFileLogger::INFO);
@@ -685,7 +685,8 @@ class cronActions extends sfActions
      */
     public function executeTestPostgw(sfWebRequest $request)
     {
-        var_dump(PostGateway::getPostPhoneInfo($request->getParameter('isdn')));
+        // var_dump(PostGateway::getPostPhoneInfo($request->getParameter('isdn')));
+        var_dump(PostGateway::getBillInfo($request->getParameter('isdn')));
         die();
     }
 

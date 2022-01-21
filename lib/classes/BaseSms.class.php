@@ -33,8 +33,8 @@ class BaseSms
     const BANK_CAPITAL = 8;
 
     #
-    const HOST_SMS = "http://sms/";
-    const HOST_SMS_API = "http://sms.api/api/";
+    const HOST_SMS = "http://qasms/";
+    const HOST_SMS_API = "http://qa.sms.api/api/";
     const HOST_SMS_USER_KHAAN = "BOT_KHAAN";
     const HOST_SMS_USER_KHAAN_PASSWORD = "123";
     const HOST_SMS_USER_SAVINGS = "BOT";
