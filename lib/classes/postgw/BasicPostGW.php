@@ -22,7 +22,7 @@ class BasicPostGW
         if (!in_array(@$_SERVER['REMOTE_ADDR'], array('127.0.0.1', '::1', '172.30.14.101'))) {
             die('You are not allowed to access this file. Check ' . basename(__FILE__) . ' for more information.');
         }
-        $yml = sfYaml::load(sfConfig::get('sf_config_dir') . '/app.yml');
+	$yml = sfYaml::load(sfConfig::get('sf_config_dir') . '/app.yml');
         $this->curl_timeout = $yml['all']['curl_timeout'];
     }
 

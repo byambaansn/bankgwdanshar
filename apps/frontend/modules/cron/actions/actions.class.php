@@ -141,12 +141,12 @@ class cronActions extends sfActions
         } catch (Exception $exc) {
             error_log($exc->getTraceAsString());
         }
-       try {
-           $logger->log('--bankPaymentHBB--', sfFileLogger::INFO);
-           BankKhaanTable::bankPaymentHBB(null, null, $limit);
-       } catch (Exception $exc) {
-           error_log($exc->getTraceAsString());
-       }
+        try {
+            $logger->log('--bankPaymentHBB--', sfFileLogger::INFO);
+            BankKhaanTable::bankPaymentHBB(null, null, $limit);
+        } catch (Exception $exc) {
+            error_log($exc->getTraceAsString());
+        }
         echo '<br/><br/>Done : ' . date('Y-m-d H:i:s');
         return sfView::NONE;
     }
