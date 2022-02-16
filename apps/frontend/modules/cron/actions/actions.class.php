@@ -381,7 +381,7 @@ class cronActions extends sfActions
      */
     public function executeBankpayment(sfWebRequest $request)
     {
-        $limit = 50;
+        $limit = 100;
         if ($request->getParameter('limit')) {
             $limit = $request->getParameter('limit');
         }
