@@ -1238,8 +1238,14 @@ LIMIT 1";
                     $number = trim($number);
                     if ($number) {
                         if (AppTools::isContractNumber($number)) {
-                            $contractNumbers[] = $number;
+                            if (AppTools::isNumberVoo($number)) {
+                                $phoneNumbers[] = $number;
+                                $type = BankpaymentTable::TYPE_MOBINET;
+                            }else{
+                                $contractNumbers[] = $number;
+                            }
                         }
+                        
                         if ($type == BankpaymentTable::TYPE_CALL_PAYMENT) {
                             if (AppTools::isNumber($number) || AppTools::isMobinetHHB($number)) {
                                 $phoneNumbers[] = $number;
@@ -1270,6 +1276,15 @@ LIMIT 1";
                     if ($phoneNumber) {
                         $bankPaymentLogger->log($bankOrder->order_id .', $phoneNumber: ' . $phoneNumber, sfFileLogger::INFO);
                         $bill = PostGateway::getBillInfo($phoneNumber);
+                        // VOO dugaar bol billInfo gereegeer duudah
+                        if(AppTools::isNumberVoo($phoneNumber)){
+                            $phoneInfo = PostGateway::getPostPhoneInfo($phoneNumber); 
+                            $bankPaymentLogger->log($bankOrder->order_id . ' PostGateway::getPostPhoneInfo:$result: '. print_r($phoneInfo, true), sfFileLogger::INFO);
+                            $contractNumber = $phoneInfo['AccountNo'];
+                            $bill = PostGateway::getBillInfo(0, $contractNumber);
+                            $type = BankpaymentTable::TYPE_MOBINET;
+                            $bankPaymentLogger->log($bankOrder->order_id . ' VOO $contractNumber: '. $contractNumber, sfFileLogger::INFO);
+                        } 
                     } else if ($contractNumber) {
                         $bill = PostGateway::getBillInfo(0, $contractNumber);
                         $bankPaymentLogger->log($bankOrder->order_id .', $contractNumber: ' . $contractNumber, sfFileLogger::INFO);
