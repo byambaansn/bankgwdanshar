@@ -916,6 +916,69 @@ WHERE parent_id=$bankpaymentId";
      */
     public static function processVatNopayer($bankpayment = null, $limit = 50)
     {
+        $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/VatNopayer.log'));
+        $logger->log('============Started processVatNopayer================', sfFileLogger::INFO);
+        if ($bankpayment instanceof Bankpayment) {
+            if ($bankpayment->canReVat()) {
+                $bankpayment->status = self::STAT_NEW;
+                $bankpayment->save();
+            } else {
+                return FALSE;
+            }
+            $bankpaymentVat = BankpaymentVatTable::getInstance()->findBy('bankpayment_id', $bankpayment->id);
+            $rows = array($bankpaymentVat);
+        } elseif ($bankpayment) {
+            return FALSE;
+        } else {
+            $rows = BankpaymentVatTable::updateForCharge($limit);
+        }
+        $logger->log('Total count: '.count($rows), sfFileLogger::INFO);
+        echo 'processVatNopayer count: '.count($rows);
+        $count = 0;
+        if(count($rows)>0){
+            foreach ($rows as $bankpayment) {
+                try {
+                    $count++;
+                    $bankpaymentVat = BankpaymentVatTable::retrieveByPK($bankpayment['id']);
+                    $bankTransaction = BankpaymentTable::getBankTransaction($bankpayment['vendor_id'], $bankpayment['bank_order_id']);
+                    $logger->log( $bankpayment['bank_order_id'].', $bankpaymentVat: '.print_r($bankpaymentVat->toArray(), true), sfFileLogger::INFO);
+                    $logger->log( $bankpayment['bank_order_id'].', $bankTransaction: '.print_r($bankTransaction->toArray(), true), sfFileLogger::INFO);
+                    if ($bankTransaction) {
+                        $productId = BaseSms::getProductIdByCycle($bankpayment['bill_cycle']);
+                        $outcomeUserId = BaseSms::CUSTOMER_CORPORATE;
+                        $outcomeGroupId = BaseSms::GROUP_CUSTOMER;
+                        $contract = $bankpayment['contract_number'];
+                        if ($productId) {
+                            if ($bankpayment['parent_id']) {
+                                $pay = $bankpayment['paid_amount'];
+                            } else {
+                                $pay = $bankTransaction['order_amount'];
+                            }
+                            $result = BaseSms::insertNoVatpayerApi($bankpayment['vendor_id'], $productId, $contract, $pay, 1, $outcomeUserId, $outcomeGroupId);
+                            $logger->log( $bankpayment['bank_order_id'].', BaseSms::insertNoVatpayerApi:$result: '.print_r($result, true), sfFileLogger::INFO);
+                            $bankpaymentVat->status = BankpaymentVatTable::STAT_SUCCESS;
+                        } else {
+                            $bankpaymentVat->status = BankpaymentVatTable::STAT_FAILED;
+                        }
+                        if ($result) {
+                            $bankpaymentVat->setOutcomeOrderId($result);
+                            $logger->log( $bankpayment['bank_order_id'].', BaseSms::insertNoVatpayerApi:$result: '.print_r($result, true), sfFileLogger::INFO);
+                        }
+                    } else {
+                        $bankpaymentVat->status = BankpaymentVatTable::STAT_FAILED;
+                    }
+                    $bankpaymentVat->save();
+                    unset($bankpaymentVat);
+                    unset($bankpayment);
+                } catch (Exception $ex) {
+                    //log later
+                    $logger->log('-catch--=' . $ex->getMessage(), sfFileLogger::ERR);
+                }
+            }
+        }
+    }
+    public static function processVatNopayerOld($bankpayment = null, $limit = 50)
+    {
         if ($bankpayment instanceof Bankpayment) {
             if ($bankpayment->canReVat()) {
                 $bankpayment->status = self::STAT_NEW;
@@ -1167,7 +1230,7 @@ WHERE parent_id=$bankpaymentId";
 		LEFT OUTER JOIN bank_transaction.payment_type E ON D.type_id = E.id
             WHERE IFNULL(pa.id,0) = 0 AND b.status < CASE WHEN ref.type = 'REFUND' AND ref.refund_type = 'PAYMENTTYPE' AND b.status = 9 THEN 10 ELSE 9 END AND $where ) t1 " . $whereTwo;
         $query .= " ORDER BY t1.created_at DESC";
-//        echo $query;        die();
+        //echo $query;        die();
         $rows = $pdo->query($query)->fetchAll(PDO::FETCH_ASSOC);
         return $rows;
     }

@@ -1282,7 +1282,6 @@ class BankSavingsTable extends Doctrine_Table
                         if (AppTools::isContractNumber($number)) {
                             if (AppTools::isNumberVoo($number)) {
                                 $phoneNumbers[] = $number;
-                                $type = BankpaymentTable::TYPE_MOBINET;
                             }else{
                                 $contractNumbers[] = $number;
                             }
@@ -1325,7 +1324,6 @@ class BankSavingsTable extends Doctrine_Table
                             $logger->log($bankOrder->order_id . ' PostGateway::getPostPhoneInfo:$result: '. print_r($phoneInfo, true), sfFileLogger::INFO);
                             $contractNumber = $phoneInfo['AccountNo'];
                             $bill = PostGateway::getBillInfo(0, $contractNumber);
-                            $type = BankpaymentTable::TYPE_MOBINET;
                             $logger->log($bankOrder->order_id . ' VOO $contractNumber: '. $contractNumber, sfFileLogger::INFO);
                         } 
                     } else if ($contractNumber) {
@@ -1417,7 +1415,6 @@ class BankSavingsTable extends Doctrine_Table
                         return false;
                     } else {
                         # Guilgeenii utgaas medeelel oldoogui bol HBB Prepaid tulult shalgah
-                        $logger->log($bankOrder->order_id . ' Guilgeenii utgaas medeelel oldoogui bol HBB Prepaid tulult shalgah', sfFileLogger::INFO);
                         $insertBankpayment = self::bankPaymentHBB($bankOrder, TRUE);
                     }
                 }

@@ -1116,7 +1116,6 @@ class BankGolomtTable extends Doctrine_Table
                         if (AppTools::isContractNumber($number)) {
                             if (AppTools::isNumberVoo($number)) {
                                 $phoneNumbers[] = $number;
-                                $type = BankpaymentTable::TYPE_MOBINET;
                             }else{
                                 $contractNumbers[] = $number;
                             }
@@ -1156,7 +1155,6 @@ class BankGolomtTable extends Doctrine_Table
                             $bankPaymentLogger->log($bankOrder->order_id . ' PostGateway::getPostPhoneInfo:$result: '. print_r($phoneInfo, true), sfFileLogger::INFO);
                             $contractNumber = $phoneInfo['AccountNo'];
                             $bill = PostGateway::getBillInfo(0, $contractNumber);
-                            $type = BankpaymentTable::TYPE_MOBINET;
                             $bankPaymentLogger->log($bankOrder->order_id . ' VOO $contractNumber: '. $contractNumber, sfFileLogger::INFO);
                         } 
                     } else if ($contractNumber) {
@@ -1248,7 +1246,6 @@ class BankGolomtTable extends Doctrine_Table
                         return false;
                     } else {
                         # Guilgeenii utgaas medeelel oldoogui bol HBB Prepaid tulult shalgah
-                        $bankPaymentLogger->log($bankOrder->order_id . ' Guilgeenii utgaas medeelel oldoogui bol HBB Prepaid tulult shalgah', sfFileLogger::INFO);
                         $insertBankpayment = self::bankPaymentHBB($bankOrder, TRUE);
                     }
                 }
@@ -1561,7 +1558,15 @@ class BankGolomtTable extends Doctrine_Table
                 }
                 break;
             }
-            $type = BankpaymentTable::TYPE_MOBINET;
+            if ($bankOrder->getBankAccount() == self::ACCOUNT_CALLPAYMENT) {
+                $type = BankpaymentTable::TYPE_CALL_PAYMENT;
+                $limit = sfConfig::get('app_bankpayment_gsm_limit');
+            } elseif (in_array($bankOrder->getBankAccount(), array(self::ACCOUNT_MOBINET_PAYMENT, self::ACCOUNT_PRODUCT_MOBINET))) {
+                $type = BankpaymentTable::TYPE_MOBINET;
+                $limit = sfConfig::get('app_bankpayment_nsl_limit');
+            } else {
+                continue;
+            }
             $phoneNumbers = array_unique($numbers);
             $insertBankpayment = false;
             if (count($phoneNumbers) == 1) {

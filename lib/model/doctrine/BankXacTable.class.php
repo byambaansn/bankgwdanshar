@@ -1240,7 +1240,6 @@ LIMIT 1";
                         if (AppTools::isContractNumber($number)) {
                             if (AppTools::isNumberVoo($number)) {
                                 $phoneNumbers[] = $number;
-                                $type = BankpaymentTable::TYPE_MOBINET;
                             }else{
                                 $contractNumbers[] = $number;
                             }
@@ -1282,7 +1281,6 @@ LIMIT 1";
                             $bankPaymentLogger->log($bankOrder->order_id . ' PostGateway::getPostPhoneInfo:$result: '. print_r($phoneInfo, true), sfFileLogger::INFO);
                             $contractNumber = $phoneInfo['AccountNo'];
                             $bill = PostGateway::getBillInfo(0, $contractNumber);
-                            $type = BankpaymentTable::TYPE_MOBINET;
                             $bankPaymentLogger->log($bankOrder->order_id . ' VOO $contractNumber: '. $contractNumber, sfFileLogger::INFO);
                         } 
                     } else if ($contractNumber) {
