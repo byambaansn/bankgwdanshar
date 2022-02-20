@@ -1114,7 +1114,12 @@ class BankGolomtTable extends Doctrine_Table
                     $number = trim($number);
                     if ($number) {
                         if (AppTools::isContractNumber($number)) {
-                            $contractNumbers[] = $number;
+                            if (AppTools::isNumberVoo($number)) {
+                                $phoneNumbers[] = $number;
+                                $type = BankpaymentTable::TYPE_MOBINET;
+                            }else{
+                                $contractNumbers[] = $number;
+                            }
                         }
                         if ($type == BankpaymentTable::TYPE_CALL_PAYMENT) {
                             if (AppTools::isNumber($number) || AppTools::isMobinetHHB($number)) {
@@ -1145,6 +1150,15 @@ class BankGolomtTable extends Doctrine_Table
                     if ($phoneNumber) {
                         $bankPaymentLogger->log($bankOrder->order_id .', PhoneNumber: ' . $phoneNumber, sfFileLogger::INFO);
                         $bill = PostGateway::getBillInfo($phoneNumber);
+                        // VOO dugaar bol billInfo gereegeer duudah
+                        if(AppTools::isNumberVoo($phoneNumber)){
+                            $phoneInfo = PostGateway::getPostPhoneInfo($phoneNumber); 
+                            $bankPaymentLogger->log($bankOrder->order_id . ' PostGateway::getPostPhoneInfo:$result: '. print_r($phoneInfo, true), sfFileLogger::INFO);
+                            $contractNumber = $phoneInfo['AccountNo'];
+                            $bill = PostGateway::getBillInfo(0, $contractNumber);
+                            $type = BankpaymentTable::TYPE_MOBINET;
+                            $bankPaymentLogger->log($bankOrder->order_id . ' VOO $contractNumber: '. $contractNumber, sfFileLogger::INFO);
+                        } 
                     } else if ($contractNumber) {
                         $bankPaymentLogger->log($bankOrder->order_id .', ContractNumber: ' . $contractNumber, sfFileLogger::INFO);
                         $bill = PostGateway::getBillInfo(0, $contractNumber);
@@ -1234,6 +1248,7 @@ class BankGolomtTable extends Doctrine_Table
                         return false;
                     } else {
                         # Guilgeenii utgaas medeelel oldoogui bol HBB Prepaid tulult shalgah
+                        $bankPaymentLogger->log($bankOrder->order_id . ' Guilgeenii utgaas medeelel oldoogui bol HBB Prepaid tulult shalgah', sfFileLogger::INFO);
                         $insertBankpayment = self::bankPaymentHBB($bankOrder, TRUE);
                     }
                 }

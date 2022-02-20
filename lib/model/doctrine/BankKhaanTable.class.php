@@ -1379,8 +1379,14 @@ class BankKhaanTable extends Doctrine_Table
                     $number = trim($number);
                     if ($number) {
                         if (AppTools::isContractNumber($number)) {
-                            $contractNumbers[] = $number;
+                            if (AppTools::isNumberVoo($number)) {
+                                $phoneNumbers[] = $number;
+                                $type = BankpaymentTable::TYPE_MOBINET;
+                            }else{
+                                $contractNumbers[] = $number;
+                            }
                         }
+                        
                         if ($type == BankpaymentTable::TYPE_CALL_PAYMENT) {
                             if (AppTools::isNumber($number) || AppTools::isMobinetHHB($number)) {
                                 $phoneNumbers[] = $number;
@@ -1409,7 +1415,16 @@ class BankKhaanTable extends Doctrine_Table
                     $contractNumber = isset($contractNumbers[0]) ? $contractNumbers[0] : 0;
                     if ($phoneNumber) {
                         $bankPaymentLogger->log($bankOrder->order_id .', PhoneNumber: ' . $phoneNumber, sfFileLogger::INFO);
-                        // $bill = PostGateway::getBillInfo($phoneNumber);
+                        $bill = PostGateway::getBillInfo($phoneNumber);
+                        // VOO dugaar bol billInfo gereegeer duudah
+                        if(AppTools::isNumberVoo($phoneNumber)){
+                            $phoneInfo = PostGateway::getPostPhoneInfo($phoneNumber); 
+                            $bankPaymentLogger->log($bankOrder->order_id . ' PostGateway::getPostPhoneInfo:$result: '. print_r($phoneInfo, true), sfFileLogger::INFO);
+                            $contractNumber = $phoneInfo['AccountNo'];
+                            $bill = PostGateway::getBillInfo(0, $contractNumber);
+                            $type = BankpaymentTable::TYPE_MOBINET;
+                            $bankPaymentLogger->log($bankOrder->order_id . ' VOO $contractNumber: '. $contractNumber, sfFileLogger::INFO);
+                        } 
                     } else if ($contractNumber) {
                         $bankPaymentLogger->log($bankOrder->order_id .', ContractNumber: ' . $contractNumber, sfFileLogger::INFO);
                         // $bill = PostGateway::getBillInfo(0, $contractNumber);
@@ -1573,6 +1588,7 @@ class BankKhaanTable extends Doctrine_Table
                         return false;
                     } else {
                         # Guilgeenii utgaas medeelel oldoogui bol HBB Prepaid tulult shalgah
+			            $bankPaymentLogger->log($bankOrder->order_id . ' Guilgeenii utgaas medeelel oldoogui bol HBB Prepaid tulult shalgah', sfFileLogger::INFO);
                         $insertBankpayment = self::bankPaymentHBB($bankOrder, TRUE);
                     }
                 }
@@ -2096,7 +2112,12 @@ class BankKhaanTable extends Doctrine_Table
                     $number = trim($number);
                     if ($number) {
                         if (AppTools::isContractNumber($number)) {
-                            $contractNumbers[] = $number;
+                            if (AppTools::isNumberVoo($number)) {
+                                $phoneNumbers[] = $number;
+                                $type = BankpaymentTable::TYPE_MOBINET;
+                            } else{
+                                $contractNumbers[] = $number;
+                            }
                         }
                         if (AppTools::isNumber($number) || AppTools::isMobinetHHB($number)) {
                             $phoneNumbers[] = $number;
@@ -2106,16 +2127,10 @@ class BankKhaanTable extends Doctrine_Table
                 $phoneNumber = isset($phoneNumbers[0]) ? $phoneNumbers[0] : 0;
                 $contractNumber = isset($contractNumbers[0]) ? $contractNumbers[0] : 0;
                 $topupLogger->log($bankOrder->order_id . ' $phoneNumber: ' . $phoneNumber, sfFileLogger::INFO);
-		$topupLogger->log($bankOrder->order_id . ' $contractNumber: ' . $contractNumber, sfFileLogger::INFO);
+		        $topupLogger->log($bankOrder->order_id . ' $contractNumber: ' . $contractNumber, sfFileLogger::INFO);
                 $phoneInfo = PostGateway::getPostPhoneInfo($phoneNumber); 
                 $topupLogger->log($bankOrder->order_id . ' PostGateway::getPostPhoneInfo:$result: '. print_r($phoneInfo, true), sfFileLogger::INFO);
-//                $phoneInfo = 0;
-//                if($phoneNumber){
-//                    $phoneInfo = PostGateway::getPostPhoneInfo($phoneNumber); 
-//                    $topupLogger->log($bankOrder->order_id . ' PostGateway::getPostPhoneInfo:$result: '. print_r($phoneInfo, true), sfFileLogger::INFO);
-//                } else{
-//		    $topupLogger->log($bankOrder->order_id . '  $phoneInfo: '. $phoneInfo, sfFileLogger::INFO);
-//		}
+                
                 $yml = sfYaml::load(sfConfig::get('sf_config_dir') . '/app_rtcgw_packages.yml');
                 $hybridRegex = $yml['all']['regex']['hybrid'];
                 $postpaidRegex = $yml['all']['regex']['postpaid'];
@@ -2256,6 +2271,13 @@ class BankKhaanTable extends Doctrine_Table
                         if ($phoneNumber) {
                             $topupLogger->log($bankOrder->order_id . ' $phoneNumber: ' . $phoneNumber, sfFileLogger::INFO);
                             $bill = PostGateway::getBillInfo($phoneNumber);
+                            // VOO dugaar bol billInfo gereegeer duudah
+                            if(AppTools::isNumberVoo($phoneNumber) && isset($phoneInfo['AccountNo']) && $phoneInfo['AccountNo'] != '' ){
+                                $contractNumber = $phoneInfo['AccountNo'];
+                                $bill = PostGateway::getBillInfo(0, $contractNumber);
+                                $type = BankpaymentTable::TYPE_MOBINET;
+                                $topupLogger->log($bankOrder->order_id . ' VOO $contractNumber: '. $contractNumber, sfFileLogger::INFO);
+                            } 
                         } else if ($contractNumber) {
                             $topupLogger->log($bankOrder->order_id . ' $contractNumber: ' . $contractNumber, sfFileLogger::INFO);
                             $bill = PostGateway::getBillInfo(0, $contractNumber);

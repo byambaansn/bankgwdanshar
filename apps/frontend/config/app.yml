@@ -13,7 +13,8 @@ all:
     gsm_limit: 81000
     nsl_limit: 1500
   postgateway:
-    api: http://172.27.27.11:8080/Postgw/Postgw
+    #api: http://172.27.27.11:8080/Postgw/Postgw
     #api: http://172.22.2.58:80/Postgw/Postgw
+    api: http://10.12.40.131/Postgw/Postgw
     username: autobankpayment
     password: 49kF0autobankpayment6xwON
