@@ -150,34 +150,35 @@ class PaymentTypeTable extends Doctrine_Table
     {
         $maps = array();
         $maps[0] = 1004;
-        $maps[15] = 1053;
-        $maps[16] = 1053;
-        $maps[20] = 1054;
-        $maps[22] = 1055;
-        $maps[30] = 1042;
-        $maps[31] = 1041;
-        $maps[32] = 1047;
-        $maps[33] = 1043;
-        $maps[34] = 1060;
-        $maps[35] = 77;
-        $maps[36] = 1043;
-        $maps[37] = 1043;
-        $maps[38] = 1058;
-        $maps[40] = 1061;
-        $maps[41] = 1061;
-        $maps[42] = 1061;
-        $maps[43] = 78;
-        $maps[44] = 1056;
-        $maps[45] = 79;
-        $maps[46] = 1057;
-        $maps[47] = 1061;
-        $maps[48] = 1059;
-        $maps[49] = 1017;
-        $maps[50] = 1057;
-        $maps[91] = 1053;
+        $maps[15] = 1053; // testing subscribers
+        $maps[16] = 1053; // roaming bc
+        $maps[20] = 1054; // prepaid bc
+        $maps[22] = 1055; // mobile office bc
+        $maps[30] = 1042; // mobinetphone bc
+        $maps[31] = 1041; // iridium satellite phone bc
+        $maps[32] = 1047; // bgan satellite phone bc
+        $maps[33] = 1043; // nsl solution bc3
+        $maps[34] = 1060; // ip customers bc
+        $maps[35] = 77; // telemarketing bc
+        $maps[36] = 1043; // nsl solution bc1
+        $maps[37] = 1043; // nsl solution bc2
+        $maps[38] = 1058; // ulusnet bc
+        $maps[40] = 1061; // external carriers 01
+        $maps[41] = 1061; // external carriers 15
+        $maps[42] = 1061; // special numbers call
+        $maps[43] = 78; // special numbers smsmo
+        $maps[44] = 1056; // special number smsmt
+        $maps[45] = 79; // international sms
+        $maps[46] = 1057; // suvag suvagchlal non gsm
+        $maps[47] = 1061; // special numbers call mobinet
+        $maps[48] = 1059; // special numbers 1199
+        $maps[49] = 1017; // sms and mobile bank non gsm
+        $maps[50] = 1057; // suvag, suvagchlal non gsm-2
+        $maps[91] = 1053; // dummy bc
         # Бусад
+        // busad ni ub city, rural, mpki, moco staff, mobicom employee, onebill, prepaid hs billcycle, voo
         $paymentType = $maps[0];
-        if (in_array($billCycle, array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 17, 18, 19, 21, 23, 24, 25, 26, 27, 28, 29, 39, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 83))) {
+        if (in_array($billCycle, array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 17, 18, 19, 21, 23, 24, 25, 26, 27, 28, 29, 39, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 83, 84, 85))) {
             $paymentType = self::PAYMENT_GSM;
         } else {
             if (isset($maps[$billCycle])) {
