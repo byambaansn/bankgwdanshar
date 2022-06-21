@@ -13,7 +13,7 @@ class CapitronCorpgw
 
         $response = self::sendGet($url);
         LogTools::setLogCapitronInit($url, $response, null, null, null, null, null);
-        return json_decode($response);
+        return json_decode($response)->body;
     }
 
     public static function sendGet($url) {
