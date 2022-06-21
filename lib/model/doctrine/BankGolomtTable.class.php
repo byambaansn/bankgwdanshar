@@ -45,6 +45,8 @@ class BankGolomtTable extends Doctrine_Table
     CONST ACCOUNT_PRODUCT_NETWORKS = '2715001885';
     CONST ACCOUNT_MOBIFINANCE_CANDY = '2800000354';
     CONST ACCOUNT_CANDY_CASHIN = '8125100425';
+    CONST ACCOUNT_PREPAID = '2020001512';
+    CONST ACCOUNT_DATA = '2020001512';
 
     /**
      * Returns an instance of this class.
@@ -1067,7 +1069,7 @@ class BankGolomtTable extends Doctrine_Table
         } elseif ($bankOrder) {
             return FALSE;
         } else {
-            $bankOrderRows = self::updateForCharge(array(self::ACCOUNT_MOBINET_PAYMENT, self::ACCOUNT_CALLPAYMENT), $limit);
+            $bankOrderRows = self::updateForCharge(array(self::ACCOUNT_MOBINET_PAYMENT, self::ACCOUNT_CALLPAYMENT, self::ACCOUNT_PREPAID), $limit);
         }
         $bankPaymentLogger->log('Total count: ' . count($bankOrderRows), sfFileLogger::INFO);
         echo 'bankPayment count: '.count($bankOrderRows).'</br>';
@@ -1100,13 +1102,25 @@ class BankGolomtTable extends Doctrine_Table
                     break;
                 }
                 $type = 0;
+
                 if ($bankOrder->getBankAccount() == self::ACCOUNT_CALLPAYMENT) {
                     $type = BankpaymentTable::TYPE_CALL_PAYMENT;
                     $limit = sfConfig::get('app_bankpayment_gsm_limit');
+                    $bankPaymentLogger->log('ACCOUNT_CALLPAYMENT', sfFileLogger::INFO);
                 } elseif (in_array($bankOrder->getBankAccount(), array(self::ACCOUNT_MOBINET_PAYMENT, self::ACCOUNT_PRODUCT_MOBINET))) {
                     $type = BankpaymentTable::TYPE_MOBINET;
                     $limit = sfConfig::get('app_bankpayment_nsl_limit');
+                    $bankPaymentLogger->log('MOBINET', sfFileLogger::INFO);
+                } elseif ($bankOrder->getBankAccount() == self::ACCOUNT_PREPAID) {
+                    $type = BankpaymentTable::TYPE_TOPUP;
+                    $limit = sfConfig::get('app_bankpayment_gsm_limit');
+                    $bankPaymentLogger->log('ACCOUNT_PREPAID', sfFileLogger::INFO);
+                } elseif ($bankOrder->getBankAccount() == self::ACCOUNT_DATA) {
+                    $type = BankpaymentTable::TYPE_SAPC;
+                    $limit = sfConfig::get('app_bankpayment_gsm_limit');
+                    $bankPaymentLogger->log('ACCOUNT_DATA', sfFileLogger::INFO);
                 } else {
+                    $bankPaymentLogger->log('CONTINUE --- ', sfFileLogger::INFO);
                     continue;
                 }
                 $contractNumbers = $phoneNumbers = array();
@@ -1122,6 +1136,11 @@ class BankGolomtTable extends Doctrine_Table
                         }
                         if ($type == BankpaymentTable::TYPE_CALL_PAYMENT) {
                             if (AppTools::isNumber($number) || AppTools::isMobinetHHB($number)) {
+                                $phoneNumbers[] = $number;
+                            }
+                        }
+                        if ($type == BankpaymentTable::TYPE_TOPUP || $type == BankpaymentTable::TYPE_SAPC) {
+                            if (AppTools::isNumber($number)) {
                                 $phoneNumbers[] = $number;
                             }
                         } else if (AppTools::isNumberMobinet($number)) {
@@ -1248,6 +1267,19 @@ class BankGolomtTable extends Doctrine_Table
                         # Guilgeenii utgaas medeelel oldoogui bol HBB Prepaid tulult shalgah
                         $insertBankpayment = self::bankPaymentHBB($bankOrder, TRUE);
                     }
+                }
+
+                $txnDesc = $bankOrder->order_p;
+                $topupRegex = "/PRETOP-(([9][954][0-9]{6})|(85[0-9]{6}))-([0-9_a-zA-Z]{2,20})-*/";
+                $sapcRegex = "/SAPC-(([9][954][0-9]{6})|(85[0-9]{6}))-([0-9_.a-zA-Z]{2,20})-*/";
+                if( $type === BankPaymentTable::TYPE_TOPUP || $type === BankPaymentTable::TYPE_SAPC ) {
+                    if (preg_match($topupRegex, $txnDesc, $matches)) {
+                        $contractNumber = $matches[4];                                        
+                    }
+                    if (preg_match($sapcRegex, $txnDesc, $matches)) {
+                        $contractNumber = $matches[4];
+                    }
+                    $bankPaymentLogger->log("order_p=" . $bankOrder->order_p . ' $matches[4]: ' . $matches[4], sfFileLogger::INFO);
                 }
 
                 $bankPaymentLogger->log($bankOrder->order_id . ' $status: ' . $status. ' ,$statusComment: '.$statusComment, sfFileLogger::INFO);
