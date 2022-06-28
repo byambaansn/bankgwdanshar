@@ -6,7 +6,7 @@ class KhaanCorpgw
     {
         set_time_limit(3600);
         $yml = sfYaml::load(sfConfig::get('sf_config_dir') . '/app_banks.yml');
-        $url = $yml['all']['bankgwDistributorUrl'] . '/khaan/record';
+        $url = $yml['all']['corpgwUrl'] . '/statement/khaan/record';
 
         $header[] = "Content-Type: application/json";
         $accountsDto = json_encode(self::getAccountListWithRecord());
@@ -25,7 +25,7 @@ class KhaanCorpgw
     {
 
         $yml = sfYaml::load(sfConfig::get('sf_config_dir') . '/app_banks.yml');
-        $url = $yml['all']['bankgwDistributorUrl'] . '/khaan/date';
+        $url = $yml['all']['corpgwUrl'] . '/statement/khaan/date';
 
         $header[] = "Content-Type: application/json";
         $accountsDto = json_encode($accountList);
@@ -43,7 +43,7 @@ class KhaanCorpgw
     {
 //        set_time_limit(3600);
         $yml = sfYaml::load(sfConfig::get('sf_config_dir') . '/app_banks.yml');
-        $url = $yml['all']['bankgwDistributorUrl'] . '/khaan/update-record';
+        $url = $yml['all']['corpgwUrl'] . '/khaan/update-record';
 
         $header[] = "Content-Type: application/json";
         $accountsDto = json_encode(self::getAccountListWithRecord());
