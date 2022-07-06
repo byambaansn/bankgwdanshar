@@ -271,6 +271,7 @@ class LoyaltyCharge
         if ($result['HttpCode'] == 200) {
             $responseXml = json_decode($result['Result'], true);
             $response['Message'] = $responseXml['info'];
+            $response['overRepaymentAmount'] = $responseXml['items']['0']['overRepaymentAmount'];
         } else {
             $response['Message'] = $responseXml['items']['0']['refundOverRepayment'];
         }
