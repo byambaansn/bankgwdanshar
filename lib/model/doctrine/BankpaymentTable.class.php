@@ -1388,27 +1388,43 @@ WHERE parent_id=$bankpaymentId";
                 if ($number) {
                     $bankpaymentRow->setTryCount($bankpaymentRow->getTryCount() + 1);
                 }
-                $bankpaymentRow->save();
+                
                 $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/Payment.log'));
-                $logger->log("========= over payment =========", sfFileLogger::INFO);
-                if (isset($result['overRepaymentAmount']) && $result['overRepaymentAmount'] > 0 ) {
-                    $logger->log('============Started overRepaymentAmount================', sfFileLogger::INFO);
-                    $item = array();
-                    $item['parent_id'] = $bankpaymentRow['id'];
-                    $item['vendor_id'] = $bankpaymentRow['vendor_id'];
-                    $item['type'] = $bankpaymentRow['type'];
-                    $item['bank_order_id'] = $bankpaymentRow['bank_order_id'];
-                    $item['paid_amount'] = $result['overRepaymentAmount'];
-                    $item['username'] = $this->getUser()->getUsername();
-                    $item['bank_payment_code'] = $bankpaymentRow['bank_payment_code'];
-                    $item['contract_number'] = $bankpaymentRow['contract_number'];
-                    $item['contract_name'] = $bankpaymentRow['contract_name'];
-                    $item['status'] = BankPaymentTable::STAT_REFUND;
-                    $item['status_comment'] = 'Over re-payment';
-                    $logger->log('overpayItem[paid_amount]='.$result['overRepaymentAmount'], sfFileLogger::INFO);
-                    $logger->log('bankpaymentRow[paid_amount]='.$bankpaymentRow['paid_amount'], sfFileLogger::INFO);   
-                    BankpaymentTable::insert($item);
+                if (isset($result['result']) ) {
+                    $items = $result['result']['items'];
+                    $total = 0;
+                    for($i = 0; $i < sizeof($items); $i++) {
+                        $overpayment = $items[$i]['overRepaymentAmount'];
+                        if( isset($overpayment) && $overpayment != '' && $overpayment > 0 ) {
+                            $logger->log("for[".$i."] = " . $overpayment, sfFileLogger::INFO);
+                            $total = $total + $overpayment;
+                        }
+                    }
+                    if( $total > 0 ) {
+                        if( $total == $bankpaymentRow['paid_amount'] ) {
+                            $bankpaymentRow['status'] = BankPaymentTable::STAT_REFUND;
+                        } else {
+                            try {
+                                $item = array();
+                                $item['parent_id'] = $bankpaymentRow['id'];
+                                $item['vendor_id'] = $bankpaymentRow['vendor_id'];
+                                $item['type'] = $bankpaymentRow['type'];
+                                $item['bank_order_id'] = $bankpaymentRow['bank_order_id'];
+                                $item['paid_amount'] = $total;
+                                $item['bank_payment_code'] = $bankpaymentRow['bank_payment_code'];
+                                $item['contract_number'] = $bankpaymentRow['contract_number'];
+                                $item['contract_name'] = $bankpaymentRow['contract_name'];
+                                $item['status'] = BankPaymentTable::STAT_REFUND;
+                                $item['status_comment'] = 'Over re-payment';
+                                $bankpaymentRow['paid_amount'] = $bankpaymentRow['paid_amount'] - $total;
+                                BankpaymentTable::insert($item);
+                            } catch(\Exception $ex) {
+                                $logger->log('Exception = '. $ex->getMessage(), sfFileLogger::INFO);
+                            }
+                        }
+                    }
                 }
+                $bankpaymentRow->save();
                 unset($item);
                 unset($bankpaymentRow);
             } catch (\Exception $ex) {
