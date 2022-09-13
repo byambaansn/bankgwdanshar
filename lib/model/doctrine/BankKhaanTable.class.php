@@ -125,6 +125,7 @@ class BankKhaanTable extends Doctrine_Table
                 ->where('charge_mobile = ?', $number)
                 ->addWhere('status = ?', self::STAT_NEW)
                 ->addWhere('bank_account = ?', $bank_account)
+                ->addWhere('related_account = ?', $related_account)
                 ->addWhere('order_amount = ?', $amount);
         return $q->execute();
     }
@@ -149,6 +150,16 @@ class BankKhaanTable extends Doctrine_Table
         $q->addWhere('vendor_id = ?', VendorTable::BANK_KHAAN)
                 ->orderBy('status DESC, id DESC');
         $request = sfContext::getInstance()->getRequest();
+
+        $orderedMobile = (int) $request->getParameter('orderedMobile');
+        if ($orderedMobile) {
+            $q->addWhere('order_mobile = ?', $orderedMobile);
+        }
+         // optional
+         $relatedAccount = (int) $request->getParameter('relatedAccount');
+         if ($relatedAccount) {
+             $q->addWhere('related_account = ?', $relatedAccount);
+         }
 
         // mandatory
         $dateFrom = $request->getParameter('dateFrom') ? $request->getParameter('dateFrom') : date('Y-m-d');
@@ -222,6 +233,12 @@ class BankKhaanTable extends Doctrine_Table
             $where[] = "b.bank_account IN (" . implode(',', $account) . ")";
         } else {
             $where[] = "b.bank_account ='$account'";
+        }
+
+        // optional
+        $relatedAccount = (int) $request->getParameter('relatedAccount');
+        if ($relatedAccount) {
+            $where[] = "b.related_account ='$relatedAccount'";
         }
 
         // optional
@@ -364,6 +381,7 @@ class BankKhaanTable extends Doctrine_Table
         $bankOrder->order_id = $trans['JournalNo'];
         $bankOrder->order_id_date = $trans['TxnDate'];
         $bankOrder->bank_account = $trans['Account'];
+        $bankOrder->relatedAccount = $trans['relatedAccount'];
         $bankOrder->order_p = $trans['TxnDesc'];
         $bankOrder->order_type = $trans['TxnType'];
         $bankOrder->order_amount = $trans['Amount'];
@@ -479,6 +497,7 @@ class BankKhaanTable extends Doctrine_Table
                 $param = array();
                 $param['TxnType'] = $trans['type'];
                 $param['Account'] = $trans['acct'];
+                
                 $param['JournalNo'] = $trans['jrnl'];
                 $param['TxnDesc'] = AppTools::cp1251_utf8($trans['desc']);
                 $param['Amount'] = (double) $trans['amt'];
@@ -547,6 +566,9 @@ class BankKhaanTable extends Doctrine_Table
                     $param['TxnType'] = 'ADD';
                 }
                 $param['Account'] = "0000000" . substr($trans->account, 0, 9);
+                
+                $param['relatedAccount'] = substr($trans->relatedAccount, 0, 10);
+          
                 $param['JournalNo'] = $trans->record . $trans->account . $trans->journal;
                 $param['TxnDesc'] = htmlspecialchars(AppTools::cp1251_utf8($trans->description), ENT_QUOTES);
                 $param['Amount'] = abs((double) $trans->amount);
@@ -587,7 +609,6 @@ class BankKhaanTable extends Doctrine_Table
                               WHERE account = '" . $trans->account . "'
                               LIMIT 1";
                     $pdo->exec($sql);
-
                 } catch (\Exception $exc) {
                     print_r("error");
                     $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/my-khaan-order.log'));
@@ -614,6 +635,7 @@ class BankKhaanTable extends Doctrine_Table
                     $param['TxnType'] = 'ADD';
                 }
                 $param['Account'] = "0000000" . substr($trans->account, 0, 9);
+                $param['relatedAccount'] = substr($trans->relatedAccount, 0, 10);
                 $param['JournalNo'] = $trans->record . $trans->account . $trans->journal;
                 $param['TxnDesc'] = AppTools::cp1251_utf8($trans->description);
                 $param['Amount'] = abs((double) $trans->amount);

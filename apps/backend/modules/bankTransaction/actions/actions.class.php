@@ -182,7 +182,7 @@ class bankTransactionActions extends sfActions
 //print_r($results->getResults()[0]->BankAccount->type);
 //die();
         if ($this->excel) {
-            $results = TransactionTable::getListCustom($this->dateFrom, $this->dateTo, $this->bank, $this->orderId, $this->orderType, $this->orderAmount, $this->orderValue, $this->accountNumber, $this->status, $this->bankDate);
+            $results = TransactionTable::getListCustom($this->dateFrom, $this->dateTo, $this->bank, $this->orderId, $this->orderType, $this->orderAmount, $this->orderValue, $this->accountNumber, $this->relatedAccount, $this->status, $this->bankDate);
 
             set_time_limit(0);
             ini_set("memory_limit", "1024M");
@@ -192,6 +192,7 @@ class bankTransactionActions extends sfActions
             $data = "БАНК;";
             $data .= "№ ГҮЙЛГЭЭ;";
             $data .= "ДАНСНЫ ДУГААР;";
+            $data .= "ХАРЬЦСАН ДАНС;";
             $data .= "ТӨЛӨВ;";
             $data .= "ГҮЙЛГЭЭНИЙ ТӨРӨЛ;";
             $data .= "ГҮЙЛГЭЭНИЙ УТГА;";
@@ -205,6 +206,7 @@ class bankTransactionActions extends sfActions
                 $data.='"' . $row['bank_name'] . '";';
                 $data.='"' . $row['order_id'] . '";';
                 $data.='"' . $row['bank_account'] . '";';
+                $data.='"' . $row['related_account'] . '";';
                 $data.='"' . $status . '";';
                 $data.='"' . $row['order_type'] . '";';
                 $data.='"' . $row['order_p'] . '";';
@@ -596,6 +598,7 @@ class bankTransactionActions extends sfActions
             $data = "БАНК;";
             $data .= "№ ГҮЙЛГЭЭ;";
             $data .= "ДАНСНЫ ДУГААР;";
+            $data .= "ХАРЬЦСАН ДАНС;";
             $data .= "ТӨЛӨВ;";
             $data .= "ГҮЙЛГЭЭНИЙ УТГА;";
             $data .= "ГҮЙЛГЭЭНИЙ ДҮН ;";
@@ -612,6 +615,7 @@ class bankTransactionActions extends sfActions
                 $data.='"' . $row['bank_name'] . '";';
                 $data.='"' . $row['order_id'] . '";';
                 $data.='"' . $row['bank_account'] . '";';
+                $data.='"' . $row['related_account'] . '";';
                 $data.='"' . $row['status'] . '";';
                 $data.='"' . $row['order_p'] . '";';
                 if ($row['order_type'] == 'SUB') {
@@ -631,7 +635,7 @@ class bankTransactionActions extends sfActions
             AppTools::ExportCsv($data, $filename, false);
             die();
         } elseif ($sap && $this->getUser()->hasCredential('transaction_admin')) {
-            $results = PaymentTable::getListCustom(2, $this->dateFrom, $this->dateTo, $this->bank, $this->account, $this->orderId, $this->orderAmount, $this->orderValue, $this->status, $this->type, $this->bankDate);
+            $results = PaymentTable::getListCustom(2, $this->dateFrom, $this->dateTo, $this->bank, $this->account, $this->relatedAccount, $this->orderId, $this->orderAmount, $this->orderValue, $this->status, $this->type, $this->bankDate);
             set_time_limit(0);
             ini_set("memory_limit", "1024M");
 
