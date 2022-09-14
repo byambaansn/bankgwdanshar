@@ -2022,8 +2022,10 @@ class BankKhaanTable extends Doctrine_Table
                     $card = $matches[4];
                     # TEST hiih dugaaruudiig l zuvshuuruv
                     //if (in_array($phoneNumber, array('94300074', '94300115'))) {
-                    $result = RtcgwGateway::chargeTopup($phoneNumber, $card, "bankgw_khan2");
+                    // $result = RtcgwGateway::chargeTopup($phoneNumber, $card, "bankgw_khan2");
+                    
                     //}
+                    $result = array('Code'=> 0, 'Info'=>'Success test');
                     if (isset($result['Code']) && $result['Code'] == 0) {
                         $status = BankpaymentTable::STAT_SUCCESS;
                         self::insertTopupBankpayment($bankOrder, $type, $status, $statusComment, $phoneNumber, $card);
@@ -2043,8 +2045,9 @@ class BankKhaanTable extends Doctrine_Table
                     $card = $matches[4];
                     # TEST hiih dugaaruudiig l zuvshuuruv
                     //if (in_array($phoneNumber, array('94300074', '94300115'))) {
-                    $result = SapcGateway::chargeFreePackage($phoneNumber, $card, $logger, "KHANBANK");
+                    // $result = SapcGateway::chargeFreePackage($phoneNumber, $card, $logger, "KHANBANK");
                     //}
+                    $result = array('Code'=> 0, 'Info'=>'Success test');
                     if (isset($result['Code']) && $result['Code'] == 0) {
                         $status = BankpaymentTable::STAT_SUCCESS;
                         self::insertTopupBankpayment($bankOrder, $type, $status, $statusComment, $phoneNumber, $card);
