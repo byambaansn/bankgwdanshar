@@ -381,7 +381,7 @@ class BankKhaanTable extends Doctrine_Table
         $bankOrder->order_id = $trans['JournalNo'];
         $bankOrder->order_id_date = $trans['TxnDate'];
         $bankOrder->bank_account = $trans['Account'];
-        $bankOrder->relatedAccount = $trans['relatedAccount'];
+        $bankOrder->related_account = $trans['relatedAccount'];
         $bankOrder->order_p = $trans['TxnDesc'];
         $bankOrder->order_type = $trans['TxnType'];
         $bankOrder->order_amount = $trans['Amount'];
@@ -497,7 +497,7 @@ class BankKhaanTable extends Doctrine_Table
                 $param = array();
                 $param['TxnType'] = $trans['type'];
                 $param['Account'] = $trans['acct'];
-                
+           
                 $param['JournalNo'] = $trans['jrnl'];
                 $param['TxnDesc'] = AppTools::cp1251_utf8($trans['desc']);
                 $param['Amount'] = (double) $trans['amt'];
@@ -567,7 +567,7 @@ class BankKhaanTable extends Doctrine_Table
                 }
                 $param['Account'] = "0000000" . substr($trans->account, 0, 9);
                 
-                $param['relatedAccount'] = substr($trans->relatedAccount, 0, 10);
+                $param['relatedAccount'] = "" . substr($trans->relatedAccount, 0, 10);
           
                 $param['JournalNo'] = $trans->record . $trans->account . $trans->journal;
                 $param['TxnDesc'] = htmlspecialchars(AppTools::cp1251_utf8($trans->description), ENT_QUOTES);
