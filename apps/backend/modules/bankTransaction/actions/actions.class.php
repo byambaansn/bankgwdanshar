@@ -595,10 +595,11 @@ class bankTransactionActions extends sfActions
 
             $filename = 'transaction_payment';
 
+
             $data = "БАНК;";
             $data .= "№ ГҮЙЛГЭЭ;";
             $data .= "ДАНСНЫ ДУГААР;";
-            $data .= "ХАРЬЦСАН ДАНС;";
+        
             $data .= "ТӨЛӨВ;";
             $data .= "ГҮЙЛГЭЭНИЙ УТГА;";
             $data .= "ГҮЙЛГЭЭНИЙ ДҮН ;";
@@ -615,7 +616,7 @@ class bankTransactionActions extends sfActions
                 $data.='"' . $row['bank_name'] . '";';
                 $data.='"' . $row['order_id'] . '";';
                 $data.='"' . $row['bank_account'] . '";';
-                $data.='"' . $row['related_account'] . '";';
+              
                 $data.='"' . $row['status'] . '";';
                 $data.='"' . $row['order_p'] . '";';
                 if ($row['order_type'] == 'SUB') {

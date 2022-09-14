@@ -50,6 +50,7 @@
         <tr>
             <th rowspan="2" width="90">№ ГҮЙЛГЭЭ</th>
             <th rowspan="2" width="90">ДАНСНЫ ДУГААР</th>
+            <th  rowspan="2" width="90">ХАРЬЦСАН ДАНС</th>
             <th colspan="2">ДУГААР</th>
             <th rowspan="2" width="60">ТӨРӨЛ</th>
             <th colspan="3">ЦЭНЭГЛЭЛТ ₮</th>
@@ -73,6 +74,7 @@
             <tr>
                 <td><?php echo $khaan->order_id ?></td>
                 <td><?php echo $khaan->bank_account ?></td>
+                <td><?php echo $khaan->related_account ?></td>
                 <td><?php echo $khaan->charge_mobile ?></td>
                 <td><?php echo $khaan->order_mobile ?></td>
                 <td align="center"><?php echo $khaan->order_type ?></td>

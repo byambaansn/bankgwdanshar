@@ -298,6 +298,7 @@ class khaanActions extends sfActions
         $this->forward404Unless($this->bankKhaan);
 
         $this->chargeResponse = LogTools::getLogKhaanChargeCallPayment($request->getParameter('id'));
+        
     }
 
     /**

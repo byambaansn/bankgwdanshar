@@ -125,7 +125,7 @@ class BankKhaanTable extends Doctrine_Table
                 ->where('charge_mobile = ?', $number)
                 ->addWhere('status = ?', self::STAT_NEW)
                 ->addWhere('bank_account = ?', $bank_account)
-                ->addWhere('related_account = ?', $related_account)
+              
                 ->addWhere('order_amount = ?', $amount);
         return $q->execute();
     }
@@ -2066,7 +2066,8 @@ class BankKhaanTable extends Doctrine_Table
                     $card = $matches[4];
                     # TEST hiih dugaaruudiig l zuvshuuruv
                     //if (in_array($phoneNumber, array('94300074', '94300115'))) {
-                    $result = RtcgwGateway::chargeTopup($phoneNumber, $card, "bankgw_khan2");
+                   // $result = RtcgwGateway::chargeTopup($phoneNumber, $card, "bankgw_khan2");
+                   $result = 
                     //}
                     if (isset($result['Code']) && $result['Code'] == 0) {
                         $status = BankpaymentTable::STAT_SUCCESS;

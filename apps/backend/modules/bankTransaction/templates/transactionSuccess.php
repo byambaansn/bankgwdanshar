@@ -1,4 +1,5 @@
 <form id="form" action="<?php echo url_for('@transaction_list') ?>" autocomplete="off">
+
     <fieldset>
         <legend>ХАЙЛТ</legend>
         <div style="width: 500px;float: left">
