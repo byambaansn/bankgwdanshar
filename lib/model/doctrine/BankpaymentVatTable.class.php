@@ -53,7 +53,7 @@ class BankpaymentVatTable extends Doctrine_Table
         $pdo->beginTransaction();
         $query = "SELECT b.id,b.parent_id,b.vendor_id,b.contract_number,b.bill_cycle,b.paid_amount,b.bank_order_id FROM `bankpayment` b
                     LEFT JOIN bankpayment_vat vat on vat.bankpayment_id=b.id
-                    WHERE vat.status IS NULL and b.status=3 AND b.id>14981494
+                    WHERE vat.status IS NULL and b.status=3 AND b.created_at > DATE_SUB(now(),INTERVAL 7 day) 
                     LIMIT $limit FOR UPDATE";
         $rows = $pdo->query($query)->fetchAll(PDO::FETCH_ASSOC);
         foreach ($rows as $row) {
