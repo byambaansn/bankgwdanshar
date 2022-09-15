@@ -99,7 +99,7 @@ class cronActions extends sfActions
      */
     public function executeKhaanBank(sfWebRequest $request)
     {
-        $limit = 50;
+        $limit = sfConfig::get('app_bankpayment_khan_charge_limit');
         if ($request->getParameter('limit')) {
             $limit = $request->getParameter('limit');
         }
@@ -121,7 +121,7 @@ class cronActions extends sfActions
      */
     public function executeKhaanBankCharge(sfWebRequest $request)
     {
-        $limit = 150;
+        $limit = sfConfig::get('app_bankpayment_khan_charge_limit');
         if ($request->getParameter('limit')) {
             $limit = $request->getParameter('limit');
         }
@@ -152,7 +152,7 @@ class cronActions extends sfActions
     }
     
     public function executeKhaanSetAssignment(sfWebRequest $request) {
-        $limit = 150;
+        $limit = sfConfig::get('app_bankpayment_khan_assignment_limit');
         if ($request->getParameter('limit')) {
             $limit = $request->getParameter('limit');
         }
@@ -381,7 +381,7 @@ class cronActions extends sfActions
      */
     public function executeBankpayment(sfWebRequest $request)
     {
-        $limit = 100;
+        $limit = sfConfig::get('app_bankpayment_khan_payment_limit');
         if ($request->getParameter('limit')) {
             $limit = $request->getParameter('limit');
         }
