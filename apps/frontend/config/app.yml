@@ -12,6 +12,10 @@ all:
   bankpayment:
     gsm_limit: 81000
     nsl_limit: 1500
+    vat_days: 7
+    khan_payment_limit: 200
+    khan_charge_limit: 150
+    khan_assignment_limit: 150
   postgateway:
     #api: http://172.27.27.11:8080/Postgw/Postgw
     #api: http://172.22.2.58:80/Postgw/Postgw
