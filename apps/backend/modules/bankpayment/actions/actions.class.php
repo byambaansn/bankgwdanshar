@@ -853,7 +853,7 @@ class bankpaymentActions extends sfActions
         }
         $this->staff = mysql_escape_string($request->getParameter('staff'));
         $this->keyword = mysql_escape_string($request->getParameter('keyword'));
-        $this->type = array(BankpaymentTable::TYPE_TOPUP, BankpaymentTable::TYPE_SAPC, BankpaymentTable::TYPE_WIFI);
+        $this->type = array(BankpaymentTable::TYPE_CALL_PAYMENT,BankpaymentTable::TYPE_TOPUP, BankpaymentTable::TYPE_SAPC, BankpaymentTable::TYPE_WIFI,);
         if ($this->ussd) {
             $this->type = $this->ussd;
         }
@@ -918,6 +918,40 @@ class bankpaymentActions extends sfActions
         }
     }
 
+
+     /**
+     * Topup цэнэглэлт
+     * 
+     * @param sfWebRequest $request
+     */
+    public function executeChargeData(sfWebRequest $request)
+    {   
+        if($request->isMethod('POST')){
+
+            $bankpayment = BankpaymentTable::retrieveByPK($id);
+            $number = $request->getParameter('number');
+            $card = $request->getParameter('card', 0);
+        }
+    }
+                  
+         /**
+     * Topup цэнэглэлт
+     * 
+     * @param sfWebRequest $request
+     */
+    public function executeChargeUnit(sfWebRequest $request)
+    {   
+    
+        $number = $request->getParameter('number');
+        $card = $request->getParameter('card');
+        $userId =$bankpayment['paid_amount'];
+
+        $result=RtcgwGateway::chargeTopup($number, $card, $userId);
+      
+       
+}
+    
+
     /**
      * Topup цэнэглэлт , DATA sapc , WIFI Card
      * 
@@ -925,8 +959,8 @@ class bankpaymentActions extends sfActions
      */
     public function executeUssdUpdate(sfWebRequest $request)
     {
-        $id = $request->getParameter('id', 0);
-        $number = $request->getParameter('number', 0);
+            $id = $request->getParameter('id', 0);
+            $number = $request->getParameter('number', 0);
         $cart = $request->getParameter('cart', 0);
 
         $bankpayment = BankpaymentTable::retrieveByPK($id);
