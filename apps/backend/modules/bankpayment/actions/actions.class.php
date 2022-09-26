@@ -927,10 +927,18 @@ class bankpaymentActions extends sfActions
     public function executeChargeData(sfWebRequest $request)
     {   
         if($request->isMethod('POST')){
-
+          /*  @param String $number утасны дугаар
+          * @param String $card profile code
+          * @param integer $userId төлөх дүн
+          * @param integer $chargerId төлөлт хийж буй огноо
+          * @return array Цэнэгэлэлт орсон тухай*/
             $bankpayment = BankpaymentTable::retrieveByPK($id);
             $number = $request->getParameter('number');
-            $card = $request->getParameter('card', 0);
+            $profile = $request->getParameter('card', 0);
+            $result= SapcGateway::chargeFreePackage($msisdn, $rofile, $logger, $bankName);
+            if(isset($result)){
+                $code==1;
+            }else{$code==0;}
         }
     }
                   
@@ -941,14 +949,16 @@ class bankpaymentActions extends sfActions
      */
     public function executeChargeUnit(sfWebRequest $request)
     {   
-    
+    if($request->isMethod('post')){
         $number = $request->getParameter('number');
         $card = $request->getParameter('card');
         $userId =$bankpayment['paid_amount'];
 
         $result=RtcgwGateway::chargeTopup($number, $card, $userId);
-      
-       
+        if(isset($result)){
+            $code=1;
+        }else {$code=0;}
+    }
 }
     
 
@@ -979,7 +989,18 @@ class bankpaymentActions extends sfActions
         }
         if ($request->isMethod('post')) {
             try {
-                $status = $bankpayment->getStatus();
+                $trans = array();
+                $number = $request->getParameter('number');
+                $card = $_POST['$card'];
+                $userId =$bankpayment['paid_amount'];
+                $trans['user_name'] = $this->getUser()->getUsername();
+            
+               
+
+                $result=RtcgwGateway::chargeTopup($number, $card, $userId);
+            
+                $bankTransaction = BankpaymentTable::getBankTransaction($bankpayment->getVendorId(), $bankpayment->getBankOrderId());
+             
                 $bankpayment->setUpdatedUserId($this->getUser()->getId());
                 $bankpayment->setUsername($this->getUser()->getUsername());
                 $bankpayment->setUpdatedAt(date('Y-m-d H:i:s'));
@@ -989,12 +1010,14 @@ class bankpaymentActions extends sfActions
                 LogTools::setLogBankpayment($bankpayment);
                 $this->getUser()->setFlash('success', "Утасны дугаарыг амжилттай заслаа.");
             } catch (Exception $exc) {
-                $this->getUser()->setFlash('error', "Гэрээний дугаар засах хүсэлт амжилтгүй.");
+                $this->getUser()->setFlash('error', "aldaa");
             }
             $this->redirect($request->getReferer());
         }
+        $this->types = PaymentTypeTable::getForSelect();
         $this->transaction = BankpaymentTable::getBankTransaction($bankpayment['vendor_id'], $bankpayment['bank_order_id']);
         $this->bankpayment = $bankpayment;
+        
     }
 
     public function executeReturn(sfWebRequest $request)

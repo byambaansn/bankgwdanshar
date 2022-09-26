@@ -25,6 +25,7 @@ bank_loyaltyapi_outcome_success:
   param: { module: candyLoan, action: successOutcome }
 
 
+
 # Bankpayment
 bankpayment_ussd:
   url: /manage/bankpayment/ussd
