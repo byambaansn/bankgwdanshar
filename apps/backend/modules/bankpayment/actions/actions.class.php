@@ -949,16 +949,21 @@ class bankpaymentActions extends sfActions
      */
     public function executeChargeUnit(sfWebRequest $request)
     {   
-    if($request->isMethod('post')){
-        $number = $request->getParameter('number');
-        $card = $request->getParameter('card');
-        $userId =$bankpayment['paid_amount'];
-
-        $result=RtcgwGateway::chargeTopup($number, $card, $userId);
+        $bankpayment->setUpdatedUserId($this->getUser()->getId());
+        $id = $request->getParameter('id', 0);
+        $number= $request -> getParameter('number');
+        $card= $request -> getParameter('card');
+        $result=RtcgwGateway::chargeTopup($number, $card, "bankgw_khan1");
         if(isset($result)){
             $code=1;
-        }else {$code=0;}
-    }
+
+            alert("1");
+        }else {$code=0;
+            alert("2");}
+        
+    
+    return sfView::NONE;
+    
 }
     
 
@@ -971,7 +976,7 @@ class bankpaymentActions extends sfActions
     {
             $id = $request->getParameter('id', 0);
             $number = $request->getParameter('number', 0);
-        $cart = $request->getParameter('cart', 0);
+            $cart = $request->getParameter('cart', 0);
 
         $bankpayment = BankpaymentTable::retrieveByPK($id);
         $this->forward404Unless($bankpayment);
@@ -987,17 +992,15 @@ class bankpaymentActions extends sfActions
             $message = '<div class="warning message">' . $block['block_date'] . ' -ны өдрөөр хаалт хийсэн тул энэ гүйлгээг засах боломжгүй.';
             return $this->renderText($message);
         }
+
         if ($request->isMethod('post')) {
             try {
+                $status = BankpaymentTable::STAT_NEW;
                 $trans = array();
-                $number = $request->getParameter('number');
-                $card = $_POST['$card'];
-                $userId =$bankpayment['paid_amount'];
+                $trans['old_bankpayment_id'] = $bankpayment['id'];
+                $trans['bankpayment_id'] = $bankpayment['id'];
                 $trans['user_name'] = $this->getUser()->getUsername();
-            
-               
-
-                $result=RtcgwGateway::chargeTopup($number, $card, $userId);
+                $trans['type'] = 'EDIT';
             
                 $bankTransaction = BankpaymentTable::getBankTransaction($bankpayment->getVendorId(), $bankpayment->getBankOrderId());
              

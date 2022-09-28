@@ -35,7 +35,7 @@ bankpayment_ussd_update:
   param: { module: bankpayment, action: ussdUpdate }  
 bankpayment_ussd_chargeunit:
   url: /manage/bankpayment/ussd/chargeunit
-  param: { module: bankpayment, action: ussdChargeUnit } 
+  param: { module: bankpayment, action: ChargeUnit } 
 bankpayment_ussd_chargedata:
 url: /manage/bankpayment/ussd/chargedata
 param: { module: bankpayment, action: ussdChargeData }

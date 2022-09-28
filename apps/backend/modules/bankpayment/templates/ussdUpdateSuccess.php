@@ -20,15 +20,15 @@
                     </tr>
                     <tr>
                         <td><b>Гүйлгээний утга:</b></td>
-                        <td>   <?php echo $transaction['order_p'] ?></td>
+                        <td> <?php echo $transaction['order_p'] ?></td>
                     </tr>
                     <tr>
-                        <td>   <b>Төлөлтийн дүн:</b></td>
-                        <td>  <?php echo $transaction['order_amount'] ?></td>
+                        <td> <b>Төлөлтийн дүн:</b></td>
+                        <td> <?php echo $transaction['order_amount'] ?></td>
                     </tr>
                     <tr>
                         <td><b>Төлөв:</b></td>
-                        <td>  <?php echo $bankpayment['status'] ?></td>
+                        <td> <?php echo $bankpayment['status'] ?></td>
                     </tr>
                     <tr>
                         <td> <b>Гэрээний дугаар:</b></td>
@@ -36,7 +36,7 @@
                     </tr>
                     <tr>
                         <td> <b>Утасны дугаар:</b></td>
-                        <td> <?php echo $bankpayment['contract_number'] ?></td>
+                        <td> <?php echo $bankpayment['number'] ?></td>
                     </tr>
                     <tr>
                         <td> <b>Гэрээний үлдэгдэл:</b></td>
@@ -90,11 +90,11 @@
 
                 <tbody id="unitRow" style="display:none;">
                     <tr>
-                        <td id="number0" class="number">
-                            <input class="number" type="text" name="number" value="" size="8" />
+                        <td  class="number1">
+                            <input id="number1" type="text" name="number1" value="" size="8" />
                         </td>
                         <td>
-                            <input list="unitType" name="unitType">
+                            <input list="unitType" id="uType" name="unitType">
                             <datalist id="unitType">
                                 <option value="promo">7000₮: 4000 нэгж+20 хоног 7gb дата </option>
                                 <option value="1000_opt1">1000₮</option>
@@ -112,8 +112,8 @@
                     <tr>
                         <td>Цэнэглэлт хийх</td>
                         <td>
-                            <button class="right btn btn-chargeunit" type="submit" name="btnChargeUnit"
-                                id="btnChargeUnit">Цэнэглэх</button>
+                            <input class="right btn btn-chargeunit" type="button" value="Цэнэглэх" name="btnChargeUnit"
+                                id="btnChargeUnit">
                         </td>
                     </tr>
                 </tbody>
@@ -247,17 +247,16 @@ $('#btnPayment').click(function() {
         });
     }
 });
+
+
 $('#btnChargeUnit').click(function() {
+    var number1= $('#number1').val();
+    var card= $('#uType').val();
     $.ajax({
         type: "POST",
-            url: "<?php echo url_for('@bankpayment_ussd_chargeunit') ?>",
-            data: 
-            "id=" + <?php echo $bankpayment['id']; ?> + 
-            "$number=" +$('#number').val()+ 
-            "$card=" + $('#unitType').val()+
-            "$order_amount=" + <?php echo $transaction['order_amount'] ?>,
+        url: "<?php echo url_for('@bankpayment_ussd_chargeunit') . "?id=" . $bankpayment['id'] . "?order_amount=" . $transaction['order_amount'] ?>&number="+number1+"&card="+card,
         dataType: "json",
-            success: function(data) {
+        success: function(data) {
             alert("Tseneglelt ok");
         },
         error: function(data) {
@@ -265,5 +264,4 @@ $('#btnChargeUnit').click(function() {
         }
     });
 });
-
 </script>
