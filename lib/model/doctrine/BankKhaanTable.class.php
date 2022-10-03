@@ -566,9 +566,7 @@ class BankKhaanTable extends Doctrine_Table
                     $param['TxnType'] = 'ADD';
                 }
                 $param['Account'] = "0000000" . substr($trans->account, 0, 9);
-                
-                $param['relatedAccount'] = "" . substr($trans->relatedAccount, 0, 10);
-          
+                $param['relatedAccount'] = "" . substr($trans->relatedAccount, 0, 9);
                 $param['JournalNo'] = $trans->record . $trans->account . $trans->journal;
                 $param['TxnDesc'] = htmlspecialchars(AppTools::cp1251_utf8($trans->description), ENT_QUOTES);
                 $param['Amount'] = abs((double) $trans->amount);
@@ -610,7 +608,7 @@ class BankKhaanTable extends Doctrine_Table
                               LIMIT 1";
                     $pdo->exec($sql);
                 } catch (\Exception $exc) {
-                    print_r("error");
+                   var_dump($exc);
                     $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/my-khaan-order.log'));
                     $logger->log('--ERROR--=' . trim($param['JournalNo']), sfFileLogger::INFO);
                     die();

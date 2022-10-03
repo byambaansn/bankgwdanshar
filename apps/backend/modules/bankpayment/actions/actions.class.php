@@ -831,7 +831,7 @@ class bankpaymentActions extends sfActions
         $this->transaction = BankpaymentTable::getBankTransaction($bankpayment['vendor_id'], $bankpayment['bank_order_id']);
         $this->bankpayment = $bankpayment;
     }
-
+    
     /**
      * Topup цэнэглэлт, DATA sapc , WIFI Card
      * 
@@ -919,53 +919,113 @@ class bankpaymentActions extends sfActions
     }
 
 
-     /**
-     * Topup цэнэглэлт
-     * 
-     * @param sfWebRequest $request
-     */
-    public function executeChargeData(sfWebRequest $request)
-    {   
-        if($request->isMethod('POST')){
-          /*  @param String $number утасны дугаар
-          * @param String $card profile code
-          * @param integer $userId төлөх дүн
-          * @param integer $chargerId төлөлт хийж буй огноо
-          * @return array Цэнэгэлэлт орсон тухай*/
-            $bankpayment = BankpaymentTable::retrieveByPK($id);
-            $number = $request->getParameter('number');
-            $profile = $request->getParameter('card', 0);
-            $result= SapcGateway::chargeFreePackage($msisdn, $rofile, $logger, $bankName);
-            if(isset($result)){
-                $code==1;
-            }else{$code==0;}
-        }
-    }
-                  
+    
          /**
      * Topup цэнэглэлт
      * 
      * @param sfWebRequest $request
      */
     public function executeChargeUnit(sfWebRequest $request)
-    {   
-        $bankpayment->setUpdatedUserId($this->getUser()->getId());
-        $id = $request->getParameter('id', 0);
+    { 
+        $id = $request->getParameter('id', 0);   
         $number= $request -> getParameter('number');
         $card= $request -> getParameter('card');
-        $result=RtcgwGateway::chargeTopup($number, $card, "bankgw_khan1");
-        if(isset($result)){
-            $code=1;
+        $userId = $this->getUser()->getId();
+        $bankpayment = BankpaymentTable::retrieveByPK($id);
+        $transaction = BankpaymentTable::getBankTransaction($bankpayment['vendor_id'], $bankpayment['bank_order_id']);
+        $this->forward404Unless($bankpayment);
+        $result=RtcgwGateway::chargeTopup($number, $card, $userId);
+               
+        if (isset($result['Code']) && $result['Code'] == 0) {
+            BankpaymentTable::updateStatus($id, BankpaymentTable::STAT_SUCCESS, 'Амжилттай цэнэглэсэн', $this->getUser()->getId(), $this->getUser()->getUsername());
+            $bankpayment->setUpdatedUserId($this->getUser()->getId());
+            $bankpayment->setUsername($this->getUser()->getUsername());
+            $bankpayment->setUpdatedAt(date('Y-m-d H:i:s'));
+            $bankpayment->setNumber($number);
+            $bankpayment->setContractName($card);
+        } else {
+            $statusComment = "Амжилтгүй";
+            $bankpayment->setStatus(BankpaymentTable::STAT_FAILED_CHARGE);  
+        }
+        $bankpayment->save();
+        LogTools::setLogBankpayment($bankpayment);
+        $this->redirect($request->getReferer());
+        $this->types = PaymentTypeTable::getForSelect();
+        $this->transaction = BankpaymentTable::getBankTransaction($bankpayment['vendor_id'], $bankpayment['bank_order_id']);
+        $this->bankpayment = $bankpayment;
+    }
+                
 
-            alert("1");
-        }else {$code=0;
-            alert("2");}
-        
-    
-    return sfView::NONE;
-    
-}
-    
+     /**
+     * Sapc цэнэглэлт
+     * 
+     * @param sfWebRequest $request
+     */
+    public function executeChargeData(sfWebRequest $request)
+    {   $id = $request->getParameter('id', 0);  
+        $number= $request -> getParameter('number');
+        $card= $request -> getParameter('card');
+        $userId = $this->getUser()->getId();
+        $bankpayment = BankpaymentTable::retrieveByPK($id);
+        $transaction = BankpaymentTable::getBankTransaction($bankpayment['vendor_id'], $bankpayment['bank_order_id']);
+        $this->forward404Unless($bankpayment);
+
+        $result= SapcGateway::chargeFreePackage($number, $card, $logger, $userId);
+       
+        if (isset($result['Code']) && $result['Code'] == 0) {
+            BankpaymentTable::updateStatus($id, BankpaymentTable::STAT_SUCCESS, 'Амжилттай цэнэглэсэн', $this->getUser()->getId(), $this->getUser()->getUsername());
+            $bankpayment->setUpdatedUserId($this->getUser()->getId());
+            $bankpayment->setUsername($this->getUser()->getUsername());
+            $bankpayment->setUpdatedAt(date('Y-m-d H:i:s'));
+            $bankpayment->setNumber($number);
+            $bankpayment->setContractName($card);
+        } else {
+            $statusComment = "Амжилтгүй";
+            $bankpayment->setStatus(BankpaymentTable::STAT_FAILED_CHARGE); 
+        } 
+        $bankpayment->save();
+        LogTools::setLogBankpayment($bankpayment);
+        $this->redirect($request->getReferer());
+        $this->types = PaymentTypeTable::getForSelect();
+        $this->transaction = BankpaymentTable::getBankTransaction($bankpayment['vendor_id'], $bankpayment['bank_order_id']);
+        $this->bankpayment = $bankpayment;      
+    }
+                  
+     /**
+     * Задгай нэгж цэнэглэлт
+     * 
+     * @param sfWebRequest $request
+     */
+    public function executeChargeSmall(sfWebRequest $request)
+    {   
+        $number= $request -> getParameter('number');
+        $amount= $request -> getParameter('order_amount');
+        $id = $request->getParameter('id', 0);  
+        $userId = $this->getUser()->getId();
+        $bankpayment = BankpaymentTable::retrieveByPK($id);
+        $transaction = BankpaymentTable::getBankTransaction($bankpayment['vendor_id'], $bankpayment['bank_order_id']);
+        $this->forward404Unless($bankpayment);
+
+        $result = SmallUnitGateway::chargeUnit($number, $amount, 'bankgw_bankpayment', $userId);
+        if (isset($result['Code']) && $result['Code'] == 0) {
+            BankpaymentTable::updateStatus($id, BankpaymentTable::STAT_SUCCESS, 'Амжилттай цэнэглэсэн', $this->getUser()->getId(), $this->getUser()->getUsername());
+            $bankpayment->setUpdatedUserId($this->getUser()->getId());
+            $bankpayment->setUsername($this->getUser()->getUsername());
+            $bankpayment->setUpdatedAt(date('Y-m-d H:i:s'));
+            $bankpayment->setNumber($number);
+            $bankpayment->setContractName($amount);
+        } else {
+            $statusComment = "Амжилтгүй";
+            $bankpayment->setStatus(BankpaymentTable::STAT_FAILED_CHARGE); 
+        }
+        $bankpayment->save();
+        LogTools::setLogBankpayment($bankpayment);
+        $this->redirect($request->getReferer());
+        $this->types = PaymentTypeTable::getForSelect();
+        $this->transaction = BankpaymentTable::getBankTransaction($bankpayment['vendor_id'], $bankpayment['bank_order_id']);
+        $this->bankpayment = $bankpayment;  
+    }
+           
 
     /**
      * Topup цэнэглэлт , DATA sapc , WIFI Card
@@ -976,7 +1036,7 @@ class bankpaymentActions extends sfActions
     {
             $id = $request->getParameter('id', 0);
             $number = $request->getParameter('number', 0);
-            $cart = $request->getParameter('cart', 0);
+            $card = $request->getParameter('card', 0);
 
         $bankpayment = BankpaymentTable::retrieveByPK($id);
         $this->forward404Unless($bankpayment);

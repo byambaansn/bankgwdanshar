@@ -34,11 +34,14 @@ bankpayment_ussd_update:
   url: /manage/bankpayment/ussd/update
   param: { module: bankpayment, action: ussdUpdate }  
 bankpayment_ussd_chargeunit:
-  url: /manage/bankpayment/ussd/chargeunit
-  param: { module: bankpayment, action: ChargeUnit } 
+  url: /manage/bankpayment/chargeunit
+  param: { module: bankpayment, action: chargeUnit } 
 bankpayment_ussd_chargedata:
-url: /manage/bankpayment/ussd/chargedata
-param: { module: bankpayment, action: ussdChargeData }
+  url: /manage/bankpayment/chargedata
+  param: { module: bankpayment, action: chargeData }
+bankpayment_ussd_chargesmall:
+  url: /manage/bankpayment/chargesmall
+  param: { module: bankpayment, action: chargeSmall}
 bankpayment_mobinet_prepaid:
   url: /manage/bankpayment/mobinet/prepaid/:page.html
   param: { module: bankpayment, action: mobinetPrepaid, page: 1 }

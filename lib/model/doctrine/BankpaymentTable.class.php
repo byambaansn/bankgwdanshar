@@ -13,7 +13,7 @@ class BankpaymentTable extends Doctrine_Table
     const STAT_SUCCESS = 3;
     const STAT_FAILED_CHARGE = 4;
     const STAT_BANKPAYMENT_AMOUNT = 5; // Гэрээний үлдэгдэлээс зөрүүтэй 3000
-    const STAT_BANKPAYMENT_TRANS_VALUE = 6; // Гүйлгээний утгаk буруу
+    const STAT_BANKPAYMENT_TRANS_VALUE = 6; // Гүйлгээний утга буруу
     const STAT_FAILED_BILL_INFO = 7; // bill- medeelel tatagdsangui
     const STAT_IMPOSSIBLE = 8; // Bolomjgui
     const STAT_REFUND = 9; // Butsaalt
@@ -881,7 +881,7 @@ WHERE parent_id=$bankpaymentId";
     /**
      * Дахин дуудсан ажилтан авах
      * @param integer $bankpaymentId
-     * @return Chlid count | null
+     * @return Child count | null
      */
     public static function getForSelectStaff($type)
     {
@@ -1230,7 +1230,7 @@ WHERE parent_id=$bankpaymentId";
 		LEFT OUTER JOIN bank_transaction.payment_type E ON D.type_id = E.id
             WHERE IFNULL(pa.id,0) = 0 AND b.status < CASE WHEN ref.type = 'REFUND' AND ref.refund_type = 'PAYMENTTYPE' AND b.status = 9 THEN 10 ELSE 9 END AND $where ) t1 " . $whereTwo;
         $query .= " ORDER BY t1.created_at DESC";
-        //echo $query;        die();
+//        echo $query;        die();
         $rows = $pdo->query($query)->fetchAll(PDO::FETCH_ASSOC);
         return $rows;
     }

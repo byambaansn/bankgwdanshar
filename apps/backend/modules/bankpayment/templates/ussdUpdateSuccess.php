@@ -119,11 +119,11 @@
                 </tbody>
                 <tbody id="dataRow" style="display:none;">
                     <tr>
-                        <td id="number0" class="number">
-                            <input class="number" type="text" name="number" value="" size="8" />
+                        <td class="number">
+                            <input class="number"  id="number2"type="text" name="number" value="" size="8" />
                         </td>
                         <td>
-                            <input list="dataType" name="dataType">
+                            <input list="dataType" id="dType" name="dataType">
                             <datalist id="dataType">
                                 <option value="OnDemand_2DAY">2 хоног 2gb 2000₮</option>
                                 <option value="OnDemand_4DAY">4 хоног 4gb 4000₮</option>
@@ -155,15 +155,15 @@
                         <td>Цэнэглэлт хийх</td>
                         <td>
                             <input class="right btn btn-chargedata" type="button" value="Цэнэглэх" name="btnchargedata"
-                                id="btnChargedata">
+                                id="btnChargeData">
                         </td>
                     </tr>
                 </tbody>
                 <tbody id="smallUnitRow" style="display:none;">
                     <tr>
 
-                        <td id="number0" class="number">
-                            <input class="number" type="text" name="number" value="" size="8" />
+                        <td class="number">
+                            <input id="number3" class="number" type="text" name="number" value="" size="8" />
                         </td>
                         <td id="amt0" class="amt">
                             <input id="amount" type="text" name="amount" value="0" size="10" />
@@ -173,7 +173,7 @@
                         <td>Цэнэглэлт хийх</td>
                         <td>
                             <input class="right btn btn-chargesmall" type="button" value="Цэнэглэх"
-                                name="btnchargesmall" id="btnChargesmall">
+                                name="btnchargesmall" id="btnChargeSmall">
                         </td>
                     </tr>
                 </tbody>
@@ -250,18 +250,61 @@ $('#btnPayment').click(function() {
 
 
 $('#btnChargeUnit').click(function() {
-    var number1= $('#number1').val();
-    var card= $('#uType').val();
+    if ($('#uType').val() == "")
+        alert('Та цэнэглэх картаа сонгоно уу!!!');
+    else
+    if (confirm('Та цэнэглэхдээ итгэлтэй байна уу?')) {
     $.ajax({
+        url: "<?php echo url_for('@bankpayment_ussd_chargeunit')?>",
+        data: "id=" + <?php echo $bankpayment['id']; ?> + "&number="+$('#number1').val()+"&card="+$('#uType').val(),
         type: "POST",
-        url: "<?php echo url_for('@bankpayment_ussd_chargeunit') . "?id=" . $bankpayment['id'] . "?order_amount=" . $transaction['order_amount'] ?>&number="+number1+"&card="+card,
-        dataType: "json",
         success: function(data) {
-            alert("Tseneglelt ok");
+            alert("Амжилттай цэнэглэгдлээ");
         },
         error: function(data) {
-            alert("Tseneglelt amjiltgui");
+            alert("Цэнэглэлт амжилтгүй");
         }
     });
+}
+});
+
+
+$('#btnChargeData').click(function() {
+    if ($('#uType').val() == "")
+        alert('Та цэнэглэх картаа сонгоно уу!!!');
+    else
+    if (confirm('Та цэнэглэхдээ итгэлтэй байна уу?')) {
+    $.ajax({
+        url: "<?php echo url_for('@bankpayment_ussd_chargedata')?>",
+        data: "number="+$('#number2').val()+"&card="+$('#dType').val(),
+        type: "POST",
+        success: function(data) {
+            alert("Амжилттай цэнэгллээ");
+        },
+        error: function(data) {
+            alert("Цэнэглэлт амжилтгүй");
+        }
+    });
+  }
+});
+
+$('#btnChargeSmall').click(function() {
+    if ($('#amount').val() == 0)
+        alert('Та цэнэглэх дүнгээ оруулна уу!!!');
+    else
+    if (confirm('Та цэнэглэхдээ итгэлтэй байна уу?')) {
+
+    $.ajax({
+        url: "<?php echo url_for('@bankpayment_ussd_chargesmall')?>",
+        data: "number="+$('#number3').val()+"&amount="+$('#amount').val()+"&order_amount="+ <?php echo $transaction['order_amount'] ?>,
+        type: "POST",
+        success: function(data) {
+            alert("Амжилттай цэнэгллээ");
+        },
+        error: function(data) {
+            alert("Цэнэглэлт амжилтгүй");
+        }
+    });
+}
 });
 </script>

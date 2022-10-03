@@ -9,3 +9,7 @@ web/backend_dev.php
 
 web/backend_dev.php
 lib/model/doctrine/BankKhaanTable.class.php
+web/frontend_dev.php
+lib/LogTools.class.php
+lib/model/doctrine/BankKhaanTable.class.php
+lib/model/doctrine/BankpaymentTable.class.php
