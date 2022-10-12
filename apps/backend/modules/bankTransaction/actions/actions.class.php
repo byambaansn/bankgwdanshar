@@ -152,7 +152,7 @@ class bankTransactionActions extends sfActions
         $this->orderAmount = $request->getParameter('order_amount');
         $this->orderValue = $request->getParameter('order_value');
         $this->accountNumber = $request->getParameter('account_number');
-        //$this->relatedAccount = $request->getParameter('related_account');
+
         $this->statuses = TransactionTable::getForSelectStatus();
         $this->banks = BankTable::getForSelect();
         $this->types = PaymentTypeTable::getForSelect();
@@ -181,7 +181,7 @@ class bankTransactionActions extends sfActions
 //print_r($results->getResults()[0]->BankAccount->type);
 //die();
         if ($this->excel) {
-            $results = TransactionTable::getListCustom($this->dateFrom, $this->dateTo, $this->bank, $this->orderId, $this->orderType, $this->orderAmount, $this->orderValue, $this->accountNumber, $this->relatedAccount, $this->status, $this->bankDate);
+            $results = TransactionTable::getListCustom($this->dateFrom, $this->dateTo, $this->bank, $this->orderId, $this->orderType, $this->orderAmount, $this->orderValue, $this->accountNumber, $this->status, $this->bankDate);
 
             set_time_limit(0);
             ini_set("memory_limit", "1024M");
@@ -635,7 +635,7 @@ class bankTransactionActions extends sfActions
             AppTools::ExportCsv($data, $filename, false);
             die();
         } elseif ($sap && $this->getUser()->hasCredential('transaction_admin')) {
-            $results = PaymentTable::getListCustom(2, $this->dateFrom, $this->dateTo, $this->bank, $this->account, $this->relatedAccount, $this->orderId, $this->orderAmount, $this->orderValue, $this->status, $this->type, $this->bankDate);
+            $results = PaymentTable::getListCustom(2, $this->dateFrom, $this->dateTo, $this->bank, $this->account, $this->orderId, $this->orderAmount, $this->orderValue, $this->status, $this->type, $this->bankDate);
             set_time_limit(0);
             ini_set("memory_limit", "1024M");
 
