@@ -974,7 +974,7 @@ class bankpaymentActions extends sfActions
      */
     public function executeChargeUnit(sfWebRequest $request)
     {   
-        $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/PaymentVAT/USSD/PaymentVAT_'.date('Y-m-d').'.log'));
+        $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/PaymentVAT/USSD/CHARGEUNIT_'.date('Y-m-d').'.log'));
         $id = $request->getParameter('id', 0);   
         $number= $request -> getParameter('number');
         $card= $request -> getParameter('card');
@@ -985,9 +985,6 @@ class bankpaymentActions extends sfActions
         $userId = $this->getUser()->getId();
         $bankpayment = BankpaymentTable::retrieveByPK($id);
         $transaction = BankpaymentTable::getBankTransaction($bankpayment['vendor_id'], $bankpayment['bank_order_id']);
-        
-        $logger->log("ChargeUnit - ", sfFileLogger::INFO);
-
         $yml = sfYaml::load(sfConfig::get('sf_config_dir') . '/unit_type.yml');
         $dun =  (float) 0.00;
         $optNegj = $yml['all']['opt_negj'];
@@ -1000,7 +997,7 @@ class bankpaymentActions extends sfActions
             
             $result=RtcgwGateway::chargeTopup($number, $card, $userId);
 
-            $logger->log("ChargeUnit -  chargeTopup -> result status ".$result['Code'], sfFileLogger::INFO);
+            $logger->log("ChargeUnit number: ".$number."Card:".$card." result code:".$result['Code'], sfFileLogger::INFO);
          
 
             if (isset($result['Code']) && $result['Code'] == 0) {
@@ -1017,22 +1014,22 @@ class bankpaymentActions extends sfActions
                         $bankName = VendorTable::getNameById($bankpayment['vendor_id']);
                         $phoneInfo = PostGateway::getPostPhoneInfo($number);
                         $contract = $phoneInfo['AccountNo'] ? $phoneInfo['AccountNo'] : $bankpayment['contract_number'];
-                        $productCode =  PaymentTypeTable::AUTO_PREPAID;;
+                        $productCode =  PaymentTypeTable::AUTO_PREPAID;
                         $productName = BaseSms::getTopupProductName($bankpayment['vendor_id'],$bankpayment['contract_number'], $type);
                         $company = 'mobicom';
                         BankpaymentTable::updateStatus($id, BankpaymentTable::STAT_SUCCESS, 'Амжилттай цэнэглэсэн', $this->getUser()->getId(), $this->getUser()->getUsername());   
                         $bankpayment->save(); 
                         LogTools::setLogBankpayment($bankpayment);
-                        // $logger->log('--createAndSendVat--=', sfFileLogger::INFO);
+                        $logger->log('--createAndSendVat--=', sfFileLogger::INFO);
                         $res = BasicVatSenderNew::createAndSendVat($number, $contract, $amount, $bankAccount, $paymentCode, $bankName, $productName, $productCode, null, $company); 
-                        // $logger->log($id->order_id . ' SEND_VAT_RESPONSE: ' . print_r($result, true) . sfFileLogger::INFO);
+                        $logger->log(' SEND_VAT_RESPONSE: ' . print_r($res, true) . sfFileLogger::INFO);
                         if (isset($res['errorCode']) && isset($res['errorCode']) == 0) {
                             return true;
                         } else{
                             return false;
                         }
                     }catch (\Exception $ex) {
-                        // logger->log($bankOrder->order_id . 'sendPaymentVat ERROR: ' . $ex->getMessage(), sfFileLogger::INFO);
+                        logger->log($bankOrder->order_id . 'sendPaymentVat ERROR: ' . $ex->getMessage(), sfFileLogger::INFO);
                         return false;
                     }
                     $this->getUser()->setFlash('success', "Амжилттай цэнэглэгдлээ");
@@ -1058,7 +1055,7 @@ class bankpaymentActions extends sfActions
      */
     public function executeChargeData(sfWebRequest $request)
     {  
-        $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/PaymentVAT/SAPC/PaymentVAT_'.date('Y-m-d').'.log'));
+        $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/PaymentVAT/USSD/CHARGEDATA_'.date('Y-m-d').'.log'));
         $id = $request->getParameter('id', 0);  
         $number= $request -> getParameter('number');
         $card= $request -> getParameter('card');
@@ -1068,9 +1065,6 @@ class bankpaymentActions extends sfActions
         $userId = $this->getUser()->getId();
         $bankpayment = BankpaymentTable::retrieveByPK($id);
         $transaction = BankpaymentTable::getBankTransaction($bankpayment['vendor_id'], $bankpayment['bank_order_id']);
-        
-        $logger->log( ' PaymentVAT:SAPC bankpayment: ' ,  sfFileLogger::INFO);
-
         $yml = sfYaml::load(sfConfig::get('sf_config_dir') . '/unit_type.yml');
         $dun =  (int)0;
         $optData = $yml['all']['opt_data'];
@@ -1081,6 +1075,7 @@ class bankpaymentActions extends sfActions
                   $result= SapcGateway::chargeFreePackage($number, $card, $logger, $userId);
         
         if (isset($result['Code']) && $result['Code'] == 0) {
+            $logger->log("ChargeUnit number: ".$number." Card: ".$card." result code: ".$result['Code'], sfFileLogger::INFO);
             $bankpayment->setUpdatedUserId($this->getUser()->getId());
             $bankpayment->setUsername($this->getUser()->getUsername());
             $bankpayment->setUpdatedAt(date('Y-m-d H:i:s'));
@@ -1099,9 +1094,8 @@ class bankpaymentActions extends sfActions
                 BankpaymentTable::updateStatus($id, BankpaymentTable::STAT_SUCCESS, 'Амжилттай цэнэглэсэн', $this->getUser()->getId(), $this->getUser()->getUsername());
                 $bankpayment->save(); 
                 LogTools::setLogBankpayment($bankpayment);
-                $logger->log('--createAndSendVat--=', sfFileLogger::INFO);
                 $res = BasicVatSenderNew::createAndSendVat($number, $contract, $amount, $bankAccount, $paymentCode, $bankName, $productName, $productCode, null, $company); 
-                //   $logger->log($id->order_id . ' SEND_VAT_RESPONSE: ' . error_log(print_r($result, true)) . sfFileLogger::INFO);
+                $logger->log(' SEND_VAT_RESPONSE: ' . error_log(print_r($res, true)) . sfFileLogger::INFO);
                 if (isset($res['errorCode']) && $res['errorCode'] == 0) {                    
                     return true;
                 } else{
@@ -1113,7 +1107,6 @@ class bankpaymentActions extends sfActions
             }
             $this->getUser()->setFlash('success', "Амжилттай цэнэглэгдлээ");
             
-         // $logger->log($bankOrder->order_id . 'sendPaymentVat ERROR: ' . $ex->getMessage(), sfFileLogger::INFO);
                     
         } else {
             $this->getUser()->setFlash('error', "Цэнэглэлт амжилтгүй. Тaны сонгосон картын үнэ тохирохгүй байна");
@@ -1137,7 +1130,7 @@ class bankpaymentActions extends sfActions
      */
     public function executeChargeSmall(sfWebRequest $request)
     {   
-        $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/PaymentVAT/SMALL/PaymentVAT_'.date('Y-m-d').'.log'));
+        $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/PaymentVAT/SMALL/UNIT_'.date('Y-m-d').'.log'));
         $number= $request -> getParameter('number');
         $amount= $request -> getParameter('amount');
         $order_amount= $request -> getParameter('order_amount');
@@ -1146,8 +1139,6 @@ class bankpaymentActions extends sfActions
         $type = BankpaymentTable::TYPE_SAPC;
         $bankName = $request->getParameter('bank');
         $userId = $this->getUser()->getId();
-
-        $logger->log($id->order_id . ' PaymentVAT:SAPC bankpayment: ' . $bankpayment->id. ', $Transaction: ' . $transaction->id, sfFileLogger::INFO);
         $bankpayment = BankpaymentTable::retrieveByPK($id);
         $transaction = BankpaymentTable::getBankTransaction($bankpayment['vendor_id'], $bankpayment['bank_order_id']);
      
@@ -1155,6 +1146,7 @@ class bankpaymentActions extends sfActions
             $result = SmallUnitGateway::chargeUnit($number, $amount, 'bankgw_bankpayment', $userId);  
         }else{  $this->getUser()->setFlash('error', "Цэнэглэлт амжилтгүй. Та нэгжийн тоогоо төлсөн дүнтэй адил оруулна уу");}
         if (isset($result['Code']) && $result['Code'] == 0) {
+            $logger->log("ChargeUnit number: ".$number." amount: ".$amount." result code: ".$result['Code'], sfFileLogger::INFO);
             BankpaymentTable::updateStatus($id, BankpaymentTable::STAT_SUCCESS, 'Амжилттай цэнэглэсэн', $this->getUser()->getId(), $this->getUser()->getUsername());
             $bankpayment->setUpdatedUserId($this->getUser()->getId());
             $bankpayment->setUsername($this->getUser()->getUsername());
@@ -1172,18 +1164,16 @@ class bankpaymentActions extends sfActions
                 $productCode =  PaymentTypeTable::AUTO_PREPAID;;
                 $productName = BaseSms::getTopupProductName($bankpayment['vendor_id'],$bankpayment['contract_number'], $type);
                 $company = 'mobicom';
-                $logger->log('--createAndSendVat--=', sfFileLogger::INFO);
                 $res = BasicVatSenderNew::createAndSendVat($number, $contract, $amount, $bankAccount, $paymentCode, $bankName, $productName, $productCode, null, $company); 
-                $logger->log($id->order_id . ' SEND_VAT_RESPONSE: ' . error_log(print_r($result, true)) . sfFileLogger::INFO);
+              
                 if (isset($result['errorCode']) && isset($result['errorCode']) == 0) {
                     return true;
                         } else{
                     return false;
                         } 
                     }catch (\Exception $ex) {
-              $logger->log($bankOrder->order_id . 'sendPaymentVat ERROR: ' . $ex->getMessage(), sfFileLogger::INFO);
-
-        return false;}
+                                    return false;
+                                }
         $this->getUser()->setFlash('success', "Амжилттай цэнэглэгдлээ");
         } else {
             $this->getUser()->setFlash('error', "Цэнэглэлт амжилтгүй. Та нэгжийн тоогоо төлсөн дүнтэй адил оруулна уу");
@@ -1210,7 +1200,7 @@ class bankpaymentActions extends sfActions
     {
             $id = $request->getParameter('id', 0);
             $number = $request->getParameter('number', 0);
-            $card = $request->getParameter('card', 0);
+            $cart = $request->getParameter('cart', 0);
 
         $bankpayment = BankpaymentTable::retrieveByPK($id);
         $this->forward404Unless($bankpayment);
@@ -1226,18 +1216,9 @@ class bankpaymentActions extends sfActions
             $message = '<div class="warning message">' . $block['block_date'] . ' -ны өдрөөр хаалт хийсэн тул энэ гүйлгээг засах боломжгүй.';
             return $this->renderText($message);
         }
-
         if ($request->isMethod('post')) {
             try {
-                $status = BankpaymentTable::STAT_NEW;
-                $trans = array();
-                $trans['old_bankpayment_id'] = $bankpayment['id'];
-                $trans['bankpayment_id'] = $bankpayment['id'];
-                $trans['user_name'] = $this->getUser()->getUsername();
-                $trans['type'] = 'EDIT';
-            
-                $bankTransaction = BankpaymentTable::getBankTransaction($bankpayment->getVendorId(), $bankpayment->getBankOrderId());
-             
+                $status = $bankpayment->getStatus();
                 $bankpayment->setUpdatedUserId($this->getUser()->getId());
                 $bankpayment->setUsername($this->getUser()->getUsername());
                 $bankpayment->setUpdatedAt(date('Y-m-d H:i:s'));
@@ -1247,7 +1228,7 @@ class bankpaymentActions extends sfActions
                 LogTools::setLogBankpayment($bankpayment);
                 $this->getUser()->setFlash('success', "Утасны дугаарыг амжилттай заслаа.");
             } catch (Exception $exc) {
-                $this->getUser()->setFlash('error', "Утасны дугаар засалт амжилмилтгүй");
+                $this->getUser()->setFlash('error', "Утасны дугаар засалт амжилтгүй");
             }
             $this->redirect($request->getReferer());
         }
