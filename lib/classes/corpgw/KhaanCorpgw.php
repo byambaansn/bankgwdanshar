@@ -6,7 +6,7 @@ class KhaanCorpgw
     {
         set_time_limit(3600);
         $yml = sfYaml::load(sfConfig::get('sf_config_dir') . '/app_banks.yml');
-        $url = $yml['all']['bankgwDistributorUrl'] . '/khaan/record';
+        $url = $yml['all']['corpgwUrl'] . '/statement/khaan/record';
 
         $header[] = "Content-Type: application/json";
         $accountsDto = json_encode(self::getAccountListWithRecord());

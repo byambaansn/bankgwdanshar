@@ -64,29 +64,11 @@
                         <td>Гэрээний дугаар:</td>
                         <td>
                             <input type="text" id="contract_number" name="contract_number" value="" maxlength="8" />
-                            <input class="right btn btn-success" type="submit" value="засах">
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Төлөлт болгох:</td>
-                        <td>
-                            <select id="payment" name="payment">
-                                <option value="0">[сонгох]</option>
-                                <?php foreach ($types as $i => $type): ?>
-                                <optgroup label="<?php echo $i ?>">
-                                    <?php foreach ($type as $id => $v): ?>
-                                    <option value="<?php echo $id ?>"
-                                        <?php echo $i == $type ? 'selected="selected"' : '' ?>><?php echo $v ?></option>
-                                    <?php endforeach; ?>
-                                </optgroup>
-                                <?php endforeach; ?>
-                            </select>
-                            <input class="right btn btn-payment" type="button" value="Төлөлт болгох" name="btnPayment"
-                                id="btnPayment">
+                            <input class="right btn btn-success" type="submit" value="засах" id="btn-Success">
                         </td>
                     </tr>
                 </tbody>
-
+                
 
                 <tbody id="unitRow" style="display:none;">
                     <tr>
@@ -96,16 +78,16 @@
                         <td>
                             <input list="unitType" id="uType" name="unitType">
                             <datalist id="unitType">
-                                <option value="promo">7000₮: 4000 нэгж+20 хоног 7gb дата </option>
+                                <option value="7000_opt1">7000₮: 4000 нэгж+20 хоног 7gb дата </option>
                                 <option value="1000_opt1">1000₮</option>
                                 <option value="2500_opt1">2500₮</option>
                                 <option value="5000_opt1">5000₮</option>
                                 <option value="10000_opt1">10000₮</option>
                                 <option value="20000_opt1">20000₮</option>
-                                <option value="4000_opt2">4000₮: 1000 нэгж + 7 хоног яриа </option>
-                                <option value="14000_opt2">14000₮: 4000 нэгж + 30 хоног яриа </option>
-                                <option value="9000_opt2">9000₮: 2000 нэгж + бүх сүлжээнд 7 хоног яриа</option>
-                                <option value="28000_opt2">28000₮: 4000 нэгж + бүх сүлжээнд 30 хоног яриа</option>
+                                <option value="4000_opt2_on">4000₮: 1000 нэгж + 7 хоног яриа </option>
+                                <option value="14000_opt2_on">14000₮: 4000 нэгж + 30 хоног яриа </option>
+                                <option value="9000_opt2_off_n">9000₮: 2000 нэгж + бүх сүлжээнд 7 хоног яриа</option>
+                                <option value="28000_opt2_off">28000₮: 4000 нэгж + бүх сүлжээнд 30 хоног яриа</option>
                             </datalist>
                         </td>
                     </tr>
@@ -128,6 +110,7 @@
                                 <option value="OnDemand_2DAY">2 хоног 2gb 2000₮</option>
                                 <option value="OnDemand_4DAY">4 хоног 4gb 4000₮</option>
                                 <option value="OnDemand_7DAY">7 хоног 7gb 6500₮</option>
+                                <option value="Child_10GB_15DAY"> 15 хоног 10gb 7000₮ Postpaid</option>
                                 <option value="OnDemand_15DAY">15 хоног 15gb 12000₮</option>
                                 <option value="OnDemand_30DAY">30 хоног 5gb 12500₮</option>
                                 <option value="OnDemand_S_30DAY">30 хоног 10gb 17500₮</option>
@@ -182,7 +165,15 @@
     </form>
 </div>
 
-<script>
+<script> 
+      $(document).ready(function () {
+        $('#notification').html("asdasdasd");
+        $('#subtract').on('input', function () {
+            var subtrahend = $('#subtrahend').html();
+            $('#answer').html(subtrahend - $('#subtract').val());
+        });
+    });
+
 $(document).ready(function() {
     $('#selAction').change(function() {
         if (this.value == 'Bill') {
@@ -212,41 +203,6 @@ $(document).ready(function() {
     });
 });
 
-$(document).ready(function() {
-    $('#notification').html("asdasdasd");
-    $('#subtract').on('input', function() {
-        var subtrahend = $('#subtrahend').html();
-        $('#answer').html(subtrahend - $('#subtract').val());
-    });
-});
-$('#btnPayment').click(function() {
-    if ($('#payment').val() == 0)
-        alert('Төлөлт болгох сонголт сонгоно уу!!!');
-    else
-    if (confirm('Та төлөлт болгохдоо итгэлтэй байна уу?')) {
-        $.ajax({
-            type: "POST",
-            url: "<?php echo url_for('@bankpayment_update_make_payment') ?>",
-            data: "id=" + <?php echo $bankpayment['id']; ?> + "&payment=" + $('#payment').val(),
-            dataType: "json",
-            success: function(data) {
-                if (data.code == 1) {
-                    $('#btnPayment').hide();
-                    // $('#btnPayment').setAttribute("disabled","disabled");
-                    window.location.reload(true);
-                } else if (data.code == 2) {
-                    alert(data.message);
-                } else {
-                    alert(data.message);
-                }
-            },
-            error: function(data) {
-                alert('Систем дээр алдаа гарлаа! ');
-                console.log(data.message);
-            }
-        });
-    }
-});
 
 
 $('#btnChargeUnit').click(function() {
@@ -256,10 +212,12 @@ $('#btnChargeUnit').click(function() {
     if (confirm('Та цэнэглэхдээ итгэлтэй байна уу?')) {
     $.ajax({
         url: "<?php echo url_for('@bankpayment_ussd_chargeunit')?>",
-        data: "id=" + <?php echo $bankpayment['id']; ?> + "&number="+$('#number1').val()+"&card="+$('#uType').val(),
+        data: "id="+<?php echo $bankpayment['id']; ?>+"&number="+$('#number1').val()+"&card="+$('#uType').val()+ "&order_amount="+ <?php echo $transaction['order_amount'];?>+"&bank="+<?php echo $bankpayment['vendor_id'];?>+"&bankAccount="+<?php echo $transaction['bank_account'];?>,
         type: "POST",
         success: function(data) {
-            alert("Амжилттай цэнэглэгдлээ");
+           
+            $('#btnChargeUnit').hide();
+            window.location.reload(true);
         },
         error: function(data) {
             alert("Цэнэглэлт амжилтгүй");
@@ -270,16 +228,18 @@ $('#btnChargeUnit').click(function() {
 
 
 $('#btnChargeData').click(function() {
-    if ($('#uType').val() == "")
+    if ($('#dType').val() == "")
         alert('Та цэнэглэх картаа сонгоно уу!!!');
     else
     if (confirm('Та цэнэглэхдээ итгэлтэй байна уу?')) {
     $.ajax({
         url: "<?php echo url_for('@bankpayment_ussd_chargedata')?>",
-        data: "number="+$('#number2').val()+"&card="+$('#dType').val(),
+        data: "id="+<?php echo $bankpayment['id'];?>+"&number="+$('#number2').val()+"&card="+$('#dType').val() + "&order_amount="+ <?php echo $transaction['order_amount'];?>+"&bank="+<?php echo $bankpayment['vendor_id'];?>,
         type: "POST",
         success: function(data) {
-            alert("Амжилттай цэнэгллээ");
+      
+            $('#btnChargeData').hide();
+            window.location.reload(true);
         },
         error: function(data) {
             alert("Цэнэглэлт амжилтгүй");
@@ -289,22 +249,20 @@ $('#btnChargeData').click(function() {
 });
 
 $('#btnChargeSmall').click(function() {
-    if ($('#amount').val() == 0)
-        alert('Та цэнэглэх дүнгээ оруулна уу!!!');
-    else
-    if (confirm('Та цэнэглэхдээ итгэлтэй байна уу?')) {
-
+     
     $.ajax({
         url: "<?php echo url_for('@bankpayment_ussd_chargesmall')?>",
-        data: "number="+$('#number3').val()+"&amount="+$('#amount').val()+"&order_amount="+ <?php echo $transaction['order_amount'] ?>,
+        data: "id=" + <?php echo $bankpayment['id']; ?> + "&number="+$('#number3').val()+"&amount="+$('#amount').val()+"&order_amount="+ <?php echo $transaction['order_amount'] ?>+"&order_amount="+ <?php echo $transaction['order_amount'];?>+"&bank="+<?php echo $bankpayment['vendor_id'];?>,
         type: "POST",
         success: function(data) {
-            alert("Амжилттай цэнэгллээ");
+       
+            $('#btnChargeSmall').hide();
+            window.location.reload(true);
         },
         error: function(data) {
             alert("Цэнэглэлт амжилтгүй");
         }
     });
-}
+
 });
 </script>

@@ -1,5 +1,4 @@
 <form id="form" action="<?php echo url_for('@transaction_list') ?>" autocomplete="off">
-
     <fieldset>
         <legend>ХАЙЛТ</legend>
         <div style="width: 500px;float: left">
@@ -26,17 +25,6 @@
                             <option value="<?php echo $id ?>" <?php echo $id == $accountNumber ? 'selected="selected"' : '' ?>><?php echo $account ?></option>
                         <?php endforeach; ?>
                     </optgroup>    
-                <?php endforeach; ?>
-            </select>  
-
- <br />
-            <label for="related_account">Харьцсан Данс:</label>
-            <select id="related_account" name="related_account">
-                <option value="0">[бүгд]</option>
-                <?php foreach ($relatedAccounts as $i => $v): ?>
-                        <?php foreach ($v as $id => $relatedAccount): ?>
-                            <option value="<?php echo $id ?>" <?php echo $id == $relatedAccount ? 'selected="selected"' : '' ?>><?php echo $relatedAccount ?></option>
-                        <?php endforeach; ?> 
                 <?php endforeach; ?>
             </select>  
             <br />
@@ -222,7 +210,6 @@
             }
         });
     });
-  
     function countChecked() {
         var n = $("input:checked").length;
         return n;

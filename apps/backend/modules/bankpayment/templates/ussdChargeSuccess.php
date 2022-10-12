@@ -59,7 +59,7 @@
                             style="cursor: pointer" src="/images/icons/edit.png" alt="Засах"></a>
                 </td>
                 <td align="center">
-                    <a rel="facebox" href="<?php echo url_for('@bankpayment_update_copy') . '?id=' . $row['id'] ?>"><img
+                    <a rel="facebox" href="<?php echo url_for('@bankpayment_ussd_copy') . '?id=' . $row['id'] ?>"><img
                             style="cursor: pointer" src="/images/icons/copy.png" alt="Хувилах"></a>
                 </td>
 

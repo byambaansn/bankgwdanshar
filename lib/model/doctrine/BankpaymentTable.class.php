@@ -247,6 +247,11 @@ class BankpaymentTable extends Doctrine_Table
                             if (!$bankpayment->username) {
                                 $bankpayment->username = 'Bankpayment';
                             }
+                            if( $bankpayment->bank_payment_code = "BNKTE" ) {
+                                
+                                $res = BasicVatSenderNew::createAndSendVat($number, $contract, $amount, $bankAccount, $paymentCode, $bankName, $productName, $productCode, null, $company); 
+                                //createAndSendVat(99111096, $bankPayment->contract_number, $bankpayment->15000);
+                            }
                             $bankpayment->status_comment = "Амжилттай";
                             try {
                                 $isChild = intval($bankpayment['parent_id']) > 0;
@@ -1230,7 +1235,7 @@ WHERE parent_id=$bankpaymentId";
 		LEFT OUTER JOIN bank_transaction.payment_type E ON D.type_id = E.id
             WHERE IFNULL(pa.id,0) = 0 AND b.status < CASE WHEN ref.type = 'REFUND' AND ref.refund_type = 'PAYMENTTYPE' AND b.status = 9 THEN 10 ELSE 9 END AND $where ) t1 " . $whereTwo;
         $query .= " ORDER BY t1.created_at DESC";
-//        echo $query;        die();
+        //echo $query;        die();
         $rows = $pdo->query($query)->fetchAll(PDO::FETCH_ASSOC);
         return $rows;
     }

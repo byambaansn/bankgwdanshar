@@ -5,6 +5,7 @@ config/
 /.idea
 web/backend_dev.php
 .vscode/launch.json
+.vscode/
 
 
 web/backend_dev.php

@@ -152,7 +152,7 @@ class bankTransactionActions extends sfActions
         $this->orderAmount = $request->getParameter('order_amount');
         $this->orderValue = $request->getParameter('order_value');
         $this->accountNumber = $request->getParameter('account_number');
-
+        //$this->relatedAccount = $request->getParameter('related_account');
         $this->statuses = TransactionTable::getForSelectStatus();
         $this->banks = BankTable::getForSelect();
         $this->types = PaymentTypeTable::getForSelect();
@@ -172,7 +172,6 @@ class bankTransactionActions extends sfActions
             $this->getUser()->setFlash('info', 'Та 1 сараас илүүтэйгээр шүүх боломжгүй');
         } else {
             $results = TransactionTable::getList($this->dateFrom, $this->dateTo, $this->bank, $this->orderId, $this->orderType, $this->orderAmount, $this->orderValue, $this->accountNumber, $this->status, $this->bankDate, $this->page);
-
             $this->rows = $results->getResults();
             $this->count = $results->getNbResults();
             //$this->totalAmount = TransactionTable::getListTotalAmount($this->dateFrom, $this->dateTo, $this->bank, $this->orderId, $this->orderAmount, $this->orderValue, $this->accountNumber, $this->status, $this->bankDate);

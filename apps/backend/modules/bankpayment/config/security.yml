@@ -61,3 +61,6 @@ ChargeData:
 ChargeSmall:
   is_secure: true
   credentials: [bankpayment_ussd]
+copyUssd:
+  is_secure: true
+  credentials: [bankpayment_ussd]

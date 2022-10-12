@@ -83,7 +83,9 @@ bankpayment_update_make_payment:
 bankpayment_update_copy:
   url: /manage/bankpayment/update/copy
   param: { module: bankpayment, action: copy }
-  
+bankpayment_ussd_copy:
+  url: /manage/bankpayment/ussd/copy
+  param: { module: bankpayment, action: copyUssd }
 bankpayment_return:
   url: /manage/bankpayment/return
   param: { module: bankpayment, action: return }
