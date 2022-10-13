@@ -720,7 +720,7 @@ class LogTools
     public static function setLogGatewayTocGwUpdate($id, $response)
     {
         $query = "UPDATE bankgw_log.log_gateway_toc_gw
-              SET response_xml = \"$response\"
+              SET response_xml = \"$response\", updated_at = \"(new \DateTime())->format('Y-m-d H:i:s')\"
               WHERE id = '$id'";
         return self::execute($query);
     }

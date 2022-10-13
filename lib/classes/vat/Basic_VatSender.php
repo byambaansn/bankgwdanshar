@@ -148,7 +148,7 @@ class Basic_VatSender
     }
 
 
-    public function logAccess()
+    public function logAccess($start, $end)
     {
         $pdo = LogTools::getLogPDO();
 
@@ -162,7 +162,7 @@ class Basic_VatSender
         $rt = str_replace("'", "\'", $rt);
         $re = str_replace("'", "\'", $re);
 
-        $sql = "INSERT INTO bankgw_log.`log_gateway_vat` (`number` ,`type_s`, `user_id`, `response_code`, `url`, `request_xml` ,`response_xml`)VALUES ('" . $this->number . "', '" . $this->getClassName() . "', '" . $this->userId . "'," . $this->responseCode . ", '" . $this->url . "', '" . $rt . "', '" . $re . "');";
+        $sql = "INSERT INTO bankgw_log.`log_gateway_vat` (`number` ,`type_s`, `user_id`, `response_code`, `url`, `request_xml` ,`response_xml`, `created_at`, `updated_at`)VALUES ('" . $this->number . "', '" . $this->getClassName() . "', '" . $this->userId . "'," . $this->responseCode . ", '" . $this->url . "', '" . $rt . "', '" . $re . "', '". $start ."', '". $end ."');";
         $pdo->exec($sql);
     }
 
@@ -175,7 +175,9 @@ class Basic_VatSender
     {
         $this->setHeader();
         $this->track .= "Call function дуудагдав <br /> XML ийг мобикомоос дуудаж байна <br />";
+        $start = (new \DateTime())->format('Y-m-d H:i:s');
         $this->xml_response = $this->httpsPost();
+        $end = (new \DateTime())->format('Y-m-d H:i:s');
         $this->xml_response_raw = $this->xml_response;
         if ($this->xml_response_raw) {
             $this->track .= "Хариу ирсэн <br />";
@@ -184,7 +186,7 @@ class Basic_VatSender
         }
         $this->track .= "Задлаж байна <br />";
         $this->track .= "Лог бүртгэж байна <br />";
-        $this->logAccess();
+        $this->logAccess($start, $end);
 
         if ($this->isValid()) {
             return true;

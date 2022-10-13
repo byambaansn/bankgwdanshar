@@ -52,7 +52,9 @@ class BasicVatSenderNew
         $data["group"] = false;
         $data["productList"] = array($detail);
         $body = json_encode($data);
+        $start = (new \DateTime())->format('Y-m-d H:i:s');
         $result = self::curlCall($url, $body, $header, true);
+        $end = (new \DateTime())->format('Y-m-d H:i:s');
         $httpcode = $result['HttpCode'];
         $resp = $result['Result'];
         $response = array();
@@ -66,7 +68,7 @@ class BasicVatSenderNew
             $response['Message'] = $res['info'];
             $response['Result'] = $res['result'];
         }
-        self::logAccess($isdn,$httpcode,$url,$result['Result'], $type, $body);
+        self::logAccess($isdn,$httpcode,$url,$result['Result'], $type, $body, $start, $end);
         return $response;
     }
     
@@ -93,8 +95,9 @@ class BasicVatSenderNew
         $data["offset"] = $offset;
 
         $body = json_encode($data);
-        
+        $start = (new \DateTime())->format('Y-m-d H:i:s');
         $result = self::curlCall($url, $body, $header, true);
+        $end = (new \DateTime())->format('Y-m-d H:i:s');
         $httpcode = $result['HttpCode'];
         $resp = $result['Result'];
         $response = array();
@@ -109,7 +112,7 @@ class BasicVatSenderNew
             $response['Message'] = $res['info'];
             $response['Result'] = [];
         }
-        self::logAccess($custNum,$response['Code'],$url,$result['Result'], $type, $body);
+        self::logAccess($custNum,$response['Code'],$url,$result['Result'], $type, $body, $start, $end);
         return $response['Result'];
     }
     
@@ -146,7 +149,9 @@ class BasicVatSenderNew
         $data["channel"] = "bank";
         
         $body = json_encode($data);
+        $start = (new \DateTime())->format('Y-m-d H:i:s');
         $result = self::curlCall($url, $body, $header, true);
+        $end = (new \DateTime())->format('Y-m-d H:i:s');
         $httpcode = $result['HttpCode'];
         $resp = $result['Result'];
         $response = array();
@@ -161,7 +166,7 @@ class BasicVatSenderNew
             $response['Message'] = $res['info'];
             $response['Result'] = $res['result'];
         }
-        self::logAccess($isdn,$httpcode,$url,$result['Result'], $type, $body);
+        self::logAccess($isdn,$httpcode,$url,$result['Result'], $type, $body, $start, $end);
         return $response;
     }
 
@@ -205,12 +210,12 @@ class BasicVatSenderNew
         return $response;
     }
 
-    public static function logAccess($number, $responseCode, $url, $response, $type, $request)
+    public static function logAccess($number, $responseCode, $url, $response, $type, $request, $start, $end)
     {
         $pdo = LogTools::getLogPDO();
 
-        $sql = "INSERT INTO bankgw_log.`log_gateway_vat` (`number` ,`type_s`, `user_id`, `response_code`, `url`, `request_xml` ,`response_xml`)VALUES ('" .
-            $number . "', '".$type."', 0," . $responseCode . ", '" . $url . "', '".$request."', '" . $response . "');";
+        $sql = "INSERT INTO bankgw_log.`log_gateway_vat` (`number` ,`type_s`, `user_id`, `response_code`, `url`, `request_xml` ,`response_xml`, `created_at`, `updated_at`)VALUES ('" .
+            $number . "', '".$type."', 0," . $responseCode . ", '" . $url . "', '".$request."', '" . $response . "', '". $start ."', '". $end ."');";
         $pdo->exec($sql);
     }
     

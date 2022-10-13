@@ -31,7 +31,9 @@ class HBBVatSender
         if($email) {
             $url = $url . '&email=' . $email;
         }
+        $start = (new \DateTime())->format('Y-m-d H:i:s');
         $result = self::curlCall($url, null, $header);
+        $end = (new \DateTime())->format('Y-m-d H:i:s');
         $httpcode = $result['HttpCode'];
         $response = array();
         $response['Code'] = $httpcode;
@@ -44,7 +46,7 @@ class HBBVatSender
         } else {
             $response['Message'] = $result['Result'];
         }
-        self::logAccess($isdn,$response['Code'],$url,$result['Result']);
+        self::logAccess($isdn,$response['Code'],$url,$result['Result'], $start, $end);
         return $response;
     }
 
@@ -87,12 +89,12 @@ class HBBVatSender
         return $response;
     }
 
-    public function logAccess($number, $responseCode, $url, $response)
+    public function logAccess($number, $responseCode, $url, $response, $start, $end)
     {
         $pdo = LogTools::getLogPDO();
 
-        $sql = "INSERT INTO bankgw_log.`log_gateway_vat` (`number` ,`type_s`, `user_id`, `response_code`, `url`, `request_xml` ,`response_xml`)VALUES ('" .
-            $number . "', '" . get_class($this) . "', 0," . $responseCode . ", '" . $url . "', '', '" . $response . "');";
+        $sql = "INSERT INTO bankgw_log.`log_gateway_vat` (`number` ,`type_s`, `user_id`, `response_code`, `url`, `request_xml` ,`response_xml`, `created_at`, `updated_at`)VALUES ('" .
+            $number . "', '" . get_class($this) . "', 0," . $responseCode . ", '" . $url . "', '', '" . $response . "', '". $start ."', '". $end ."');";
         $pdo->exec($sql);
     }
 
