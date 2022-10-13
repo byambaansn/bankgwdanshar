@@ -1388,7 +1388,49 @@ WHERE parent_id=$bankpaymentId";
                 if ($number) {
                     $bankpaymentRow->setTryCount($bankpaymentRow->getTryCount() + 1);
                 }
+                
+                $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/Payment.log'));
+                if (isset($result['result']) ) {
+                    $items = $result['result']['items'];
+                    $total = 0;
+                    $overpayment = $items[0]['overRepaymentAmount'];
+                    if( isset($overpayment) && $overpayment != '' && $overpayment > 0 ) {
+                        $total = $total + $overpayment;
+                    }
+
+                    if( $total == $bankpaymentRow['paid_amount']  ) {
+                        $bankpaymentRow['status'] = BankPaymentTable::STAT_REFUND;
+                    } else if( $result['result']['items'][0]['refundOverRepayment'] == 'NO_REFUND_LOAN' && $total > 0 ) {
+                        $item['parent_id'] = $bankpaymentRow['id'];
+                        $item['vendor_id'] = $bankpaymentRow['vendor_id'];
+                        $item['type'] = self::TYPE_CANDY_CASHIN;
+                        $item['bank_order_id'] = $bankpaymentRow['bank_order_id'];
+                        $item['paid_amount'] = $total;
+                        $item['bank_payment_code'] = $bankpaymentRow['bank_payment_code'];
+                        $item['contract_number'] = $bankpaymentRow['contract_number'];
+                        $item['contract_name'] = $bankpaymentRow['contract_name'];
+                        $item['status'] = BankpaymentTable::STAT_SUCCESS;
+                        $item['status_comment'] = 'Refund Over re-payment amount';
+                        $bankpaymentRow['paid_amount'] = $bankpaymentRow['paid_amount'] - $total;
+                        BankpaymentTable::insert($item);
+                    } else if( $result['result']['items'][0]['refundOverRepayment'] == 'REFUND' && $total > 0 ) {
+                        $item = array();
+                        $item['parent_id'] = $bankpaymentRow['id'];
+                        $item['vendor_id'] = $bankpaymentRow['vendor_id'];
+                        $item['type'] = $bankpaymentRow['type'];
+                        $item['bank_order_id'] = $bankpaymentRow['bank_order_id'];
+                        $item['paid_amount'] = $total;
+                        $item['bank_payment_code'] = $bankpaymentRow['bank_payment_code'];
+                        $item['contract_number'] = $bankpaymentRow['contract_number'];
+                        $item['contract_name'] = $bankpaymentRow['contract_name'];
+                        $item['status'] = BankpaymentTable::STAT_FAILED_CHARGE;
+                        $item['status_comment'] = 'Over re-payment';
+                        $bankpaymentRow['paid_amount'] = $bankpaymentRow['paid_amount'] - $total;
+                        BankpaymentTable::insert($item);
+                    }
+                }
                 $bankpaymentRow->save();
+                unset($item);
                 unset($bankpaymentRow);
             } catch (\Exception $ex) {
                 $bankpaymentRow->status = BankpaymentTable::STAT_FAILED_BILL_INFO;
