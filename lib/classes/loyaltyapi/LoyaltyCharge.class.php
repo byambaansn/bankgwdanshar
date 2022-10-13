@@ -553,9 +553,9 @@ class LoyaltyCharge
     public function logAccessUpdate($logId, $text = "")
     {
         $pdo = LogTools::getLogPDO();
-        $sql = "UPDATE bankgw_log.`log_gateway_loyaltyapi` SET `response_xml` = :text WHERE id = :logId";
+        $sql = "UPDATE bankgw_log.`log_gateway_loyaltyapi` SET `response_xml` = :text, `updated_at` = :date WHERE id = :logId";
         $sth = $pdo->prepare($sql);
-        $sth->execute(array(':text' => $text, ':logId' => $logId));
+        $sth->execute(array(':text' => $text, ':date' => (new \DateTime())->format('Y-m-d H:i:s'), ':logId' => $logId));
     }
 
 }

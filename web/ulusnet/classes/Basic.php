@@ -125,7 +125,7 @@ class Basic
         } else {
             $str = $this->xml_response_raw;
         }
-        $sql = "UPDATE bankgw_log.`log_gateway_ulusnet` SET `response_xml` = '" . $str . "' WHERE id = " . $this->logId;
+        $sql = "UPDATE bankgw_log.`log_gateway_ulusnet` SET `response_xml` = '" . $str . "', `updated_at` = '". (new \DateTime())->format('Y-m-d H:i:s') ."' WHERE id = " . $this->logId;
 
         $this->mysqlExecute($sql);
     }

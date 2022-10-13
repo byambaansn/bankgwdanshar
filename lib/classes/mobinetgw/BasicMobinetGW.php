@@ -180,7 +180,7 @@ class BasicMobinetGW
         } else {
             $str = $this->xml_response;
         }
-        $sql = "UPDATE bankgw_log.`log_gateway_mobinet` SET `response_xml` = '" . $str . "' WHERE id = " . $this->logId;
+        $sql = "UPDATE bankgw_log.`log_gateway_mobinet` SET `response_xml` = '" . $str . "', `updated_at` = '". (new \DateTime())->format('Y-m-d H:i:s') ."' WHERE id = " . $this->logId;
         LogTools::execute($sql);
     }
 

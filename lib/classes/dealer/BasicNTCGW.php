@@ -112,9 +112,9 @@ class BasicNTCGW
     public function logAccessUpdate($logId, $text = "")
     {
         $pdo = LogTools::getLogPDO();
-        $sql = "UPDATE bankgw_log.`log_gateway_dealer` SET `response_xml` = :text WHERE id = :logId";
+        $sql = "UPDATE bankgw_log.`log_gateway_dealer` SET `response_xml` = :text, `updated_at` = :date WHERE id = :logId";
         $sth = $pdo->prepare($sql);
-        $sth->execute(array(':text' => $this->xml_response_raw, ':logId' => $logId));
+        $sth->execute(array(':text' => $this->xml_response_raw, ':date' => (new \DateTime())->format('Y-m-d H:i:s'), ':logId' => $logId));
     }
 
     public function isValid()

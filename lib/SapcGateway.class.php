@@ -73,9 +73,9 @@ class SapcGateway
     public static function logAccessUpdate($logId, $result = "")
     {
         $pdo = LogTools::getLogPDO();
-        $sql = "UPDATE bankgw_log.`log_gateway_sapc` SET `response_xml` = :text WHERE id = :logId";
+        $sql = "UPDATE bankgw_log.`log_gateway_sapc` SET `response_xml` = :text, `updated_at` = :date WHERE id = :logId";
         $sth = $pdo->prepare($sql);
-        $sth->execute(array(':text' => $result, ':logId' => $logId));
+        $sth->execute(array(':text' => $result, ':date' => (new \DateTime())->format('Y-m-d H:i:s'), ':logId' => $logId));
     }
 
 }
