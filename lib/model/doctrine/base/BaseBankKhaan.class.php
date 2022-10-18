@@ -13,6 +13,7 @@ Doctrine_Manager::getInstance()->bindComponent('BankKhaan', 'doctrine');
  * @property integer $charge_amount
  * @property integer $percent
  * @property string $bank_account
+ * @property string $related_account
  * @property string $order_id
  * @property date $order_id_date
  * @property integer $sales_order_id
@@ -34,6 +35,7 @@ Doctrine_Manager::getInstance()->bindComponent('BankKhaan', 'doctrine');
  * @method integer   getChargeAmount()   Returns the current record's "charge_amount" value
  * @method integer   getPercent()        Returns the current record's "percent" value
  * @method string    getBankAccount()    Returns the current record's "bank_account" value
+ * @method string    getRelatedAccount()    Returns the current record's "related_account" value
  * @method string    getOrderId()        Returns the current record's "order_id" value
  * @method date      getOrderIdDate()    Returns the current record's "order_id_date" value
  * @method integer   getSalesOrderId()   Returns the current record's "sales_order_id" value
@@ -54,6 +56,7 @@ Doctrine_Manager::getInstance()->bindComponent('BankKhaan', 'doctrine');
  * @method BankKhaan setChargeAmount()   Sets the current record's "charge_amount" value
  * @method BankKhaan setPercent()        Sets the current record's "percent" value
  * @method BankKhaan setBankAccount()    Sets the current record's "bank_account" value
+ * @method BankKhaan setRelatedAccount()    Sets the current record's "related_account" value
  * @method BankKhaan setOrderId()        Sets the current record's "order_id" value
  * @method BankKhaan setOrderIdDate()    Sets the current record's "order_id_date" value
  * @method BankKhaan setSalesOrderId()   Sets the current record's "sales_order_id" value
@@ -132,6 +135,15 @@ abstract class BaseBankKhaan extends sfDoctrineRecord
              'autoincrement' => false,
              'length' => 50,
              ));
+        $this->hasColumn('related_account', 'string', 50, array(
+               'type' => 'string',
+               'fixed' => 0,
+               'unsigned' => false,
+               'primary' => false,
+               'notnull' => true,
+               'autoincrement' => false,
+               'length' => 50,
+               ));
         $this->hasColumn('order_id', 'string', 30, array(
              'type' => 'string',
              'fixed' => 0,

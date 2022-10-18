@@ -918,6 +918,235 @@ class bankpaymentActions extends sfActions
         }
     }
 
+
+    
+         /**
+     * Topup цэнэглэлт
+     * 
+     * @param sfWebRequest $request
+     */
+    public function executeChargeUnit(sfWebRequest $request)
+    {   
+        $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . 'ChargeTopupSapc/CHARGEUNIT_'.date('Y-m-d').'.log'));
+        $id = $request->getParameter('id');   
+        $number= $request -> getParameter('number');
+        $card= $request -> getParameter('card');
+        $amount = (float)$request ->getParameter('order_amount');
+        $type = BankpaymentTable::TYPE_TOPUP;
+        $bankName = $request->getParameter('bank');
+        $bankAcnt = $request->getParameter('bankAccount');
+        $userId = $this->getUser()->getId();
+        $bankpayment = BankpaymentTable::retrieveByPK($id);
+        $transaction = BankpaymentTable::getBankTransaction($bankpayment['vendor_id'], $bankpayment['bank_order_id']);
+        $yml = sfYaml::load(sfConfig::get('sf_config_dir') . '/unit_type.yml');
+        $dun =  (float) 0.00;
+        $optNegj = $yml['all']['opt_negj'];
+        
+        if(array_key_exists(strval($card), $optNegj)){
+            $dun = $optNegj[$card];     
+        }
+        
+        if($dun == $amount){
+            
+            $result=RtcgwGateway::chargeTopup($number, $card, $userId);
+
+            $logger->log("ChargeUnit number: ".$number."Card:".$card." result code:".$result['Code'], sfFileLogger::INFO);
+         
+
+            if (isset($result) && isset($result['Code']) && $result['Code'] == 0) {
+                    BankpaymentTable::updateStatus($id, BankpaymentTable::STAT_SUCCESS, 'Амжилттай цэнэглэсэн', $this->getUser()->getId(), $this->getUser()->getUsername());   
+                    $bankpayment->save(); 
+                    LogTools::setLogBankpayment($bankpayment);
+                    $this->getUser()->setFlash('success', "Амжилттай цэнэглэгдлээ");
+                    $bankpayment->setUpdatedUserId($this->getUser()->getId());
+                    $bankpayment->setUsername($this->getUser()->getUsername());
+                    $bankpayment->setUpdatedAt(date('Y-m-d H:i:s'));
+                    $bankpayment->setNumber($number);
+                    $bankpayment->setContractName($card);
+                    try{
+                        $bankAccount = bankpayment(child_num) == 0 ? $transaction->getBankAccount() : $bankAcnt ;
+                        $bankTopup = BankAccountTable::getByAccount($bankAccount);
+                        $paymentCode = $bankTopup->getBankCode();                    
+                        $bankName = VendorTable::getNameById($bankpayment['vendor_id']);
+                        $phoneInfo = PostGateway::getPostPhoneInfo($number);
+                        $contract = $phoneInfo['AccountNo'] ? $phoneInfo['AccountNo'] : $bankpayment['contract_number'];
+                        $productCode =  PaymentTypeTable::AUTO_PREPAID;
+                        $productName = BaseSms::getTopupProductName($bankpayment['vendor_id'],$bankpayment['contract_number'], $type);
+                        $company = 'mobicom';
+                        BankpaymentTable::updateStatus($id, BankpaymentTable::STAT_SUCCESS, 'Амжилттай цэнэглэсэн', $this->getUser()->getId(), $this->getUser()->getUsername());   
+                        $bankpayment->save(); 
+                        LogTools::setLogBankpayment($bankpayment);
+                        $logger->log('--createAndSendVat--=', sfFileLogger::INFO);
+                        $res = BasicVatSenderNew::createAndSendVat($number, $contract, $amount, $bankAccount, $paymentCode, $bankName, $productName, $productCode, null, $company); 
+                        $logger->log(' SEND_VAT_RESPONSE: ' . print_r($res, true) . sfFileLogger::INFO);
+                        if (isset($res['errorCode']) && isset($res['errorCode']) == 0) {
+                            return true;
+                        } else{
+                            return false;
+                        }
+                    }catch (\Exception $ex) {
+                        $logger->log($bankOrder->order_id . 'sendPaymentVat ERROR: ' . $ex->getMessage(), sfFileLogger::INFO);
+                        return false;
+                    }
+                    $this->getUser()->setFlash('success', "Амжилттай цэнэглэгдлээ");
+                }else{
+                $this->getUser()->setFlash('error', "Цэнэглэлт амжилтгүй. Тaны сонгосон картын үнэ тохирохгүй байна");
+                    BankpaymentTable::updateStatus($id, BankpaymentTable::STAT_FAILED_CHARGE, 'Амжилтгүй', $this->getUser()->getId(), $this->getUser()->getUsername());
+                    $bankpayment->save();
+                    LogTools::setLogBankpayment($bankpayment);     
+        }
+        }else{
+            $this->getUser()->setFlash('error', "Цэнэглэлт амжилтгүй. $dun !== $amount");
+        }
+        $this->types = PaymentTypeTable::getForSelect();
+        
+        $this->bankpayment = $bankpayment;
+    }
+    
+
+     /**
+     * Sapc цэнэглэлт
+     * 
+     * @param sfWebRequest $request
+     */
+    public function executeChargeData(sfWebRequest $request)
+    {  
+        $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/ChargeTopupSapc/CHARGEDATA_'.date('Y-m-d').'.log'));
+        $id = $request->getParameter('id', 0);  
+        $number= $request -> getParameter('number');
+        $card= $request -> getParameter('card');
+        $amount =(int)$request ->getParameter('order_amount');
+        $type = BankpaymentTable::TYPE_SAPC;
+        $bankName = $request->getParameter('bank');
+        $userId = $this->getUser()->getId();
+        $bankpayment = BankpaymentTable::retrieveByPK($id);
+        $transaction = BankpaymentTable::getBankTransaction($bankpayment['vendor_id'], $bankpayment['bank_order_id']);
+        $yml = sfYaml::load(sfConfig::get('sf_config_dir') . '/unit_type.yml');
+        $dun =  (int)0;
+        $optData = $yml['all']['opt_data'];
+        if(array_key_exists(strval($card), $optData)){
+            $dun = $optData[$card];     
+        }
+        if($dun == $amount){
+                  $result= SapcGateway::chargeFreePackage($number, $card, $logger, $userId);
+        
+        if (isset($result['Code']) && $result['Code'] == 0) {
+            $logger->log("ChargeUnit number: ".$number." Card: ".$card." result code: ".$result['Code'], sfFileLogger::INFO);
+            $bankpayment->setUpdatedUserId($this->getUser()->getId());
+            $bankpayment->setUsername($this->getUser()->getUsername());
+            $bankpayment->setUpdatedAt(date('Y-m-d H:i:s'));
+            $bankpayment->setNumber($number);
+            $bankpayment->setContractName($card);
+            try{
+                $bankAccount = $transaction->getBankAccount();
+                $bankTopup = BankAccountTable::getByAccount($bankAccount);
+                $paymentCode = $bankTopup->getBankCode();                    
+                $bankName = VendorTable::getNameById($bankpayment['vendor_id']);
+                $phoneInfo = PostGateway::getPostPhoneInfo($number);
+                $contract = $phoneInfo['AccountNo'] ? $phoneInfo['AccountNo'] : $bankpayment['contract_number'];
+                $productCode =  PaymentTypeTable::AUTO_PREPAID;;
+                $productName = BaseSms::getTopupProductName($bankpayment['vendor_id'],$bankpayment['contract_number'], $type);
+                $company = 'mobicom';
+                BankpaymentTable::updateStatus($id, BankpaymentTable::STAT_SUCCESS, 'Амжилттай цэнэглэсэн', $this->getUser()->getId(), $this->getUser()->getUsername());
+                $bankpayment->save(); 
+                LogTools::setLogBankpayment($bankpayment);
+                $res = BasicVatSenderNew::createAndSendVat($number, $contract, $amount, $bankAccount, $paymentCode, $bankName, $productName, $productCode, null, $company); 
+                $logger->log(' SEND_VAT_RESPONSE: ' . error_log(print_r($res, true)) . sfFileLogger::INFO);
+                if (isset($res['errorCode']) && $res['errorCode'] == 0) {                    
+                    return true;
+                } else{
+                    $logger->log(print_r($res), sfFileLogger::INFO);
+                    return false;
+                } 
+            } catch (\Exception $ex) {
+                return false;
+            }
+            $this->getUser()->setFlash('success', "Амжилттай цэнэглэгдлээ");
+            
+                    
+        } else {
+            $this->getUser()->setFlash('error', "Цэнэглэлт амжилтгүй. Тaны сонгосон картын үнэ тохирохгүй байна");
+            BankpaymentTable::updateStatus($id, BankpaymentTable::STAT_FAILED_CHARGE, 'Амжилтгүй', $this->getUser()->getId(), $this->getUser()->getUsername()); 
+            $bankpayment->save();
+            LogTools::setLogBankpayment($bankpayment);
+        } 
+    }else{
+        $this->getUser()->setFlash('error', "Цэнэглэлт амжилтгүй. $dun !== $amount");
+        window.location.reload(true);
+    } 
+        $this->types = PaymentTypeTable::getForSelect();
+        $this->transaction = BankpaymentTable::getBankTransaction($bankpayment['vendor_id'], $bankpayment['bank_order_id']);
+        $this->bankpayment = $bankpayment;      
+    }
+                  
+     /**
+     * Задгай нэгж цэнэглэлт
+     * 
+     * @param sfWebRequest $request
+     */
+    public function executeChargeSmall(sfWebRequest $request)
+    {   
+        $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/ChargeTopupSapc/SMALLUNIT_'.date('Y-m-d').'.log'));
+        $number= $request -> getParameter('number');
+        $amount= $request -> getParameter('amt');
+        $order_amount= $request -> getParameter('order_amount');
+        $id = $request->getParameter('id', 0);  
+        $userId = $this->getUser()->getId();
+        $type = BankpaymentTable::TYPE_SAPC;
+        $bankName = $request->getParameter('bank');
+        $userId = $this->getUser()->getId();
+        $bankpayment = BankpaymentTable::retrieveByPK($id);
+        $transaction = BankpaymentTable::getBankTransaction($bankpayment['vendor_id'], $bankpayment['bank_order_id']);
+     
+        if($amount == $order_amount){
+            $result = SmallUnitGateway::chargeUnit($number, $amount, 'bankgw_bankpayment', $userId);  
+        }else{  $this->getUser()->setFlash('error', "Цэнэглэлт амжилтгүй. Та нэгжийн тоогоо төлсөн дүнтэй адил оруулна уу");}
+        if (isset($result['Code']) && $result['Code'] == 0) {
+            $logger->log("ChargeUnit number: ".$number." amount: ".$amount." result code: ".$result['Code'], sfFileLogger::INFO);
+            BankpaymentTable::updateStatus($id, BankpaymentTable::STAT_SUCCESS, 'Амжилттай цэнэглэсэн', $this->getUser()->getId(), $this->getUser()->getUsername());
+            $bankpayment->setUpdatedUserId($this->getUser()->getId());
+            $bankpayment->setUsername($this->getUser()->getUsername());
+            $bankpayment->setUpdatedAt(date('Y-m-d H:i:s'));
+            $bankpayment->setNumber($number);
+            $bankpayment->setContractName($amount);
+            $bankpayment->save();
+            try{
+                $bankAccount = $transaction->getBankAccount();
+                $bankTopup = BankAccountTable::getByAccount($bankAccount);
+                $paymentCode = $bankTopup->getBankCode();                    
+                $bankName = VendorTable::getNameById($bankpayment['vendor_id']);
+                $phoneInfo = PostGateway::getPostPhoneInfo($number);
+                $contract = $phoneInfo['AccountNo'] ? $phoneInfo['AccountNo'] : $bankpayment['contract_number'];
+                $productCode =  PaymentTypeTable::AUTO_PREPAID;;
+                $productName = BaseSms::getTopupProductName($bankpayment['vendor_id'],$bankpayment['contract_number'], $type);
+                $company = 'mobicom';
+                $res = BasicVatSenderNew::createAndSendVat($number, $contract, $amount, $bankAccount, $paymentCode, $bankName, $productName, $productCode, null, $company); 
+              
+                if (isset($result['errorCode']) && isset($result['errorCode']) == 0) {
+                    return true;
+                        } else{
+                    return false;
+                        } 
+                    }catch (\Exception $ex) {
+                                    return false;
+                                }
+        $this->getUser()->setFlash('success', "Амжилттай цэнэглэгдлээ");
+        } else {
+            $this->getUser()->setFlash('error', "Цэнэглэлт амжилтгүй. Та нэгжийн тоогоо төлсөн дүнтэй адил оруулна уу");
+            BankpaymentTable::updateStatus($id, BankpaymentTable::STAT_FAILED_CHARGE, 'Амжилтгүй', $this->getUser()->getId(), $this->getUser()->getUsername()); 
+            $bankpayment->save();
+            LogTools::setLogBankpayment($bankpayment);
+        }       
+       
+        $this->types = PaymentTypeTable::getForSelect();
+        $this->transaction = BankpaymentTable::getBankTransaction($bankpayment['vendor_id'], $bankpayment['bank_order_id']);
+        $this->bankpayment = $bankpayment;  
+
+    }
+           
+
+  
+
     /**
      * Topup цэнэглэлт , DATA sapc , WIFI Card
      * 

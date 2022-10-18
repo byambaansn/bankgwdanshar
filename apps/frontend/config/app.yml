@@ -10,7 +10,7 @@ all:
       username: 2000
       password: 2000
   bankpayment:
-    gsm_limit: 81000
+    gsm_limit: 201000
     nsl_limit: 1500
     vat_days: 7
     khan_payment_limit: 200

@@ -364,6 +364,7 @@ class BankKhaanTable extends Doctrine_Table
         $bankOrder->order_id = $trans['JournalNo'];
         $bankOrder->order_id_date = $trans['TxnDate'];
         $bankOrder->bank_account = $trans['Account'];
+        $bankOrder->related_account = $trans['relatedAccount'];
         $bankOrder->order_p = $trans['TxnDesc'];
         $bankOrder->order_type = $trans['TxnType'];
         $bankOrder->order_amount = $trans['Amount'];
@@ -479,6 +480,7 @@ class BankKhaanTable extends Doctrine_Table
                 $param = array();
                 $param['TxnType'] = $trans['type'];
                 $param['Account'] = $trans['acct'];
+           
                 $param['JournalNo'] = $trans['jrnl'];
                 $param['TxnDesc'] = AppTools::cp1251_utf8($trans['desc']);
                 $param['Amount'] = (double) $trans['amt'];
@@ -547,6 +549,7 @@ class BankKhaanTable extends Doctrine_Table
                     $param['TxnType'] = 'ADD';
                 }
                 $param['Account'] = "0000000" . substr($trans->account, 0, 9);
+                $param['relatedAccount'] = $trans->relatedAccount;
                 $param['JournalNo'] = $trans->record . $trans->account . $trans->journal;
                 $param['TxnDesc'] = htmlspecialchars(AppTools::cp1251_utf8($trans->description), ENT_QUOTES);
                 $param['Amount'] = abs((double) $trans->amount);
@@ -587,7 +590,6 @@ class BankKhaanTable extends Doctrine_Table
                               WHERE account = '" . $trans->account . "'
                               LIMIT 1";
                     $pdo->exec($sql);
-
                 } catch (\Exception $exc) {
                     print_r("error");
                     $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/my-khaan-order.log'));
@@ -614,6 +616,7 @@ class BankKhaanTable extends Doctrine_Table
                     $param['TxnType'] = 'ADD';
                 }
                 $param['Account'] = "0000000" . substr($trans->account, 0, 9);
+                $param['relatedAccount'] = $trans->relatedAccount;
                 $param['JournalNo'] = $trans->record . $trans->account . $trans->journal;
                 $param['TxnDesc'] = AppTools::cp1251_utf8($trans->description);
                 $param['Amount'] = abs((double) $trans->amount);
