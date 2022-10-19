@@ -25,7 +25,7 @@ class KhaanCorpgw
     {
 
         $yml = sfYaml::load(sfConfig::get('sf_config_dir') . '/app_banks.yml');
-        $url = $yml['all']['bankgwDistributorUrl'] . '/khaan/date';
+        $url = $yml['all']['corpgwUrl'] . '/statement/khaan/date';
 
         $header[] = "Content-Type: application/json";
         $accountsDto = json_encode($accountList);
@@ -39,16 +39,41 @@ class KhaanCorpgw
         return $sortedResponse;
     }
 
+    public static function getStatementByAccount($organization, $account) {
+        $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/khaan-corpgw.log'));
+        $logger->log('get statement by account',sfFileLogger::INFO);
+        $yml = sfYaml::load(sfConfig::get('sf_config_dir') . '/app_banks.yml');
+        $url = $yml['all']['corpgwUrl'] . '/account/khaan/' . $organization . '/' . $account;
+        $logger->log('url = ' . $url,sfFileLogger::INFO);
+        $header[] = "Content-Type: application/json";
+        $a = self::sendPost($url, $header, null);
+        var_dump(json_decode($a));
+        die();
+        return json_decode($a);
+    }
+
     public static function getAccountLatestRecords()
     {
-//        set_time_limit(3600);
+        $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/khaan-corpgw.log'));
         $yml = sfYaml::load(sfConfig::get('sf_config_dir') . '/app_banks.yml');
-        $url = $yml['all']['bankgwDistributorUrl'] . '/khaan/update-record';
+        $accountsDto = self::getAccountListWithRecord();
+        $logger->log('get account latest record', sfFileLogger::INFO);
+        $transactions = [];
+        foreach($accountsDto as $account) {
+            $logger->log('foreach organization=' . $account['organization'] . '; account=' . $account['account'], sfFileLogger::INFO);
+            $response = self::getStatementByAccount($account['organization'], $account['account']);
+            var_dump($response);
+            die();
+            $logger->log('foreach date=' . $response['account']['lastFinancialTranDate'], sfFileLogger::INFO);
+            $account['date'] = str_replace("\\", "", $response['account']['lastFinancialTranDate']);
+            $logger->log('replaced date=' . $account['date'], sfFileLogger::INFO);
 
-        $header[] = "Content-Type: application/json";
-        $accountsDto = json_encode(self::getAccountListWithRecord());
-        $a = self::sendPost($url,$header, $accountsDto);
-        return json_decode($a);
+            $item = getTransactionsByDate($account);
+            array_push($transactions, $item);
+        }
+        var_dump(json_decode($transactions));
+        die();
+        return json_decode($transactions);
     }
 
     public static function sendPost($url, $header, $body) {
