@@ -13,7 +13,7 @@ class BankpaymentTable extends Doctrine_Table
     const STAT_SUCCESS = 3;
     const STAT_FAILED_CHARGE = 4;
     const STAT_BANKPAYMENT_AMOUNT = 5; // Гэрээний үлдэгдэлээс зөрүүтэй 3000
-    const STAT_BANKPAYMENT_TRANS_VALUE = 6; // Гүйлгээний утгаk буруу
+    const STAT_BANKPAYMENT_TRANS_VALUE = 6; // Гүйлгээний утга буруу
     const STAT_FAILED_BILL_INFO = 7; // bill- medeelel tatagdsangui
     const STAT_IMPOSSIBLE = 8; // Bolomjgui
     const STAT_REFUND = 9; // Butsaalt
@@ -246,6 +246,11 @@ class BankpaymentTable extends Doctrine_Table
                             $bankpayment->status = BankpaymentTable::STAT_SUCCESS;
                             if (!$bankpayment->username) {
                                 $bankpayment->username = 'Bankpayment';
+                            }
+                            if( $bankpayment->bank_payment_code = "BNKTE" ) {
+                                
+                                $res = BasicVatSenderNew::createAndSendVat($number, $contract, $amount, $bankAccount, $paymentCode, $bankName, $productName, $productCode, null, $company); 
+                                //createAndSendVat(99111096, $bankPayment->contract_number, $bankpayment->15000);
                             }
                             $bankpayment->status_comment = "Амжилттай";
                             try {
@@ -881,7 +886,7 @@ WHERE parent_id=$bankpaymentId";
     /**
      * Дахин дуудсан ажилтан авах
      * @param integer $bankpaymentId
-     * @return Chlid count | null
+     * @return Child count | null
      */
     public static function getForSelectStaff($type)
     {

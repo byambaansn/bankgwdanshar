@@ -52,3 +52,15 @@ blockDate:
 paymentReport:
   is_secure: true
   credentials: [bankpayment_cx]
+ChargeUnit:
+  is_secure: true
+  credentials: [bankpayment_ussd]
+ChargeData:
+  is_secure: true
+  credentials: [bankpayment_ussd]
+ChargeSmall:
+  is_secure: true
+  credentials: [bankpayment_ussd]
+copyUssd:
+  is_secure: true
+  credentials: [bankpayment_ussd]

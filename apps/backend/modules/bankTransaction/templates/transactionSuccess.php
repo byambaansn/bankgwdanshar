@@ -26,7 +26,6 @@
                         <?php endforeach; ?>
                     </optgroup>    
                 <?php endforeach; ?>
-
             </select>  
             <br />
         </div>
@@ -105,6 +104,7 @@
                 <th rowspan="2" width="70">БАНК</th>
                 <th rowspan="2" width="90">ГҮЙЛГЭЭ №</th>
                 <th rowspan="2" width="90">ДАНСНЫ ДУГААР</th>
+                <th rowspan="2" width="90">ХАРЬЦСАН ДАНС</th>
                 <th rowspan="2" width="40">ТӨЛӨВ</th>
                 <th colspan="5"  width="120">ГҮЙЛГЭЭНИЙ</th>
                 <th rowspan="2" width="120">ҮҮССЭН</th>
@@ -127,6 +127,7 @@
                     <td><?php echo $row->getBank()->getName(); ?></td>
                     <td><?php echo $row->order_id ?></td>
                     <td><?php echo $row->bank_account ?></td>
+                    <td><?php echo $row->related_account ?></td>
                     <td align="center"><?php echo ($row->status == 1) ? '<b class="red">N</b>' : (($row->status == 2) ? '<b class="green">D</b>' : '' ) ?></td>
                     <td><?php echo $row->order_type ?></td>
                     <td><?php echo ($row->order_p) ?></td>

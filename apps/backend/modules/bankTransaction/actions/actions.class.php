@@ -172,7 +172,6 @@ class bankTransactionActions extends sfActions
             $this->getUser()->setFlash('info', 'Та 1 сараас илүүтэйгээр шүүх боломжгүй');
         } else {
             $results = TransactionTable::getList($this->dateFrom, $this->dateTo, $this->bank, $this->orderId, $this->orderType, $this->orderAmount, $this->orderValue, $this->accountNumber, $this->status, $this->bankDate, $this->page);
-
             $this->rows = $results->getResults();
             $this->count = $results->getNbResults();
             //$this->totalAmount = TransactionTable::getListTotalAmount($this->dateFrom, $this->dateTo, $this->bank, $this->orderId, $this->orderAmount, $this->orderValue, $this->accountNumber, $this->status, $this->bankDate);
@@ -192,6 +191,7 @@ class bankTransactionActions extends sfActions
             $data = "БАНК;";
             $data .= "№ ГҮЙЛГЭЭ;";
             $data .= "ДАНСНЫ ДУГААР;";
+            $data .= "ХАРЬЦСАН ДАНС;";
             $data .= "ТӨЛӨВ;";
             $data .= "ГҮЙЛГЭЭНИЙ ТӨРӨЛ;";
             $data .= "ГҮЙЛГЭЭНИЙ УТГА;";
@@ -205,6 +205,7 @@ class bankTransactionActions extends sfActions
                 $data.='"' . $row['bank_name'] . '";';
                 $data.='"' . $row['order_id'] . '";';
                 $data.='"' . $row['bank_account'] . '";';
+                $data.='"' . $row['related_account'] . '";';
                 $data.='"' . $status . '";';
                 $data.='"' . $row['order_type'] . '";';
                 $data.='"' . $row['order_p'] . '";';
@@ -593,9 +594,11 @@ class bankTransactionActions extends sfActions
 
             $filename = 'transaction_payment';
 
+
             $data = "БАНК;";
             $data .= "№ ГҮЙЛГЭЭ;";
             $data .= "ДАНСНЫ ДУГААР;";
+        
             $data .= "ТӨЛӨВ;";
             $data .= "ГҮЙЛГЭЭНИЙ УТГА;";
             $data .= "ГҮЙЛГЭЭНИЙ ДҮН ;";
@@ -612,6 +615,7 @@ class bankTransactionActions extends sfActions
                 $data.='"' . $row['bank_name'] . '";';
                 $data.='"' . $row['order_id'] . '";';
                 $data.='"' . $row['bank_account'] . '";';
+              
                 $data.='"' . $row['status'] . '";';
                 $data.='"' . $row['order_p'] . '";';
                 if ($row['order_type'] == 'SUB') {
