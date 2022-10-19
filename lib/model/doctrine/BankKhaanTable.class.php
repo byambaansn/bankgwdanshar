@@ -125,6 +125,7 @@ class BankKhaanTable extends Doctrine_Table
                 ->where('charge_mobile = ?', $number)
                 ->addWhere('status = ?', self::STAT_NEW)
                 ->addWhere('bank_account = ?', $bank_account)
+              
                 ->addWhere('order_amount = ?', $amount);
         return $q->execute();
     }
@@ -149,6 +150,16 @@ class BankKhaanTable extends Doctrine_Table
         $q->addWhere('vendor_id = ?', VendorTable::BANK_KHAAN)
                 ->orderBy('status DESC, id DESC');
         $request = sfContext::getInstance()->getRequest();
+
+        $orderedMobile = (int) $request->getParameter('orderedMobile');
+        if ($orderedMobile) {
+            $q->addWhere('order_mobile = ?', $orderedMobile);
+        }
+         // optional
+         $relatedAccount = (int) $request->getParameter('relatedAccount');
+         if ($relatedAccount) {
+             $q->addWhere('related_account = ?', $relatedAccount);
+         }
 
         // mandatory
         $dateFrom = $request->getParameter('dateFrom') ? $request->getParameter('dateFrom') : date('Y-m-d');
@@ -222,6 +233,12 @@ class BankKhaanTable extends Doctrine_Table
             $where[] = "b.bank_account IN (" . implode(',', $account) . ")";
         } else {
             $where[] = "b.bank_account ='$account'";
+        }
+
+        // optional
+        $relatedAccount = (int) $request->getParameter('relatedAccount');
+        if ($relatedAccount) {
+            $where[] = "b.related_account ='$relatedAccount'";
         }
 
         // optional
@@ -591,7 +608,7 @@ class BankKhaanTable extends Doctrine_Table
                               LIMIT 1";
                     $pdo->exec($sql);
                 } catch (\Exception $exc) {
-                    print_r("error");
+                   print_r("error");
                     $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/my-khaan-order.log'));
                     $logger->log('--ERROR--=' . trim($param['JournalNo']), sfFileLogger::INFO);
                     die();
@@ -1173,6 +1190,7 @@ class BankKhaanTable extends Doctrine_Table
                         'amount' => $bankOrder['order_amount'],
                         'transValue' => $bankOrder['order_p'],
                         'transAccount' => $bankOrder['bank_account'],
+                        'relatedAccount' => $bankOrder['related_account'],
                         'transType' => $bankOrder['order_type'],
                         'transNumber' => $bankOrder['order_id'],
                         'bankType' => VendorTable::BANK_KHAAN,
@@ -2047,7 +2065,8 @@ class BankKhaanTable extends Doctrine_Table
                     $card = $matches[4];
                     # TEST hiih dugaaruudiig l zuvshuuruv
                     //if (in_array($phoneNumber, array('94300074', '94300115'))) {
-                    $result = RtcgwGateway::chargeTopup($phoneNumber, $card, "bankgw_khan2");
+                  $result = RtcgwGateway::chargeTopup($phoneNumber, $card, "bankgw_khan2");
+                 
                     //}
                     if (isset($result['Code']) && $result['Code'] == 0) {
                         $status = BankpaymentTable::STAT_SUCCESS;

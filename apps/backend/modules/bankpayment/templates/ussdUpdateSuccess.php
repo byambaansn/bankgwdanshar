@@ -20,15 +20,15 @@
                     </tr>
                     <tr>
                         <td><b>Гүйлгээний утга:</b></td>
-                        <td>   <?php echo $transaction['order_p'] ?></td>
+                        <td> <?php echo $transaction['order_p'] ?></td>
                     </tr>
                     <tr>
-                        <td>   <b>Төлөлтийн дүн:</b></td>
-                        <td>  <?php echo $transaction['order_amount'] ?></td>
+                        <td> <b>Төлөлтийн дүн:</b></td>
+                        <td> <?php echo $transaction['order_amount'] ?></td>
                     </tr>
                     <tr>
                         <td><b>Төлөв:</b></td>
-                        <td>  <?php echo $bankpayment['status'] ?></td>
+                        <td> <?php echo $bankpayment['status'] ?></td>
                     </tr>
                     <tr>
                         <td> <b>Гэрээний дугаар:</b></td>

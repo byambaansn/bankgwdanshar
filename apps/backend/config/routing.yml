@@ -4,7 +4,7 @@ bank_loyaltyapi_list:
   param: { module: candyLoan, action: list, page: 1 }
 bank_loyaltyapi_list_excel:
   url: /manage/loyaltyapi/list-excel.html
-  param: { module: candyLoan, action: listExcel}
+  param: { module: candyLoan, action: listExcel }
 bank_loyaltyapi_status:
   url: /manage/loyaltyapi/status/:vendor_id/:id.html
   param: { module: candyLoan, action: status }
@@ -24,23 +24,22 @@ bank_loyaltyapi_outcome_success:
   url: /manage/loyaltyapi/outcomesuccess
   param: { module: candyLoan, action: successOutcome }
 
-
 # Bankpayment
 bankpayment_ussd:
   url: /manage/bankpayment/ussd
   param: { module: bankpayment, action: ussdCharge }
 bankpayment_ussd_update:
   url: /manage/bankpayment/ussd/update
-  param: { module: bankpayment, action: ussdUpdate }  
+  param: { module: bankpayment, action: ussdUpdate }
 bankpayment_ussd_chargeunit:
   url: /manage/bankpayment/chargeunit
-  param: { module: bankpayment, action: chargeUnit } 
+  param: { module: bankpayment, action: chargeUnit }
 bankpayment_ussd_chargedata:
   url: /manage/bankpayment/chargedata
   param: { module: bankpayment, action: chargeData }
 bankpayment_ussd_chargesmall:
   url: /manage/bankpayment/chargesmall
-  param: { module: bankpayment, action: chargeSmall}
+  param: { module: bankpayment, action: chargeSmall }
 bankpayment_mobinet_prepaid:
   url: /manage/bankpayment/mobinet/prepaid/:page.html
   param: { module: bankpayment, action: mobinetPrepaid, page: 1 }
@@ -49,7 +48,7 @@ bankpayment_mobinet_payment:
   param: { module: bankpayment, action: mobinetPrepaidPayment }
 bankpayment_mobinet_prepaid_update:
   url: /manage/bankpayment/mobinet/prepaid/update
-  param: { module: bankpayment, action: mobinetPrepaidUpdate }  
+  param: { module: bankpayment, action: mobinetPrepaidUpdate }
 bankpayment_ulusnet:
   url: /manage/bankpayment/ulusnet/:page.html
   param: { module: bankpayment, action: ulusnet, page: 1 }
@@ -58,7 +57,7 @@ bankpayment_ulusnet_payment:
   param: { module: bankpayment, action: ulusnetPayment }
 bankpayment_ulusnet_update:
   url: /manage/bankpayment/ulusnet/update
-  param: { module: bankpayment, action: ulusnetUpdate }  
+  param: { module: bankpayment, action: ulusnetUpdate }
 bankpayment_ulusnet_card:
   url: /manage/bankpayment/ulusnet/card
   param: { module: bankpayment, action: ulusnetProduct }
@@ -74,19 +73,22 @@ bankpayment_do_payment:
 bankpayment_update:
   url: /manage/bankpayment/update
   param: { module: bankpayment, action: update }
-  
+
 bankpayment_update_make_payment:
   url: /manage/bankpayment/makepayment
   param: { module: bankpayment, action: makePayment }
-  
+
 bankpayment_update_copy:
   url: /manage/bankpayment/update/copy
   param: { module: bankpayment, action: copy }
-  
+
+bankpayment_ussd_copy:
+  url: /manage/bankpayment/ussd/copy
+  param: { module: bankpayment, action: copyUssd }
 bankpayment_return:
   url: /manage/bankpayment/return
   param: { module: bankpayment, action: return }
-  
+
 bankpayment_block_date:
   url: /manage/bankpayment/bankpayment-block-date
   param: { module: bankpayment, action: blockDate }
@@ -94,7 +96,7 @@ bankpayment_block_date:
 bankpayment_payment_report:
   url: /manage/bankpayment/bankpayment-payment-report
   param: { module: bankpayment, action: paymentReport }
-  
+
 # Transaction
 transaction_list:
   url: /manage/transaction/list/:page.html
@@ -128,32 +130,31 @@ transaction_bank_account:
   param: { module: bankTransaction, action: bankAccount }
 transaction_bank_account_list:
   url: /manage/transaction/bank/account/list
-  param: { module: bankTransaction, action: ajaxAccountNumbers}
+  param: { module: bankTransaction, action: ajaxAccountNumbers }
 transaction_config_assignment:
   url: /manage/transaction/config_assignment
   param: { module: bankTransaction, action: configAssignment }
 
-  
 to_bankpayment:
   url: /manage/transaction/to_bankpayment
   param: { module: bankTransaction, action: toBankpayment }
-  
+
 # Refund
 refund_list:
   url: /manage/refund/list
   param: { module: refund, action: list, page: 1 }
-  
+
 refund_list_excel:
   url: /manage/refund/list-excel.html
-  param: { module: refund, action: listExcel}
-  
+  param: { module: refund, action: listExcel }
+
 # BANK Khaan
 bank_khaan_list:
   url: /manage/khaan/list/:page.html
   param: { module: khaan, action: list, page: 1 }
 bank_khaan_list_excel:
   url: /manage/khaan/list-excel.html
-  param: { module: khaan, action: listExcel}
+  param: { module: khaan, action: listExcel }
 bank_khaan_status:
   url: /manage/khaan/status/:id.html
   param: { module: khaan, action: status }
@@ -187,7 +188,7 @@ bank_golomt_list:
   param: { module: golomt, action: list, page: 1 }
 bank_golomt_list_excel:
   url: /manage/golomt/list-excel.html
-  param: { module: golomt, action: listExcel}
+  param: { module: golomt, action: listExcel }
 bank_golomt_status:
   url: /manage/golomt/status/:id.html
   param: { module: golomt, action: status }
@@ -215,7 +216,7 @@ bank_golomt_call_payment_status:
 bank_golomt_call_payment_excel:
   url: /manage/golomt/call/payment/excel
   param: { module: golomt, action: callPaymentExcel }
- 
+
 # BANK MOBIXPRESS
 bank_mobixpress_list:
   url: /manage/mobixpress/list/:page.html
@@ -231,8 +232,8 @@ bank_mobixpress_recharge:
   param: { module: mobixpress, action: recharge }
 bank_mobixpress_list_excel:
   url: /manage/mobixpress/list-excel.html
-  param: { module: mobixpress, action: listExcel}
-  
+  param: { module: mobixpress, action: listExcel }
+
 # BANK CANDY
 bank_candy_list:
   url: /manage/candy/list/:page.html
@@ -248,7 +249,7 @@ bank_candy_recharge:
   param: { module: candy, action: recharge }
 bank_candy_list_excel:
   url: /manage/candy/list-excel.html
-  param: { module: candy, action: listExcel}
+  param: { module: candy, action: listExcel }
 # BANK CANDY DEALER
 bank_candy_dealer:
   url: /manage/candy/dealer/list/:page.html
@@ -264,10 +265,10 @@ bank_candy_dealer_recharge:
   param: { module: candy, action: dealerRecharge }
 bank_candy_dealer_list_excel:
   url: /manage/candy/dealer/list-excel.html
-  param: { module: candy, action: dealerExcel}
+  param: { module: candy, action: dealerExcel }
 bank_candy_remain_show:
   url: /manage/candy/remain/show/:isdn
-  param: { module: candy, action: remainShow}
+  param: { module: candy, action: remainShow }
 
 # BANK SAVINGS
 bank_savings_list:
@@ -278,10 +279,10 @@ bank_savings_mx_list:
   param: { module: savings, action: mx, page: 1 }
 bank_savings_list_excel:
   url: /manage/savings/list-excel.html
-  param: { module: savings, action: listExcel}
+  param: { module: savings, action: listExcel }
 bank_savings_mx_list_excel:
   url: /manage/savings/mx-list-excel.html
-  param: { module: savings, action: mxListExcel}
+  param: { module: savings, action: mxListExcel }
 bank_savings_status:
   url: /manage/savings/status/:id.html
   param: { module: savings, action: status }
@@ -296,7 +297,7 @@ bank_savings_recharge:
   param: { module: savings, action: recharge }
 bank_savings_remx_charge:
   url: /manage/savings/remxcharge
-  param: { module: savings, action: reMxCharge }  
+  param: { module: savings, action: reMxCharge }
 bank_savings_recover:
   url: /manage/savings/recover
   param: { module: savings, action: recover }
@@ -325,7 +326,7 @@ bank_xac_list:
   param: { module: xac, action: list, page: 1 }
 bank_xac_list_excel:
   url: /manage/xac/list-excel.html
-  param: { module: xac, action: listExcel}
+  param: { module: xac, action: listExcel }
 bank_xac_status:
   url: /manage/xac/status/:id.html
   param: { module: xac, action: status }
@@ -352,7 +353,7 @@ bank_xac_call_payment_status:
   param: { module: xac, action: callPaymentStatus }
 bank_xac_call_payment_excel:
   url: /manage/xac/call/payment/excel
-  param: { module: xac, action: callPaymentExcel }  
+  param: { module: xac, action: callPaymentExcel }
 
 # BANK Capital
 bank_capital_list:
@@ -360,7 +361,7 @@ bank_capital_list:
   param: { module: capital, action: list, page: 1 }
 bank_capital_list_excel:
   url: /manage/capital/list-excel.html
-  param: { module: capital, action: listExcel}
+  param: { module: capital, action: listExcel }
 bank_capital_status:
   url: /manage/capital/status/:id.html
   param: { module: capital, action: status }
@@ -394,7 +395,7 @@ bank_tdb_list:
   param: { module: tdb, action: list, page: 1 }
 bank_tdb_list_excel:
   url: /manage/tdb/list-excel.html
-  param: { module: tdb, action: listExcel}
+  param: { module: tdb, action: listExcel }
 bank_tdb_status:
   url: /manage/tdb/status/:id.html
   param: { module: tdb, action: status }
@@ -412,7 +413,7 @@ bank_tdb_reoutcome:
   param: { module: tdb, action: reoutcome }
 bank_tdb_outcome_success:
   url: /manage/tdb/outcomesuccess
-  param: { module: tdb, action: successOutcome }  
+  param: { module: tdb, action: successOutcome }
 bank_tdb_call_payment_list:
   url: /manage/tdb/call/payment/list
   param: { module: tdb, action: callPayment }
@@ -429,7 +430,7 @@ bank_capitron_list:
   param: { module: capitron, action: list, page: 1 }
 bank_capitron_list_excel:
   url: /manage/capitron/list-excel.html
-  param: { module: capitron, action: listExcel}
+  param: { module: capitron, action: listExcel }
 bank_capitron_status:
   url: /manage/capitron/status/:id.html
   param: { module: capitron, action: status }
@@ -458,25 +459,25 @@ bank_capitron_call_payment_excel:
   url: /manage/capitron/call/payment/excel
   param: { module: capitron, action: callPaymentExcel }
 
-# buh bank dealer charge  
+# buh bank dealer charge
 bank_dealer_list:
   url: /manage/dealer/list/:page.html
   param: { module: dealer, action: list, page: 1 }
 bank_dealer_list_excel:
   url: /manage/dealer/list-excel.html
-  param: { module: dealer, action: listExcel}
+  param: { module: dealer, action: listExcel }
 bank_dealer_merge_amount:
   url: /manage/dealer/merge/amount
   param: { module: dealer, action: mergeAmount }
 bank_dealer_merge_report:
   url: /manage/dealer/merge/report
   param: { module: dealer, action: mergeReport }
-  
+
 # USER
 user_info:
   url: /manage/user/info.html
   param: { module: user, action: info }
-  
+
 login:
   url: /manage/user/login.html
   param: { module: user, action: login }
@@ -492,8 +493,8 @@ homepage:
 # generic rules
 # please, remove them by adding more specific rules
 default_index:
-  url:   /:module
+  url: /:module
   param: { action: index }
 
 default:
-  url:   /:module/:action/*
+  url: /:module/:action/*

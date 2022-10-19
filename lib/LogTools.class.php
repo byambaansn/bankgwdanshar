@@ -3,9 +3,13 @@
 class LogTools
 {
 
-    const SERVER = '127.0.0.1'; //192.168.9.19
-    const USERNAME = 'bankgw';
-    const PASSWORD = 'B4H3sAWyDvsjC382';
+    const SERVER = '10.64.10.40'; //192.168.9.19
+    //const USERNAME = 'bankgw';
+    //const PASSWORD = 'B4H3sAWyDvsjC382';
+
+    const USERNAME = 'a_bankgw';
+    const PASSWORD = 'FD@f_1234';
+
 
     public static function getLogPDO()
     {

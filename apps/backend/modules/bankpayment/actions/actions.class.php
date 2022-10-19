@@ -480,6 +480,53 @@ class bankpaymentActions extends sfActions
         $this->transaction = $transaction;
         $this->bankpayment = $bankpayment;
     }
+/**
+     * copy 
+     * 
+     * @param sfWebRequest $request
+     */
+    public function executeCopyUssd(sfWebRequest $request)
+    {
+        $bankpayment = BankpaymentTable::retrieveByPK($request->getParameter('id'));
+        $transaction = BankpaymentTable::getBankTransaction($bankpayment['vendor_id'], $bankpayment['bank_order_id']);
+        $balance = $request->getParameter('bal');
+        
+        if (!$bankpayment) {
+            $this->getUser()->setFlash('error', 'Гүйлгээ одсонгүй.'.$request->getParameter('amount[0]'));
+            $this->redirect($request->getReferer());
+        }
+        
+        if (!in_array($bankpayment->getStatus(), array(BankpaymentTable::STAT_BANKPAYMENT_AMOUNT, BankpaymentTable::STAT_BANKPAYMENT_TRANS_VALUE, BankpaymentTable::STAT_FAILED_BILL_INFO, BankpaymentTable::STAT_FAILED_CHARGE))) {
+            return $this->renderText('<div class="error message">Энэ гүйлгээг хуваах боломжгүй. Зөвхөн ' . BankpaymentTable::getStatusName(BankpaymentTable::STAT_BANKPAYMENT_AMOUNT) . ',' . BankpaymentTable::getStatusName(BankpaymentTable::STAT_BANKPAYMENT_TRANS_VALUE) . ',' . BankpaymentTable::getStatusName(BankpaymentTable::STAT_FAILED_BILL_INFO) . ',' . BankpaymentTable::getStatusName(BankpaymentTable::STAT_FAILED_CHARGE). ' төлөвтэй гүйлгээ хувилах боломжтой.</div>');
+        }
+        
+        if (BlockDateTable::checkBlock(date('Y-m-d', strtotime($transaction['order_date']))) || BlockDateTable::checkBlock(date('Y-m-d', strtotime($bankpayment['updated_at'])))) {
+            $block = BlockDateTable::getByType();
+            $message = '<div class="warning message">' . $block['block_date'] . ' -ны өдрөөр хаалт хийсэн тул энэ гүйлгээг засах боломжгүй.';
+            return $this->renderText($message);
+        }
+
+        if ($request->isMethod('POST')) {
+            $rowCount = $request->getParameter('rowCount');
+            $param = array();
+            for ($index = 0; $index <= $rowCount; $index++) {
+                $param['bank_id'] = $request->getParameter('bank_id');
+                $param['amount'.$index] = $request->getParameter('amount'.$index);
+                $param['contNumber'.$index] = $request->getParameter('contNumber'.$index,0);
+                $param['status']= $request->getParameter('status');
+                $param['order_p']= $request->getParameter('order_p');
+            }         
+            $this->copyUssd($bankpayment, $transaction, $rowCount, $balance, $param, 'SPLIT');
+            $bankpayment->setStatus(BankpaymentTable::STAT_SPLITED);
+            $bankpayment->setStatusComment('Хуваагдсан гүйлгээ');
+            $bankpayment->setUsername($this->getUser()->getUsername());
+            $bankpayment->save();
+            LogTools::setLogBankpayment($bankpayment);
+            $this->redirect($request->getReferer());
+        }
+        $this->transaction = $transaction;
+        $this->bankpayment = $bankpayment;
+    }
 
     /**
      * Улуснэт төлбөр 
@@ -831,7 +878,7 @@ class bankpaymentActions extends sfActions
         $this->transaction = BankpaymentTable::getBankTransaction($bankpayment['vendor_id'], $bankpayment['bank_order_id']);
         $this->bankpayment = $bankpayment;
     }
-
+    
     /**
      * Topup цэнэглэлт, DATA sapc , WIFI Card
      * 
@@ -1154,9 +1201,9 @@ class bankpaymentActions extends sfActions
      */
     public function executeUssdUpdate(sfWebRequest $request)
     {
-        $id = $request->getParameter('id', 0);
-        $number = $request->getParameter('number', 0);
-        $cart = $request->getParameter('cart', 0);
+            $id = $request->getParameter('id', 0);
+            $number = $request->getParameter('number', 0);
+            $cart = $request->getParameter('cart', 0);
 
         $bankpayment = BankpaymentTable::retrieveByPK($id);
         $this->forward404Unless($bankpayment);
@@ -1184,12 +1231,14 @@ class bankpaymentActions extends sfActions
                 LogTools::setLogBankpayment($bankpayment);
                 $this->getUser()->setFlash('success', "Утасны дугаарыг амжилттай заслаа.");
             } catch (Exception $exc) {
-                $this->getUser()->setFlash('error', "Гэрээний дугаар засах хүсэлт амжилтгүй.");
+                $this->getUser()->setFlash('error', "Утасны дугаар засалт амжилтгүй");
             }
             $this->redirect($request->getReferer());
         }
+        $this->types = PaymentTypeTable::getForSelect();
         $this->transaction = BankpaymentTable::getBankTransaction($bankpayment['vendor_id'], $bankpayment['bank_order_id']);
         $this->bankpayment = $bankpayment;
+        
     }
 
     public function executeReturn(sfWebRequest $request)
@@ -1497,6 +1546,60 @@ class bankpaymentActions extends sfActions
         }
     }
     
+    public function copyUssd($bankpayment, $bankTransaction, $rowCount, $balance, $param, $old_type_id, $description = '')
+    {            
+        if (!$bankTransaction) {
+            $this->getUser()->setFlash('error', 'Банкны гүйлгээний мэдээлэл олдсонгүй.');
+            $this->redirect(sfContext::getInstance()->getRequest()->getReferer());
+        }
+        if (doubleval($balance) != 0) {
+            $this->getUser()->setFlash('error', 'Амжилтгүй. Хуваах үнийн дүн буруу байна.');
+            $this->redirect(sfContext::getInstance()->getRequest()->getReferer());
+        }
+       
+        for ($index = 0; $index <= $rowCount; $index++) {
+            $amt = $param['amount'.$index];
+
+            if ($amt == 0 || $amt == "") {
+                continue;
+            }
+            $contNumber = $param['contNumber'.$index];
+                        if ($contNumber) {
+                            $text = ''.$contNumber.' утасны дугаараар';
+                        }else {
+                            $this->getUser()->setFlash('error', 'Амжилтгүй. Утасны дугаар ороогүй байна.');
+                            $this->redirect(sfContext::getInstance()->getRequest()->getReferer());
+                        }
+                    } 
+            
+                    $tran = TransactionTable::retrieveByBankAndOrderId(BankTable::getBankAndVendorMap($bankpayment['vendor_id']), $bankTransaction['order_id'], $bankTransaction['order_type'], $bankTransaction['order_amount'], $bankTransaction['order_date']);
+                   
+                for ($index = 0; $index <= $rowCount; $index++) {
+                    $amount = $param['amount'.$index];
+                    $contNumber = $param['contNumber'.$index];
+                    $childCount = (int) BankpaymentTable::getChildCount($bankpayment['id']);
+                    $values = array();
+                    $values['parent_id'] = $bankpayment['id'];
+                    $values['vendor_id'] = $bankpayment['vendor_id'];
+                    $values['type'] = $bankpayment['type'];
+                    $values['related_account'] = 0;
+                    $values['bank_order_id'] = $bankpayment['bank_order_id'];
+                    $values['child_num'] = ++$childCount;
+                    $values['paid_amount'] = $amount;
+                    $values['username'] = $this->getUser()->getUsername();
+                    $values['contract_number'] = 0;
+                    $values['contract_name'] = 0;
+                    $values['bill_cycle'] = 0;
+                    $values['contract_amount'] = 0;
+                    $values['number'] = $contNumber;
+                    $paymentCode = BankpaymentTable::getPaymentCode($bankpayment['vendor_id'], $bankTransaction->getBankAccount());
+                    $values['status'] = BankpaymentTable::STAT_FAILED_CHARGE;
+                    $values['status_comment'] = "Хуваагдал";
+                    $bankpaymentChild = BankpaymentTable::insert($values);     
+                        $this->getUser()->setFlash('success', 'Амжилттай. Хуулбарийг дараалалд орууллаа. ');          
+                }
+    }
+
     public function executeBlockDate(sfWebRequest $request)
     {
         $block_type = $request->getParameter('blockType', BlockDateTable::BLOCK_PAYMENT);
@@ -1529,7 +1632,7 @@ class bankpaymentActions extends sfActions
             }
         }
     }
-    
+
     public function executePaymentReport(sfWebRequest $request)
     {
         set_time_limit(0);

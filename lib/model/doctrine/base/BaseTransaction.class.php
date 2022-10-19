@@ -10,6 +10,7 @@ Doctrine_Manager::getInstance()->bindComponent('Transaction', 'transaction');
  * @property integer $id
  * @property integer $bank_id
  * @property string $bank_account
+ * @property string $related_account
  * @property string $order_id
  * @property timestamp $order_date
  * @property string $order_p
@@ -26,6 +27,7 @@ Doctrine_Manager::getInstance()->bindComponent('Transaction', 'transaction');
  * @method integer             getId()                    Returns the current record's "id" value
  * @method integer             getBankId()                Returns the current record's "bank_id" value
  * @method string              getBankAccount()           Returns the current record's "bank_account" value
+ * @method string              getRelatedAccount()        Returns the current record's "related_account" value
  * @method string              getOrderId()               Returns the current record's "order_id" value
  * @method timestamp           getOrderDate()             Returns the current record's "order_date" value
  * @method string              getOrderP()                Returns the current record's "order_p" value
@@ -41,6 +43,7 @@ Doctrine_Manager::getInstance()->bindComponent('Transaction', 'transaction');
  * @method Transaction         setId()                    Sets the current record's "id" value
  * @method Transaction         setBankId()                Sets the current record's "bank_id" value
  * @method Transaction         setBankAccount()           Sets the current record's "bank_account" value
+ * @method Transaction         setRelatedAccount()        Sets the current record's "related_account" value
  * @method Transaction         setOrderId()               Sets the current record's "order_id" value
  * @method Transaction         setOrderDate()             Sets the current record's "order_date" value
  * @method Transaction         setOrderP()                Sets the current record's "order_p" value
@@ -64,7 +67,7 @@ abstract class BaseTransaction extends sfDoctrineRecord
     public function setTableDefinition()
     {
         $this->setTableName('transaction');
-        $this->hasColumn('id', 'integer', 8, array(
+        $this->hasColumn('id', 'integer', 9, array(
              'type' => 'integer',
              'fixed' => 0,
              'unsigned' => false,
@@ -90,6 +93,15 @@ abstract class BaseTransaction extends sfDoctrineRecord
              'autoincrement' => false,
              'length' => 50,
              ));
+       $this->hasColumn('related_account', 'string', 50, array(
+               'type' => 'string',
+               'fixed' => 0,
+               'unsigned' => false,
+               'primary' => false,
+               'notnull' => true,
+               'autoincrement' => false,
+               'length' => 50,
+              ));
         $this->hasColumn('order_id', 'string', 30, array(
              'type' => 'string',
              'fixed' => 0,
