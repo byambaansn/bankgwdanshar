@@ -119,6 +119,4 @@ $('#dateTo').datepicker();
         }
     });
 
-});
-
 </script>

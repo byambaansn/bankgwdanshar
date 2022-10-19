@@ -974,8 +974,8 @@ class bankpaymentActions extends sfActions
      */
     public function executeChargeUnit(sfWebRequest $request)
     {   
-        $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/PaymentVAT/USSD/CHARGEUNIT_'.date('Y-m-d').'.log'));
-        $id = $request->getParameter('id', 0);   
+        $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . 'ChargeTopupSapc/CHARGEUNIT_'.date('Y-m-d').'.log'));
+        $id = $request->getParameter('id');   
         $number= $request -> getParameter('number');
         $card= $request -> getParameter('card');
         $amount = (float)$request ->getParameter('order_amount');
@@ -1000,7 +1000,10 @@ class bankpaymentActions extends sfActions
             $logger->log("ChargeUnit number: ".$number."Card:".$card." result code:".$result['Code'], sfFileLogger::INFO);
          
 
-            if (isset($result['Code']) && $result['Code'] == 0) {
+            if (isset($result) && isset($result['Code']) && $result['Code'] == 0) {
+                    BankpaymentTable::updateStatus($id, BankpaymentTable::STAT_SUCCESS, 'Амжилттай цэнэглэсэн', $this->getUser()->getId(), $this->getUser()->getUsername());   
+                    $bankpayment->save(); 
+                    LogTools::setLogBankpayment($bankpayment);
                     $this->getUser()->setFlash('success', "Амжилттай цэнэглэгдлээ");
                     $bankpayment->setUpdatedUserId($this->getUser()->getId());
                     $bankpayment->setUsername($this->getUser()->getUsername());
@@ -1029,7 +1032,7 @@ class bankpaymentActions extends sfActions
                             return false;
                         }
                     }catch (\Exception $ex) {
-                        logger->log($bankOrder->order_id . 'sendPaymentVat ERROR: ' . $ex->getMessage(), sfFileLogger::INFO);
+                        $logger->log($bankOrder->order_id . 'sendPaymentVat ERROR: ' . $ex->getMessage(), sfFileLogger::INFO);
                         return false;
                     }
                     $this->getUser()->setFlash('success', "Амжилттай цэнэглэгдлээ");
@@ -1055,7 +1058,7 @@ class bankpaymentActions extends sfActions
      */
     public function executeChargeData(sfWebRequest $request)
     {  
-        $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/PaymentVAT/USSD/CHARGEDATA_'.date('Y-m-d').'.log'));
+        $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/ChargeTopupSapc/CHARGEDATA_'.date('Y-m-d').'.log'));
         $id = $request->getParameter('id', 0);  
         $number= $request -> getParameter('number');
         $card= $request -> getParameter('card');
@@ -1130,9 +1133,9 @@ class bankpaymentActions extends sfActions
      */
     public function executeChargeSmall(sfWebRequest $request)
     {   
-        $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/PaymentVAT/SMALL/UNIT_'.date('Y-m-d').'.log'));
+        $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/ChargeTopupSapc/SMALLUNIT_'.date('Y-m-d').'.log'));
         $number= $request -> getParameter('number');
-        $amount= $request -> getParameter('amount');
+        $amount= $request -> getParameter('amt');
         $order_amount= $request -> getParameter('order_amount');
         $id = $request->getParameter('id', 0);  
         $userId = $this->getUser()->getId();

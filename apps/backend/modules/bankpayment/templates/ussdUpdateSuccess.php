@@ -149,7 +149,7 @@
                             <input id="number3" class="number" type="text" name="number" value="" size="8" />
                         </td>
                         <td id="amt0" class="amt">
-                            <input id="amount" type="text" name="amount" value="0" size="10" />
+                            <input id="amt" type="text" name="amount" value="0" size="10" />
                         </td>
                     </tr>
                     <tr>
@@ -165,8 +165,8 @@
     </form>
 </div>
 
-<script> 
-      $(document).ready(function () {
+<script>
+    $(document).ready(function () {
         $('#notification').html("asdasdasd");
         $('#subtract').on('input', function () {
             var subtrahend = $('#subtrahend').html();
@@ -215,7 +215,7 @@ $('#btnChargeUnit').click(function() {
         data: "id="+<?php echo $bankpayment['id']; ?>+"&number="+$('#number1').val()+"&card="+$('#uType').val()+ "&order_amount="+ <?php echo $transaction['order_amount'];?>+"&bank="+<?php echo $bankpayment['vendor_id'];?>+"&bankAccount="+<?php echo $transaction['bank_account'];?>,
         type: "POST",
         success: function(data) {
-           
+
             $('#btnChargeUnit').hide();
             window.location.reload(true);
         },
@@ -250,19 +250,19 @@ $('#btnChargeData').click(function() {
 
 $('#btnChargeSmall').click(function() {
      
-    $.ajax({
-        url: "<?php echo url_for('@bankpayment_ussd_chargesmall')?>",
-        data: "id=" + <?php echo $bankpayment['id']; ?> + "&number="+$('#number3').val()+"&amount="+$('#amount').val()+"&order_amount="+ <?php echo $transaction['order_amount'] ?>+"&order_amount="+ <?php echo $transaction['order_amount'];?>+"&bank="+<?php echo $bankpayment['vendor_id'];?>,
-        type: "POST",
-        success: function(data) {
-       
-            $('#btnChargeSmall').hide();
-            window.location.reload(true);
-        },
-        error: function(data) {
-            alert("Цэнэглэлт амжилтгүй");
-        }
-    });
-
-});
+     $.ajax({
+         url: "<?php echo url_for('@bankpayment_ussd_chargesmall')?>",
+         data: "id=" + <?php echo $bankpayment['id']; ?> + "&number="+$('#number3').val()+"&amt="+$('#amt').val()+"&order_amount="+ <?php echo $transaction['order_amount'] ?>+"&bank="+<?php echo $bankpayment['vendor_id'];?>,
+         type: "POST",
+         success: function(data) {
+        
+             $('#btnChargeSmall').hide();
+             window.location.reload(true);
+         },
+         error: function(data) {
+             alert("Цэнэглэлт амжилтгүй");
+         }
+     });
+ 
+ });
 </script>
