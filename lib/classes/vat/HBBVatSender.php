@@ -31,9 +31,9 @@ class HBBVatSender
         if($email) {
             $url = $url . '&email=' . $email;
         }
-        $start = (new \DateTime())->format('Y-m-d H:i:s');
+        $start = DateTime::createFromFormat('U.u', microtime(true))->format("Y-m-d H:i:s.u");
         $result = self::curlCall($url, null, $header);
-        $end = (new \DateTime())->format('Y-m-d H:i:s');
+        $end = DateTime::createFromFormat('U.u', microtime(true))->format("Y-m-d H:i:s.u");
         $httpcode = $result['HttpCode'];
         $response = array();
         $response['Code'] = $httpcode;

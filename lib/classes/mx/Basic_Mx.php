@@ -135,7 +135,8 @@ class Basic_Mx
         } else {
             $str = $this->xml_response->asXml();
         }
-        $sql = "UPDATE bankgw_log.`log_mx_charge` SET `response` = '" . $str . "', `updated_at` = '". (new \DateTime())->format('Y-m-d H:i:s') ."' WHERE id = " . $this->logId;
+        $now = DateTime::createFromFormat('U.u', microtime(true))->format("Y-m-d H:i:s.u");
+        $sql = "UPDATE bankgw_log.`log_mx_charge` SET `response` = '" . $str . "', `updated_at` = '". $now ."' WHERE id = " . $this->logId;
 
         $this->mysqlExecute($sql);
     }

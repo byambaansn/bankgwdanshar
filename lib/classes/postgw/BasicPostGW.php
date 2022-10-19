@@ -152,7 +152,8 @@ class BasicPostGW
         $pdo = LogTools::getLogPDO();
         $sql = "UPDATE bankgw_log.`log_gateway_number` SET `response_xml` = :text, `updated_at` = :date  WHERE id = :logId";
         $sth = $pdo->prepare($sql);
-        $sth->execute(array(':text' => $this->xml_response_raw . print_r($this->getResponse(), true), ':date' => (new \DateTime())->format('Y-m-d H:i:s'), ':logId' => $logId));
+        $now = DateTime::createFromFormat('U.u', microtime(true))->format("Y-m-d H:i:s.u");
+        $sth->execute(array(':text' => $this->xml_response_raw . print_r($this->getResponse(), true), ':date' => $now, ':logId' => $logId));
     }
 
     public function isValid()

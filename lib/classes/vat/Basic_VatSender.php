@@ -175,9 +175,9 @@ class Basic_VatSender
     {
         $this->setHeader();
         $this->track .= "Call function дуудагдав <br /> XML ийг мобикомоос дуудаж байна <br />";
-        $start = (new \DateTime())->format('Y-m-d H:i:s');
+        $start = DateTime::createFromFormat('U.u', microtime(true))->format("Y-m-d H:i:s.u");
         $this->xml_response = $this->httpsPost();
-        $end = (new \DateTime())->format('Y-m-d H:i:s');
+        $end = DateTime::createFromFormat('U.u', microtime(true))->format("Y-m-d H:i:s.u");
         $this->xml_response_raw = $this->xml_response;
         if ($this->xml_response_raw) {
             $this->track .= "Хариу ирсэн <br />";

@@ -719,8 +719,9 @@ class LogTools
      */
     public static function setLogGatewayTocGwUpdate($id, $response)
     {
+        $now = DateTime::createFromFormat('U.u', microtime(true))->format("Y-m-d H:i:s.u");
         $query = "UPDATE bankgw_log.log_gateway_toc_gw
-              SET response_xml = \"$response\", updated_at = \"(new \DateTime())->format('Y-m-d H:i:s')\"
+              SET response_xml = \"$response\", updated_at = \"$now\"
               WHERE id = '$id'";
         return self::execute($query);
     }

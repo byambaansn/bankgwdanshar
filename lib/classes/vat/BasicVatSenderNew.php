@@ -52,9 +52,9 @@ class BasicVatSenderNew
         $data["group"] = false;
         $data["productList"] = array($detail);
         $body = json_encode($data);
-        $start = (new \DateTime())->format('Y-m-d H:i:s');
+        $start = DateTime::createFromFormat('U.u', microtime(true))->format("Y-m-d H:i:s.u");
         $result = self::curlCall($url, $body, $header, true);
-        $end = (new \DateTime())->format('Y-m-d H:i:s');
+        $end = DateTime::createFromFormat('U.u', microtime(true))->format("Y-m-d H:i:s.u");
         $httpcode = $result['HttpCode'];
         $resp = $result['Result'];
         $response = array();
@@ -95,9 +95,9 @@ class BasicVatSenderNew
         $data["offset"] = $offset;
 
         $body = json_encode($data);
-        $start = (new \DateTime())->format('Y-m-d H:i:s');
+        $start = DateTime::createFromFormat('U.u', microtime(true))->format("Y-m-d H:i:s.u");
         $result = self::curlCall($url, $body, $header, true);
-        $end = (new \DateTime())->format('Y-m-d H:i:s');
+        $end = DateTime::createFromFormat('U.u', microtime(true))->format("Y-m-d H:i:s.u");
         $httpcode = $result['HttpCode'];
         $resp = $result['Result'];
         $response = array();
@@ -149,9 +149,9 @@ class BasicVatSenderNew
         $data["channel"] = "bank";
         
         $body = json_encode($data);
-        $start = (new \DateTime())->format('Y-m-d H:i:s');
+        $start = DateTime::createFromFormat('U.u', microtime(true))->format("Y-m-d H:i:s.u");
         $result = self::curlCall($url, $body, $header, true);
-        $end = (new \DateTime())->format('Y-m-d H:i:s');
+        $end = DateTime::createFromFormat('U.u', microtime(true))->format("Y-m-d H:i:s.u");
         $httpcode = $result['HttpCode'];
         $resp = $result['Result'];
         $response = array();
