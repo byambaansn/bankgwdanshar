@@ -1344,7 +1344,7 @@ WHERE parent_id=$bankpaymentId";
                 if ($number) {
                     if ($bankpaymentRow['type'] == self::TYPE_CANDY_LOAN) {
                         $txnDesc = preg_replace("/\([0-9]{8}\)/", "", $number);
-                        preg_match_all("/([9][954][0-9]{6})|(85[0-9]{6})/", $txnDesc, $matches);
+                        preg_match_all("/([9][013786459][0-9]{6})|([8][503689][0-9]{6})/", $txnDesc, $matches);
                         if (!count($matches[0])) {
                             $bankpaymentRow->status_comment = $number;
                             $bankpaymentRow->status = self::STAT_IMPOSSIBLE;
