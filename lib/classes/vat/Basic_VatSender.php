@@ -164,6 +164,8 @@ class Basic_VatSender
 
         $sql = "INSERT INTO bankgw_log.`log_gateway_vat` (`number` ,`type_s`, `user_id`, `response_code`, `url`, `request_xml` ,`response_xml`, `created_at`, `updated_at`)VALUES ('" . $this->number . "', '" . $this->getClassName() . "', '" . $this->userId . "'," . $this->responseCode . ", '" . $this->url . "', '" . $rt . "', '" . $re . "', '". $start ."', '". $end ."');";
         $pdo->exec($sql);
+        $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/gw-log/basicVatSender-' . date("Ymd") . '.log'));
+        $logger->log('logAccess -- sql='. $sql, sfFileLogger::INFO);
     }
 
     public function isValid()

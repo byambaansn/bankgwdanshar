@@ -154,6 +154,8 @@ class BasicPostGW
         $sth = $pdo->prepare($sql);
         $now = DateTime::createFromFormat('U.u', microtime(true))->format("Y-m-d H:i:s.u");
         $sth->execute(array(':text' => $this->xml_response_raw . print_r($this->getResponse(), true), ':date' => $now, ':logId' => $logId));
+        $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/gw-log/basicPostGw-' . date("Ymd") . '.log'));
+        $logger->log('logAccessUpdate -- id='. $logId . '; sql='. $sql . '; time: ' . $now, sfFileLogger::INFO);
     }
 
     public function isValid()

@@ -557,6 +557,8 @@ class LoyaltyCharge
         $sth = $pdo->prepare($sql);
         $now = DateTime::createFromFormat('U.u', microtime(true))->format("Y-m-d H:i:s.u");
         $sth->execute(array(':text' => $text, ':date' => $now, ':logId' => $logId));
+        $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/gw-log/loyaltyCharge-' . date("Ymd") . '.log'));
+        $logger->log('logAccessUpdate -- id='. $logId . '; sql='. $sql . '; time: ' . $now, sfFileLogger::INFO);
     }
 
 }

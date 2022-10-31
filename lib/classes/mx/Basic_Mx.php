@@ -139,6 +139,8 @@ class Basic_Mx
         $sql = "UPDATE bankgw_log.`log_mx_charge` SET `response` = '" . $str . "', `updated_at` = '". $now ."' WHERE id = " . $this->logId;
 
         $this->mysqlExecute($sql);
+        $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/gw-log/basicMx-' . date("Ymd") . '.log'));
+        $logger->log('logAccessUpdate -- id='. $this->logId . '; sql='. $sql . '; time: ' . $now, sfFileLogger::INFO);
     }
 
     public function isValid()

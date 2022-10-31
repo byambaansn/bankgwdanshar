@@ -217,6 +217,8 @@ class BasicVatSenderNew
         $sql = "INSERT INTO bankgw_log.`log_gateway_vat` (`number` ,`type_s`, `user_id`, `response_code`, `url`, `request_xml` ,`response_xml`, `created_at`, `updated_at`)VALUES ('" .
             $number . "', '".$type."', 0," . $responseCode . ", '" . $url . "', '".$request."', '" . $response . "', '". $start ."', '". $end ."');";
         $pdo->exec($sql);
+        $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/gw-log/basicVatSenderNew-' . date("Ymd") . '.log'));
+        $logger->log('logAccess -- sql='. $sql, sfFileLogger::INFO);
     }
     
     public static function getVatReturnBillListFormatter($billId, $billList)

@@ -72,10 +72,12 @@ class SapcGateway
 
     public static function logAccessUpdate($logId, $result = "")
     {
+        $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/gw-log/sapcgw-' . date("Ymd") . '.log'));
         $pdo = LogTools::getLogPDO();
         $sql = "UPDATE bankgw_log.`log_gateway_sapc` SET `response_xml` = :text, `updated_at` = :date WHERE id = :logId";
         $sth = $pdo->prepare($sql);
         $now = DateTime::createFromFormat('U.u', microtime(true))->format("Y-m-d H:i:s.u");
+        $logger->log('logAccessUpdate -- id='. $logId . '; sql='. $sql . '; time: ' . $now, sfFileLogger::INFO);
         $sth->execute(array(':text' => $result, ':date' => $now, ':logId' => $logId));
     }
 

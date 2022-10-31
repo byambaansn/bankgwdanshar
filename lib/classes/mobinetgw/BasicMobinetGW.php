@@ -183,6 +183,8 @@ class BasicMobinetGW
         $now = DateTime::createFromFormat('U.u', microtime(true))->format("Y-m-d H:i:s.u");
         $sql = "UPDATE bankgw_log.`log_gateway_mobinet` SET `response_xml` = '" . $str . "', `updated_at` = '". $now ."' WHERE id = " . $this->logId;
         LogTools::execute($sql);
+        $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/gw-log/basicMobinetGw-' . date("Ymd") . '.log'));
+        $logger->log('logAccessUpdate -- id='. $this->logId . '; sql='. $sql . '; time: ' . $now, sfFileLogger::INFO);
     }
 
 }

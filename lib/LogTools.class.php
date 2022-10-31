@@ -719,10 +719,12 @@ class LogTools
      */
     public static function setLogGatewayTocGwUpdate($id, $response)
     {
+        $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/gw-log/logtools-' . date("Ymd") . '.log'));
         $now = DateTime::createFromFormat('U.u', microtime(true))->format("Y-m-d H:i:s.u");
         $query = "UPDATE bankgw_log.log_gateway_toc_gw
               SET response_xml = \"$response\", updated_at = \"$now\"
               WHERE id = '$id'";
+        $logger->log('setLogGatewayTocGwUpdate -- id='. $id . '; response='. $response . '; time: ' . $now, sfFileLogger::INFO);
         return self::execute($query);
     }
 
