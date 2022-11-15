@@ -4,7 +4,7 @@
         <thead>
             <tr>
                 <th  width="20" rowspan="2">№</th>
-                <th  width="90" colspan="5">Банкны хуулганы мэдээлэл</th>
+                <th  width="90" colspan="6">Банкны хуулганы мэдээлэл</th>
                 <th  width="40" rowspan="2">Төлөв</th>
                 <th  width="90" colspan="5">Гэрээтэй холбоотой мэдээлэл</th>
                 <th  width="120" rowspan="2">Ажилтан</th>
@@ -15,6 +15,7 @@
             <tr>
                 <th  width="50">Банк</th>
                 <th  width="90">Дансны дугаар</th>
+                <th  width="90">Харьцсан Данс</th>
                 <th colspan="1" width="70">Банк огноо</th>
                 <th colspan="1" width="150">Гүйлгээний утга</th>
                 <th width="60">Төлөлтийн дүн</th>
@@ -41,6 +42,7 @@
                     <td><?php echo $i++; ?></td>
                     <td><?php echo $row['bank_name'] ?></td>
                     <td><?php echo $row['bank_account'] ?></td>
+                    <td><?php echo $row['related_account'] ?></td>
                     <td><?php echo $row['order_date'] ?></td>
                     <td align="left"><?php echo $row['order_p'] ?></td>
                     <td><?php echo $row['order_amount'] ?></td>

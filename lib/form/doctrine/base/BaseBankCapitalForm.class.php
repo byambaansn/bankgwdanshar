@@ -36,6 +36,7 @@ abstract class BaseBankCapitalForm extends BaseFormDoctrine
       'try_count'         => new sfWidgetFormInputText(),
       'created_at'        => new sfWidgetFormDateTime(),
       'updated_at'        => new sfWidgetFormDateTime(),
+      'related_account'   => new sfWidgetFormInputText(),
     ));
 
     $this->setValidators(array(
@@ -60,6 +61,7 @@ abstract class BaseBankCapitalForm extends BaseFormDoctrine
       'try_count'         => new sfValidatorInteger(array('required' => false)),
       'created_at'        => new sfValidatorDateTime(),
       'updated_at'        => new sfValidatorDateTime(),
+      'related_account'   => new sfValidatorString(array('max_length' => 50)),
     ));
 
     $this->widgetSchema->setNameFormat('bank_capital[%s]');

@@ -10,7 +10,6 @@ Doctrine_Manager::getInstance()->bindComponent('Transaction', 'transaction');
  * @property integer $id
  * @property integer $bank_id
  * @property string $bank_account
- * @property string $related_account
  * @property string $order_id
  * @property timestamp $order_date
  * @property string $order_p
@@ -21,13 +20,13 @@ Doctrine_Manager::getInstance()->bindComponent('Transaction', 'transaction');
  * @property timestamp $updated_at
  * @property integer $updated_user_id
  * @property timestamp $created_at
+ * @property string $related_account
  * @property Bank $Bank
  * @property Doctrine_Collection $TransactionPayment
  * 
  * @method integer             getId()                    Returns the current record's "id" value
  * @method integer             getBankId()                Returns the current record's "bank_id" value
  * @method string              getBankAccount()           Returns the current record's "bank_account" value
- * @method string              getRelatedAccount()        Returns the current record's "related_account" value
  * @method string              getOrderId()               Returns the current record's "order_id" value
  * @method timestamp           getOrderDate()             Returns the current record's "order_date" value
  * @method string              getOrderP()                Returns the current record's "order_p" value
@@ -38,12 +37,12 @@ Doctrine_Manager::getInstance()->bindComponent('Transaction', 'transaction');
  * @method timestamp           getUpdatedAt()             Returns the current record's "updated_at" value
  * @method integer             getUpdatedUserId()         Returns the current record's "updated_user_id" value
  * @method timestamp           getCreatedAt()             Returns the current record's "created_at" value
+ * @method string              getRelatedAccount()        Returns the current record's "related_account" value
  * @method Bank                getBank()                  Returns the current record's "Bank" value
  * @method Doctrine_Collection getTransactionPayment()    Returns the current record's "TransactionPayment" collection
  * @method Transaction         setId()                    Sets the current record's "id" value
  * @method Transaction         setBankId()                Sets the current record's "bank_id" value
  * @method Transaction         setBankAccount()           Sets the current record's "bank_account" value
- * @method Transaction         setRelatedAccount()        Sets the current record's "related_account" value
  * @method Transaction         setOrderId()               Sets the current record's "order_id" value
  * @method Transaction         setOrderDate()             Sets the current record's "order_date" value
  * @method Transaction         setOrderP()                Sets the current record's "order_p" value
@@ -54,6 +53,7 @@ Doctrine_Manager::getInstance()->bindComponent('Transaction', 'transaction');
  * @method Transaction         setUpdatedAt()             Sets the current record's "updated_at" value
  * @method Transaction         setUpdatedUserId()         Sets the current record's "updated_user_id" value
  * @method Transaction         setCreatedAt()             Sets the current record's "created_at" value
+ * @method Transaction         setRelatedAccount()        Sets the current record's "related_account" value
  * @method Transaction         setBank()                  Sets the current record's "Bank" value
  * @method Transaction         setTransactionPayment()    Sets the current record's "TransactionPayment" collection
  * 
@@ -93,15 +93,6 @@ abstract class BaseTransaction extends sfDoctrineRecord
              'autoincrement' => false,
              'length' => 50,
              ));
-       $this->hasColumn('related_account', 'string', 50, array(
-               'type' => 'string',
-               'fixed' => 0,
-               'unsigned' => false,
-               'primary' => false,
-               'notnull' => true,
-               'autoincrement' => false,
-               'length' => 50,
-              ));
         $this->hasColumn('order_id', 'string', 30, array(
              'type' => 'string',
              'fixed' => 0,
@@ -192,6 +183,15 @@ abstract class BaseTransaction extends sfDoctrineRecord
              'notnull' => true,
              'autoincrement' => false,
              'length' => 25,
+             ));
+        $this->hasColumn('related_account', 'string', 50, array(
+             'type' => 'string',
+             'fixed' => 0,
+             'unsigned' => false,
+             'primary' => false,
+             'notnull' => true,
+             'autoincrement' => false,
+             'length' => 50,
              ));
     }
 

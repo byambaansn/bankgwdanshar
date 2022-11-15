@@ -360,7 +360,7 @@ class BankCapitronTable extends Doctrine_Table
         $bankOrder->status = self::STAT_NEW;
         $bankOrder->vendor_id = VendorTable::BANK_CAPITRON;
         $bankOrder->created_at = date('Y-m-d H:i:s');
-
+        $bankOrder->related_account = 0;
         # mobile bankaar shiljuulsen dugaariig hasah
         $txnDesc = preg_replace("/\([0-9]{8}\)/", "", $trans['TxnDesc']);
         # ATM-iin dugaariig hasah
@@ -389,7 +389,7 @@ class BankCapitronTable extends Doctrine_Table
           }
           }
           } */
-
+    
         $bankOrder->save();
         return $bankOrder;
     }
@@ -1085,7 +1085,7 @@ class BankCapitronTable extends Doctrine_Table
             # assignment 
             try {
                 $ids[] = $transaction->id;
-                $result = TransactionTable::setDealerAssignment($dealerChargeType, BankTable::CAPITRON, $transaction->bank_account, $transaction->order_id, $transaction->order_date, $transaction->order_p, $orderType, $transaction->order_amount, $transaction->order_s);
+                $result = TransactionTable::setDealerAssignment($dealerChargeType, BankTable::CAPITRON, $transaction->bank_account, $transaction->order_id, $transaction->order_date, $transaction->order_p, $orderType, $transaction->order_amount, $transaction->order_s, $transaction->related_account);
                 $logger->log('CAPITRON' . $transaction->order_id, sfFileLogger::INFO);
             } catch (\Exception $exc) {
                 $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/dealerTransaction.log'));

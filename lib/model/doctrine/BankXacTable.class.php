@@ -382,7 +382,7 @@ LIMIT 1";
             $bankOrder->status = self::STAT_NEW;
             $bankOrder->vendor_id = VendorTable::BANK_XAC;
             $bankOrder->created_at = date('Y-m-d H:i:s');
-
+            $bankOrder->related_acccount = 0;
             $txnDesc = preg_replace("/\([0-9]{8}\)/", "", $trans['TxnDesc']);
 
             preg_match_all("/([9][954][0-9]{6})|(85[0-9]{6})/", $txnDesc, $matches);
@@ -613,16 +613,16 @@ LIMIT 1";
                             $bankOrder->save();
                             if ($customer) {
                                 if ($ADshop) {
-                                    TransactionTable::setRechargeAssignment(PaymentTypeTable::DEALER_AD, BankTable::XAC, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s);
+                                    TransactionTable::setRechargeAssignment(PaymentTypeTable::DEALER_AD, BankTable::XAC, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s, $bankOrder->related_account);
                                 } else {
-                                    TransactionTable::setRechargeAssignment(PaymentTypeTable::DEALER, BankTable::XAC, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s);
+                                    TransactionTable::setRechargeAssignment(PaymentTypeTable::DEALER, BankTable::XAC, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s, $bankOrder->related_account);
                                 }
                             } else {
                                 try {
                                     if ($ADshop) {
-                                        TransactionTable::setDealerAssignment(PaymentTypeTable::DEALER_AD, BankTable::XAC, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s);
+                                        TransactionTable::setDealerAssignment(PaymentTypeTable::DEALER_AD, BankTable::XAC, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s, $bankOrder->related_account);
                                     } else {
-                                        TransactionTable::setDealerAssignment(PaymentTypeTable::DEALER, BankTable::XAC, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s);
+                                        TransactionTable::setDealerAssignment(PaymentTypeTable::DEALER, BankTable::XAC, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s, $bankOrder->related_account);
                                     }
                                 } catch (\Exception $e) {
 
@@ -722,9 +722,9 @@ LIMIT 1";
 
         if ($chargeResult['success'] == TRUE) {
             if ($type == "AD") {
-                TransactionTable::setRechargeAssignment(PaymentTypeTable::DEALER_AD, BankTable::XAC, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s);
+                TransactionTable::setRechargeAssignment(PaymentTypeTable::DEALER_AD, BankTable::XAC, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s, $bankOrder->related_account);
             } else {
-                TransactionTable::setRechargeAssignment(PaymentTypeTable::DEALER, BankTable::XAC, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s);
+                TransactionTable::setRechargeAssignment(PaymentTypeTable::DEALER, BankTable::XAC, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s, $bankOrder->related_account);
             }
             # Цэнэглэгдсэн мөнгөн дүн хадгалах
             $bankOrder->charge_amount = $bankOrder->order_amount;
@@ -1038,7 +1038,7 @@ LIMIT 1";
                 }
                 if ($bankOrder->status == self::STAT_PROCESS) {
                     $bankOrder->try_count++;
-                    $transaction = TransactionTable::insert(BankTable::XAC, $bankOrder['bank_account'], $bankOrder['order_id'], $bankOrder['order_date'], $bankOrder['order_p'], $bankOrder['order_type'], $bankOrder['order_amount'], $bankOrder['order_s']);
+                    $transaction = TransactionTable::insert(BankTable::XAC, $bankOrder['bank_account'], $bankOrder['order_id'], $bankOrder['order_date'], $bankOrder['order_p'], $bankOrder['order_type'], $bankOrder['order_amount'], $bankOrder['order_s'], $bankOrder['related_account']);
                     if ($transaction) {
                         # Цэнэглэгдсэн мөнгөн дүн болон хувийг хадгалах
                         $bankOrder->charge_amount = $bankOrder->order_amount;
@@ -1146,7 +1146,7 @@ LIMIT 1";
             # assignment 
             try {
                 $ids[] = $transaction->id;
-                $result = TransactionTable::setDealerAssignment($dealerChargeType, BankTable::XAC, $transaction->bank_account, $transaction->order_id, $transaction->order_date, $transaction->order_p, $orderType, $transaction->order_amount, $transaction->order_s);
+                $result = TransactionTable::setDealerAssignment($dealerChargeType, BankTable::XAC, $transaction->bank_account, $transaction->order_id, $transaction->order_date, $transaction->order_p, $orderType, $transaction->order_amount, $transaction->order_s, $bankOrder->related_account);
                 $logger->log('XACBANK' . $transaction->order_id, sfFileLogger::INFO);
             } catch (\Exception $exc) {
                 $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/dealerTransaction.log'));

@@ -151,16 +151,6 @@ class BankKhaanTable extends Doctrine_Table
                 ->orderBy('status DESC, id DESC');
         $request = sfContext::getInstance()->getRequest();
 
-        $orderedMobile = (int) $request->getParameter('orderedMobile');
-        if ($orderedMobile) {
-            $q->addWhere('order_mobile = ?', $orderedMobile);
-        }
-         // optional
-         $relatedAccount = (int) $request->getParameter('relatedAccount');
-         if ($relatedAccount) {
-             $q->addWhere('related_account = ?', $relatedAccount);
-         }
-
         // mandatory
         $dateFrom = $request->getParameter('dateFrom') ? $request->getParameter('dateFrom') : date('Y-m-d');
         $dateTo = $request->getParameter('dateTo') ? $request->getParameter('dateTo') : date('Y-m-d');
@@ -233,12 +223,6 @@ class BankKhaanTable extends Doctrine_Table
             $where[] = "b.bank_account IN (" . implode(',', $account) . ")";
         } else {
             $where[] = "b.bank_account ='$account'";
-        }
-
-        // optional
-        $relatedAccount = (int) $request->getParameter('relatedAccount');
-        if ($relatedAccount) {
-            $where[] = "b.related_account ='$relatedAccount'";
         }
 
         // optional
@@ -608,7 +592,7 @@ class BankKhaanTable extends Doctrine_Table
                               LIMIT 1";
                     $pdo->exec($sql);
                 } catch (\Exception $exc) {
-                   print_r("error");
+                    print_r("error");
                     $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/my-khaan-order.log'));
                     $logger->log('--ERROR--=' . trim($param['JournalNo']), sfFileLogger::INFO);
                     die();
@@ -785,16 +769,16 @@ class BankKhaanTable extends Doctrine_Table
                             $bankOrder->save();
                             if ($customer) {
                                 if ($ADshop) {
-                                    TransactionTable::setRechargeAssignment(PaymentTypeTable::DEALER_AD, BankTable::KHAAN, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s);
+                                    TransactionTable::setRechargeAssignment(PaymentTypeTable::DEALER_AD, BankTable::KHAAN, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s, $bankOrder->related_account);
                                 } else {
-                                    TransactionTable::setRechargeAssignment(PaymentTypeTable::DEALER, BankTable::KHAAN, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s);
+                                    TransactionTable::setRechargeAssignment(PaymentTypeTable::DEALER, BankTable::KHAAN, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s, $bankOrder->related_account);
                                 }
                             } else {
                                 try {
                                     if ($ADshop) {
-                                        TransactionTable::setDealerAssignment(PaymentTypeTable::DEALER_AD, BankTable::KHAAN, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s);
+                                        TransactionTable::setDealerAssignment(PaymentTypeTable::DEALER_AD, BankTable::KHAAN, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s, $bankOrder->related_account);
                                     } else {
-                                        TransactionTable::setDealerAssignment(PaymentTypeTable::DEALER, BankTable::KHAAN, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s);
+                                        TransactionTable::setDealerAssignment(PaymentTypeTable::DEALER, BankTable::KHAAN, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s, $bankOrder->related_account);
                                     }
                                 } catch (\Exception $e) {
 
@@ -1190,7 +1174,6 @@ class BankKhaanTable extends Doctrine_Table
                         'amount' => $bankOrder['order_amount'],
                         'transValue' => $bankOrder['order_p'],
                         'transAccount' => $bankOrder['bank_account'],
-                        'relatedAccount' => $bankOrder['related_account'],
                         'transType' => $bankOrder['order_type'],
                         'transNumber' => $bankOrder['order_id'],
                         'bankType' => VendorTable::BANK_KHAAN,
@@ -1308,7 +1291,7 @@ class BankKhaanTable extends Doctrine_Table
             # assignment 
             try {
                 $ids[] = $transaction->id;
-                $result = TransactionTable::setDealerAssignment($dealerChargeType, BankTable::KHAAN, $transaction->bank_account, $transaction->order_id, $transaction->order_date, $transaction->order_p, $orderType, $transaction->order_amount, $transaction->order_s);
+                $result = TransactionTable::setDealerAssignment($dealerChargeType, BankTable::KHAAN, $transaction->bank_account, $transaction->order_id, $transaction->order_date, $transaction->order_p, $orderType, $transaction->order_amount, $transaction->order_s, $transaction->related_account);
                 $logger->log('KHAAN' . $transaction->order_id, sfFileLogger::INFO);
             } catch (\Exception $exc) {
                 $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/dealerTransaction.log'));
@@ -1506,11 +1489,11 @@ class BankKhaanTable extends Doctrine_Table
                                     if (isset($result) && isset($result['Code']) && $result['Code'] == 0) {
                                         $status = BankpaymentTable::STAT_SUCCESS;
                                         try {
-                                            TransactionTable::setAssignmentMain(PaymentTypeTable::AUTO_PREPAID, BankTable::getBankAndVendorMap($bankOrder['vendor_id']), $bankOrder['bank_account'], $bankOrder['order_id'], $bankOrder['order_date'], $bankOrder['order_p'], $bankOrder['order_type'], $bankOrder['order_amount'], $bankOrder['order_s'], "BANKPAYMENT", false, 0);
+                                            TransactionTable::setAssignmentMain(PaymentTypeTable::AUTO_PREPAID, BankTable::getBankAndVendorMap($bankOrder['vendor_id']), $bankOrder['bank_account'], $bankOrder['order_id'], $bankOrder['order_date'], $bankOrder['order_p'], $bankOrder['order_type'], $bankOrder['order_amount'], $bankOrder['order_s'], $bankOrder['related_account'], "BANKPAYMENT", false, 0);
                                         } catch (Exception $ex) {
                                             $bankPaymentLogger->log('setAssignmentMain error: '. $ex, sfFileLogger::ERR);
                                             try {
-                                                TransactionTable::setAssignmentMain(PaymentTypeTable::AUTO_PREPAID, BankTable::getBankAndVendorMap($bankOrder['vendor_id']), $bankOrder['bank_account'], $bankOrder['order_id'], $bankOrder['order_date'], $bankOrder['order_p'], $bankOrder['order_type'], $bankOrder['order_amount'], $bankOrder['order_s'], "BANKPAYMENT", false, 0);
+                                                TransactionTable::setAssignmentMain(PaymentTypeTable::AUTO_PREPAID, BankTable::getBankAndVendorMap($bankOrder['vendor_id']), $bankOrder['bank_account'], $bankOrder['order_id'], $bankOrder['order_date'], $bankOrder['order_p'], $bankOrder['order_type'], $bankOrder['order_amount'], $bankOrder['order_s'],$bankOrder['related_account'], "BANKPAYMENT", false, 0);
                                             } catch (Exception $ex) {
                                                 $bankPaymentLogger->log('retry setAssignmentMain error: '. $ex, sfFileLogger::ERR);
                                             }
@@ -2065,7 +2048,7 @@ class BankKhaanTable extends Doctrine_Table
                     $card = $matches[4];
                     # TEST hiih dugaaruudiig l zuvshuuruv
                     //if (in_array($phoneNumber, array('94300074', '94300115'))) {
-                  $result = RtcgwGateway::chargeTopup($phoneNumber, $card, "bankgw_khan2");
+                    $result = RtcgwGateway::chargeTopup($phoneNumber, $card, "bankgw_khan2");
                  
                     //}
                     if (isset($result['Code']) && $result['Code'] == 0) {

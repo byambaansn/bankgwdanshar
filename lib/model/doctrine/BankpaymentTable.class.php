@@ -247,18 +247,13 @@ class BankpaymentTable extends Doctrine_Table
                             if (!$bankpayment->username) {
                                 $bankpayment->username = 'Bankpayment';
                             }
-                            if( $bankpayment->bank_payment_code = "BNKTE" ) {
-                                
-                                $res = BasicVatSenderNew::createAndSendVat($number, $contract, $amount, $bankAccount, $paymentCode, $bankName, $productName, $productCode, null, $company); 
-                                //createAndSendVat(99111096, $bankPayment->contract_number, $bankpayment->15000);
-                            }
                             $bankpayment->status_comment = "Амжилттай";
                             try {
                                 $isChild = intval($bankpayment['parent_id']) > 0;
-                                TransactionTable::setAssignmentMain(PaymentTypeTable::getTypeByBillCycle($bankpayment['bill_cycle']), BankTable::getBankAndVendorMap($bankpayment['vendor_id']), $bankTransaction['bank_account'], $bankTransaction['order_id'], $bankTransaction['order_date'], $bankTransaction['order_p'], $bankTransaction['order_type'], $bankTransaction['order_amount'], $bankTransaction['order_s'], "BANKPAYMENT", $isChild, $isChild ? $bankpayment['paid_amount'] : 0);
+                                TransactionTable::setAssignmentMain(PaymentTypeTable::getTypeByBillCycle($bankpayment['bill_cycle']), BankTable::getBankAndVendorMap($bankpayment['vendor_id']), $bankTransaction['bank_account'], $bankTransaction['order_id'], $bankTransaction['order_date'], $bankTransaction['order_p'], $bankTransaction['order_type'], $bankTransaction['order_amount'], $bankTransaction['order_s'], $bankTransaction['related_account'], "BANKPAYMENT", $isChild, $isChild ? $bankpayment['paid_amount'] : 0);
                             } catch (Exception $exc) {
                                 $isChild = intval($bankpayment['parent_id']) > 0;
-                                TransactionTable::setAssignmentMain(PaymentTypeTable::getTypeByBillCycle($bankpayment['bill_cycle']), BankTable::getBankAndVendorMap($bankpayment['vendor_id']), $bankTransaction['bank_account'], $bankTransaction['order_id'], $bankTransaction['order_date'], $bankTransaction['order_p'], $bankTransaction['order_type'], $bankTransaction['order_amount'], $bankTransaction['order_s'], "BANKPAYMENT", $isChild, $isChild ? $bankpayment['paid_amount'] : 0);
+                                TransactionTable::setAssignmentMain(PaymentTypeTable::getTypeByBillCycle($bankpayment['bill_cycle']), BankTable::getBankAndVendorMap($bankpayment['vendor_id']), $bankTransaction['bank_account'], $bankTransaction['order_id'], $bankTransaction['order_date'], $bankTransaction['order_p'], $bankTransaction['order_type'], $bankTransaction['order_amount'], $bankTransaction['order_s'], $bankTransaction['related_account'], "BANKPAYMENT", $isChild, $isChild ? $bankpayment['paid_amount'] : 0);
                             }
                         } else {
                             $bankpayment->status = BankpaymentTable::STAT_FAILED_CHARGE;
@@ -536,6 +531,7 @@ class BankpaymentTable extends Doctrine_Table
                         bank1.bank_account,
                         bank1.order_date,
                         bank1.order_p,
+                        bank1.related_account,
                         if(b.parent_id = 0, bank1.order_amount,b.paid_amount) as order_amount,
                         b.number,
                         b.contract_number,
@@ -551,13 +547,13 @@ class BankpaymentTable extends Doctrine_Table
                         CASE WHEN ref.id IS NULL THEN 'NO_REFUND' ELSE ref.refund_type END AS pay_type
                 FROM `bankpayment` b INNER JOIN
                 (
-                select bank.created_at,bank.order_id,bank.bank_account,bank.order_date,bank.order_p,bank.order_amount,bank.id,bank.vendor_id, bank.order_type from bank_capitron bank WHERE $whereSub UNION ALL
-                select bank.created_at,bank.order_id,bank.bank_account,bank.order_date,bank.order_p,bank.order_amount,bank.id,bank.vendor_id, bank.order_type from bank_capital bank where $whereSub UNION ALL
-                select bank.created_at,bank.order_id,bank.bank_account,bank.order_date,bank.order_p,bank.order_amount,bank.id,bank.vendor_id, bank.order_type from bank_tdb bank WHERE $whereSub UNION ALL
-                select bank.created_at,bank.order_id,bank.bank_account,bank.order_date,bank.order_p,bank.order_amount,bank.id,bank.vendor_id, bank.order_type from bank_xac bank WHERE $whereSub UNION ALL
-                select bank.created_at,bank.order_id,bank.bank_account,bank.order_date,bank.order_p,bank.order_amount,bank.id,bank.vendor_id, bank.order_type from bank_savings bank WHERE $whereSub UNION ALL
-                select bank.created_at,bank.order_id,bank.bank_account,bank.order_date,bank.order_p,bank.order_amount,bank.id,bank.vendor_id, bank.order_type from bank_golomt bank WHERE $whereSub UNION ALL
-                select bank.created_at,bank.order_id,bank.bank_account,bank.order_date,bank.order_p,bank.order_amount,bank.id,bank.vendor_id, bank.order_type from bank_khaan bank WHERE $whereSub 
+                select bank.created_at,bank.order_id,bank.bank_account,bank.order_date,bank.order_p,bank.order_amount,bank.id,bank.vendor_id, bank.order_type,bank.related_account from bank_capitron bank WHERE $whereSub UNION ALL
+                select bank.created_at,bank.order_id,bank.bank_account,bank.order_date,bank.order_p,bank.order_amount,bank.id,bank.vendor_id, bank.order_type,bank.related_account from bank_capital bank where $whereSub UNION ALL
+                select bank.created_at,bank.order_id,bank.bank_account,bank.order_date,bank.order_p,bank.order_amount,bank.id,bank.vendor_id, bank.order_type,bank.related_account from bank_tdb bank WHERE $whereSub UNION ALL
+                select bank.created_at,bank.order_id,bank.bank_account,bank.order_date,bank.order_p,bank.order_amount,bank.id,bank.vendor_id, bank.order_type,bank.related_account from bank_xac bank WHERE $whereSub UNION ALL
+                select bank.created_at,bank.order_id,bank.bank_account,bank.order_date,bank.order_p,bank.order_amount,bank.id,bank.vendor_id, bank.order_type,bank.related_account from bank_savings bank WHERE $whereSub UNION ALL
+                select bank.created_at,bank.order_id,bank.bank_account,bank.order_date,bank.order_p,bank.order_amount,bank.id,bank.vendor_id, bank.order_type,bank.related_account from bank_golomt bank WHERE $whereSub UNION ALL
+                select bank.created_at,bank.order_id,bank.bank_account,bank.order_date,bank.order_p,bank.order_amount,bank.id,bank.vendor_id, bank.order_type,bank.related_account from bank_khaan bank WHERE $whereSub 
                 ) bank1 ON bank1.id=b.bank_order_id AND b.vendor_id=bank1.vendor_id
                 INNER JOIN vendor v ON v.id=b.vendor_id $tableAdd 
                 LEFT OUTER JOIN bankpayment_vat_refund ref ON b.id = ref.bankpayment_id AND ref.type <> 'EDIT'
@@ -706,7 +702,7 @@ WHERE parent_id=$bankpaymentId";
                             $bankpayment->status_comment = "Амжилттай";
                             try {
                                 $isChild = intval($bankpayment['parent_id']) > 0;
-                                TransactionTable::setAssignmentMain(PaymentTypeTable::PAYMENT_ULUSNET_CHARGE, BankTable::getBankAndVendorMap($bankpayment['vendor_id']), $bankTransaction['bank_account'], $bankTransaction['order_id'], $bankTransaction['order_date'], $bankTransaction['order_p'], $bankTransaction['order_type'], $bankTransaction['order_amount'], $bankTransaction['order_s'], "BANKPAYMENT", $isChild, $isChild ? $bankpayment['paid_amount'] : 0);
+                                TransactionTable::setAssignmentMain(PaymentTypeTable::PAYMENT_ULUSNET_CHARGE, BankTable::getBankAndVendorMap($bankpayment['vendor_id']), $bankTransaction['bank_account'], $bankTransaction['order_id'], $bankTransaction['order_date'], $bankTransaction['order_p'], $bankTransaction['order_type'], $bankTransaction['order_amount'], $bankTransaction['order_s'], $bankTransaction['related_account'], "BANKPAYMENT", $isChild, $isChild ? $bankpayment['paid_amount'] : 0);
                             } catch (Exception $exc) {
 
                             }
@@ -827,7 +823,7 @@ WHERE parent_id=$bankpaymentId";
                         $bankpayment->status_comment = "Амжилттай";
                         try {
                             $isChild = intval($bankpayment['parent_id']) > 0;
-                            TransactionTable::setAssignmentMain(PaymentTypeTable::PAYMENT_HOMENET, BankTable::getBankAndVendorMap($bankpayment['vendor_id']), $bankTransaction['bank_account'], $bankTransaction['order_id'], $bankTransaction['order_date'], $bankTransaction['order_p'], $bankTransaction['order_type'], $bankTransaction['order_amount'], $bankTransaction['order_s'], "BANKPAYMENT", $isChild, $isChild ? $bankpayment['paid_amount'] : 0);
+                            TransactionTable::setAssignmentMain(PaymentTypeTable::PAYMENT_HOMENET, BankTable::getBankAndVendorMap($bankpayment['vendor_id']), $bankTransaction['bank_account'], $bankTransaction['order_id'], $bankTransaction['order_date'], $bankTransaction['order_p'], $bankTransaction['order_type'], $bankTransaction['order_amount'], $bankTransaction['order_s'], $bankTransaction['related_account'], "BANKPAYMENT", $isChild, $isChild ? $bankpayment['paid_amount'] : 0);
                             // send VAT
                             $accountInfo = MobinetGateway::contractInfo($contract);
                             $emails = explode(",", $accountInfo['email']);
@@ -1191,6 +1187,7 @@ WHERE parent_id=$bankpaymentId";
                         bank1.created_at,
                         bank1.order_id,
                         bank1.bank_account,
+                        bank1.related_account,
                         bank1.order_date,
                         bank1.order_p,
                         if(b.parent_id = 0, bank1.order_amount,b.paid_amount) as order_amount,
@@ -1209,13 +1206,13 @@ WHERE parent_id=$bankpaymentId";
                         IFNULL(E.name, type.`name`) AS payment_type
                 FROM `bankpayment` b INNER JOIN
                 (
-                select bank.created_at,bank.order_id,bank.bank_account,bank.order_date,bank.order_p,bank.order_amount,bank.id,bank.vendor_id, bank.order_type from bank_capitron bank WHERE $whereSub UNION ALL
-                select bank.created_at,bank.order_id,bank.bank_account,bank.order_date,bank.order_p,bank.order_amount,bank.id,bank.vendor_id, bank.order_type from bank_capital bank where $whereSub UNION ALL
-                select bank.created_at,bank.order_id,bank.bank_account,bank.order_date,bank.order_p,bank.order_amount,bank.id,bank.vendor_id, bank.order_type from bank_tdb bank WHERE $whereSub UNION ALL
-                select bank.created_at,bank.order_id,bank.bank_account,bank.order_date,bank.order_p,bank.order_amount,bank.id,bank.vendor_id, bank.order_type from bank_xac bank WHERE $whereSub UNION ALL
-                select bank.created_at,bank.order_id,bank.bank_account,bank.order_date,bank.order_p,bank.order_amount,bank.id,bank.vendor_id, bank.order_type from bank_savings bank WHERE $whereSub UNION ALL
-                select bank.created_at,bank.order_id,bank.bank_account,bank.order_date,bank.order_p,bank.order_amount,bank.id,bank.vendor_id, bank.order_type from bank_golomt bank WHERE $whereSub UNION ALL
-                select bank.created_at,bank.order_id,bank.bank_account,bank.order_date,bank.order_p,bank.order_amount,bank.id,bank.vendor_id, bank.order_type from bank_khaan bank WHERE $whereSub 
+                select bank.created_at,bank.order_id,bank.bank_account,bank.order_date,bank.order_p,bank.order_amount,bank.id,bank.vendor_id, bank.order_type, bank.related_account from bank_capitron bank WHERE $whereSub UNION ALL
+                select bank.created_at,bank.order_id,bank.bank_account,bank.order_date,bank.order_p,bank.order_amount,bank.id,bank.vendor_id, bank.order_type, bank.related_account from bank_capital bank where $whereSub UNION ALL
+                select bank.created_at,bank.order_id,bank.bank_account,bank.order_date,bank.order_p,bank.order_amount,bank.id,bank.vendor_id, bank.order_type, bank.related_account from bank_tdb bank WHERE $whereSub UNION ALL
+                select bank.created_at,bank.order_id,bank.bank_account,bank.order_date,bank.order_p,bank.order_amount,bank.id,bank.vendor_id, bank.order_type, bank.related_account from bank_xac bank WHERE $whereSub UNION ALL
+                select bank.created_at,bank.order_id,bank.bank_account,bank.order_date,bank.order_p,bank.order_amount,bank.id,bank.vendor_id, bank.order_type, bank.related_account from bank_savings bank WHERE $whereSub UNION ALL
+                select bank.created_at,bank.order_id,bank.bank_account,bank.order_date,bank.order_p,bank.order_amount,bank.id,bank.vendor_id, bank.order_type, bank.related_account from bank_golomt bank WHERE $whereSub UNION ALL
+                select bank.created_at,bank.order_id,bank.bank_account,bank.order_date,bank.order_p,bank.order_amount,bank.id,bank.vendor_id, bank.order_type, bank.related_account from bank_khaan bank WHERE $whereSub 
                 ) bank1 ON bank1.id=b.bank_order_id AND b.vendor_id=bank1.vendor_id
                 INNER JOIN vendor v ON v.id=b.vendor_id $tableAdd 
                 LEFT OUTER JOIN bankpayment pa ON b.id = pa.parent_id

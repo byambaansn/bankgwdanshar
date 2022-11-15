@@ -286,6 +286,7 @@ class BankSavingsTable extends Doctrine_Table
         $bankOrder->status = self::STAT_NEW;
         $bankOrder->vendor_id = VendorCore::BANK_SAVINGS;
         $bankOrder->created_at = date('Y-m-d H:i:s');
+        $bankOrder->related_account = 0;
         $account = $trans['AcntNo'];
         if ($return) {
             if (self::setReturn($return)) {
@@ -582,16 +583,16 @@ class BankSavingsTable extends Doctrine_Table
                             $bankOrder->save();
                             if ($customer) {
                                 if ($ADshop) {
-                                    TransactionTable::setRechargeAssignment(PaymentTypeTable::DEALER_AD, BankTable::SAVINGS, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s);
+                                    TransactionTable::setRechargeAssignment(PaymentTypeTable::DEALER_AD, BankTable::SAVINGS, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s, $bankOrder->related_account);
                                 } else {
-                                    TransactionTable::setRechargeAssignment(PaymentTypeTable::DEALER, BankTable::SAVINGS, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s);
+                                    TransactionTable::setRechargeAssignment(PaymentTypeTable::DEALER, BankTable::SAVINGS, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s, $bankOrder->related_account);
                                 }
                             } else {
                                 try {
                                     if ($ADshop) {
-                                        TransactionTable::setDealerAssignment(PaymentTypeTable::DEALER_AD, BankTable::SAVINGS, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s);
+                                        TransactionTable::setDealerAssignment(PaymentTypeTable::DEALER_AD, BankTable::SAVINGS, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s, $bankOrder->related_account);
                                     } else {
-                                        TransactionTable::setDealerAssignment(PaymentTypeTable::DEALER, BankTable::SAVINGS, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s);
+                                        TransactionTable::setDealerAssignment(PaymentTypeTable::DEALER, BankTable::SAVINGS, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s, $bankOrder->related_account);
                                     }
                                 } catch (\Exception $e) {
 
@@ -692,9 +693,9 @@ class BankSavingsTable extends Doctrine_Table
 
         if ($chargeResult['success'] == TRUE) {
             if ($type == "AD") {
-                TransactionTable::setRechargeAssignment(PaymentTypeTable::DEALER_AD, BankTable::SAVINGS, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s);
+                TransactionTable::setRechargeAssignment(PaymentTypeTable::DEALER_AD, BankTable::SAVINGS, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s, $bankOrder->related_account);
             } else {
-                TransactionTable::setRechargeAssignment(PaymentTypeTable::DEALER, BankTable::SAVINGS, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s);
+                TransactionTable::setRechargeAssignment(PaymentTypeTable::DEALER, BankTable::SAVINGS, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s, $bankOrder->related_account);
             }
             # Цэнэглэгдсэн мөнгөн дүн хадгалах
             $bankOrder->charge_amount = $bankOrder->order_amount;
@@ -902,7 +903,7 @@ class BankSavingsTable extends Doctrine_Table
                 }
                 if ($bankOrder->status == self::STAT_PROCESS) {
                     $bankOrder->try_count++;
-                    $transaction = TransactionTable::insert(BankTable::SAVINGS, $bankOrder['bank_account'], $bankOrder['order_id'], $bankOrder['order_date'], $bankOrder['order_p'], $bankOrder['order_type'], $bankOrder['order_amount'], $bankOrder['order_s']);
+                    $transaction = TransactionTable::insert(BankTable::SAVINGS, $bankOrder['bank_account'], $bankOrder['order_id'], $bankOrder['order_date'], $bankOrder['order_p'], $bankOrder['order_type'], $bankOrder['order_amount'], $bankOrder['order_s'], $bankOrder['related_account']);
                     if ($transaction) {
                         # Цэнэглэгдсэн мөнгөн дүн болон хувийг хадгалах
                         $bankOrder->charge_amount = $bankOrder->order_amount;
@@ -1188,7 +1189,7 @@ class BankSavingsTable extends Doctrine_Table
             # assignment 
             try {
                 $ids[] = $transaction->id;
-                $result = TransactionTable::setDealerAssignment($dealerChargeType, BankTable::SAVINGS, $transaction->bank_account, $transaction->order_id, $transaction->order_date, $transaction->order_p, $orderType, $transaction->order_amount, $transaction->order_s);
+                $result = TransactionTable::setDealerAssignment($dealerChargeType, BankTable::SAVINGS, $transaction->bank_account, $transaction->order_id, $transaction->order_date, $transaction->order_p, $orderType, $transaction->order_amount, $transaction->order_s, $transaction->$related_account);
                 $logger->log('STATEBANK' . $transaction->order_id, sfFileLogger::INFO);
             } catch (\Exception $exc) {
                 $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/dealerTransaction.log'));

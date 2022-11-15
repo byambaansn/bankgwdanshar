@@ -202,7 +202,7 @@ class dealerActions extends sfActions
                             $bankOrder->order_mobile = $orderMobile;
                         }
                         $bankOrder->save();
-                        TransactionTable::setRechargeAssignment(PaymentTypeTable::DEALER, BankTable::getBankAndVendorMap($vendorId), $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s);                        
+                        TransactionTable::setRechargeAssignment(PaymentTypeTable::DEALER, BankTable::getBankAndVendorMap($vendorId), $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s, $bankOrder->related_account);                        
                         # Зарлага үүсгэх
                         $outcomeOrderId = DealerCore::reoutcome($bankOrder, $dealer, null, $dealerAgent, $chargeResult['percent']);
                         if ($outcomeOrderId) {
