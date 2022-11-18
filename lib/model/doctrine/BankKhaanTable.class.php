@@ -151,16 +151,6 @@ class BankKhaanTable extends Doctrine_Table
                 ->orderBy('status DESC, id DESC');
         $request = sfContext::getInstance()->getRequest();
 
-        $orderedMobile = (int) $request->getParameter('orderedMobile');
-        if ($orderedMobile) {
-            $q->addWhere('order_mobile = ?', $orderedMobile);
-        }
-         // optional
-         $relatedAccount = (int) $request->getParameter('relatedAccount');
-         if ($relatedAccount) {
-             $q->addWhere('related_account = ?', $relatedAccount);
-         }
-
         // mandatory
         $dateFrom = $request->getParameter('dateFrom') ? $request->getParameter('dateFrom') : date('Y-m-d');
         $dateTo = $request->getParameter('dateTo') ? $request->getParameter('dateTo') : date('Y-m-d');
@@ -233,12 +223,6 @@ class BankKhaanTable extends Doctrine_Table
             $where[] = "b.bank_account IN (" . implode(',', $account) . ")";
         } else {
             $where[] = "b.bank_account ='$account'";
-        }
-
-        // optional
-        $relatedAccount = (int) $request->getParameter('relatedAccount');
-        if ($relatedAccount) {
-            $where[] = "b.related_account ='$relatedAccount'";
         }
 
         // optional
@@ -381,7 +365,6 @@ class BankKhaanTable extends Doctrine_Table
         $bankOrder->order_id = $trans['JournalNo'];
         $bankOrder->order_id_date = $trans['TxnDate'];
         $bankOrder->bank_account = $trans['Account'];
-        $bankOrder->related_account = $trans['relatedAccount'];
         $bankOrder->order_p = $trans['TxnDesc'];
         $bankOrder->order_type = $trans['TxnType'];
         $bankOrder->order_amount = $trans['Amount'];
@@ -608,7 +591,7 @@ class BankKhaanTable extends Doctrine_Table
                               LIMIT 1";
                     $pdo->exec($sql);
                 } catch (\Exception $exc) {
-                   print_r("error");
+                    print_r("error");
                     $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/my-khaan-order.log'));
                     $logger->log('--ERROR--=' . trim($param['JournalNo']), sfFileLogger::INFO);
                     die();
@@ -1190,7 +1173,6 @@ class BankKhaanTable extends Doctrine_Table
                         'amount' => $bankOrder['order_amount'],
                         'transValue' => $bankOrder['order_p'],
                         'transAccount' => $bankOrder['bank_account'],
-                        'relatedAccount' => $bankOrder['related_account'],
                         'transType' => $bankOrder['order_type'],
                         'transNumber' => $bankOrder['order_id'],
                         'bankType' => VendorTable::BANK_KHAAN,
@@ -1368,6 +1350,22 @@ class BankKhaanTable extends Doctrine_Table
                 if (in_array($bankOrder->status, array(self::STAT_FAILED_CHARGE, self::STAT_FAILED))) {
                     $bankOrder->status = self::STAT_PROCESS;
                     $bankOrder->save();
+                }
+                if(preg_match("/^(TEACHER)+(-)+([0-9]{8})+(-)+([0-9])+(-)+([0-9]{7})$/", $bankOrder->order_p)) {
+                    if(preg_match_all('/[0-9]{8}/', $bankOrder->order_p, $num)){
+                         $phoneNumber=$num[0][0];
+                    }
+                    if( preg_match_all('/([^-]*$)/', $bankOrder->order_p, $register)){
+                        $contractNumber = $register[0][0];
+                    }
+                    $bill = PostGateway::getBillInfo($phoneNumber);
+                    if( $bill['Code'] == 0 ) {
+                        $contractAmount = doubleval($bill['CurrentBalance']);
+                        $billCycle = $bill['BillCycleCode'];
+                        $teacherBNC0P ="BNC0B";
+                        self::insertPostpaidBankpaymentTeacher($bankOrder, BankPaymentTable::TYPE_CALL_PAYMENT, BankPaymentTable::STAT_NEW, "", $phoneNumber, $contractNumber, $contractNumber . " " . $phoneNumber, $billCycle, $contractAmount, $teacherBNC0P);
+                    }
+                    continue;
                 }
 
                 $numbers = array();
@@ -2065,7 +2063,7 @@ class BankKhaanTable extends Doctrine_Table
                     $card = $matches[4];
                     # TEST hiih dugaaruudiig l zuvshuuruv
                     //if (in_array($phoneNumber, array('94300074', '94300115'))) {
-                  $result = RtcgwGateway::chargeTopup($phoneNumber, $card, "bankgw_khan2");
+                    $result = RtcgwGateway::chargeTopup($phoneNumber, $card, "bankgw_khan2");
                  
                     //}
                     if (isset($result['Code']) && $result['Code'] == 0) {
@@ -2762,6 +2760,46 @@ class BankKhaanTable extends Doctrine_Table
             unset($bankOrder);
         } catch (Exception $exc) {
             $bankPaymentLogger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/bankPaymentLog/khaan/bankPaymentLog_'.date('Y-m-d').'.log'));
+            $bankPaymentLogger->log('insertPostpaidBankpayment Khaan Error: '.$bankOrder->order_id .' Error message: '.$exc->getMessage(), sfFileLogger::ERR);
+        }
+
+    }
+
+      /**
+     * @param BankKhaan $bankOrder
+     * @param $type
+     * @param $status
+     * @param $statusComment
+     * @param $phoneNumber
+     * @param $contractNumber
+     * @param $contractName
+     * @param $billCycle
+     * @param $contractAmount
+     * @param $teacherBNC0B
+     * @throws Exception
+     */
+    public static function insertPostpaidBankpaymentTeacher(BankKhaan $bankOrder, $type, $status, $statusComment, $phoneNumber, $contractNumber, $contractName, $billCycle, $contractAmount, $teacherBNC0B)
+    {
+        try {
+            $data = array();
+            $data['vendor_id'] = VendorTable::BANK_KHAAN;
+            $data['bank_order_id'] = $bankOrder->id;
+            $data['type'] = $type;
+            $data['status'] = $status;
+            $data['status_comment'] = $statusComment;
+            $data['number'] = $phoneNumber;
+            $data['contract_number'] = $contractNumber;
+            $data['contract_name'] = $contractName;
+            $data['bill_cycle'] = $billCycle;
+            $data['contract_amount'] = $contractAmount;
+            $data['bank_payment_code'] = $teacherBNC0B;
+            $data['credit_control'] = 123;
+            BankpaymentTable::insert($data);
+            $bankOrder->status = BankpaymentTable::STAT_SUCCESS;
+            $bankOrder->save();
+            unset($bankOrder);
+        } catch (Exception $exc) {
+            $bankPaymentLogger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/bankPaymentLog/khaan/bankPaymentTeacherLog_'.date('Y-m-d').'.log'));
             $bankPaymentLogger->log('insertPostpaidBankpayment Khaan Error: '.$bankOrder->order_id .' Error message: '.$exc->getMessage(), sfFileLogger::ERR);
         }
 

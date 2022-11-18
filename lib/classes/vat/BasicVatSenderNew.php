@@ -69,6 +69,60 @@ class BasicVatSenderNew
         self::logAccess($isdn,$httpcode,$url,$result['Result'], $type, $body);
         return $response;
     }
+    public static function createAndSendVatTeacher($isdn, $custno, $amount, $bankAccountNo, $paymentCode, $bankName, $productName, $productCode, $email, $company, $register)
+    {
+        $yml = sfYaml::load(sfConfig::get('sf_config_dir') . '/app.yml');
+        $api = $yml['all']['vatsendernew']['api'];
+        $type = 'createAndSendVatTeacher';
+        $header = array();
+        $header[] = "Content-Type: application/json";
+        $url = $api . 'vat-channel-offline/rest/receive';
+
+        $detail = array();
+        $detail['name']=$productName;
+        $detail['code']= 8413;
+        $detail['qty']=1;
+        $detail['price']=(int) $amount;
+        $detail['profile']= $custno;
+
+        $data = array();
+        $data["custnum"] = null;
+        $data["isdnB"] = null;
+        $data["amount"] = $amount;
+        $data["register"] = $register;
+        $data["email"] = null;
+        $data["sendmail"] = false;
+        $data["company"] = 'mobicom';
+        if($company){
+            $data["company"] = $company;
+        }
+        $data["bankAccountNo"] = $bankAccountNo;
+        $data["bankName"] = $bankName;
+        $data["paymentCode"] = $paymentCode;
+        $data["smsOrderId"] = null;
+        $data["autovat"] = false;
+        $data["sendsms"] = false;
+        $data["channel"] = 'bank';
+        $data["group"] = false;
+        $data["productList"] = array($detail);
+        $body = json_encode($data);
+        $result = self::curlCall($url, $body, $header, true);
+        $httpcode = $result['HttpCode'];
+        $resp = $result['Result'];
+        $response = array();
+        if ($httpcode == 200) {
+            $res = json_decode($result['Result'], true);
+            if (isset($res['success']) && $res['success'] == true) {
+                $response = $res;
+            }
+        } else {
+            $res = json_decode($result['Result'], true);
+            $response['Message'] = $res['info'];
+            $response['Result'] = $res['result'];
+        }
+        self::logAccess($isdn,$httpcode,$url,$result['Result'], $type, $body);
+        return $response;
+    }
     
     /**
      * Get customer VAT list

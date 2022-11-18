@@ -196,7 +196,7 @@ class BankpaymentTable extends Doctrine_Table
 
     }
     
-    /**
+  /**
      * CX Төлөлт оруулах
      * @param null $bankpayment
      * @param $limit
@@ -240,17 +240,32 @@ class BankpaymentTable extends Doctrine_Table
                     $paymentCode = BankpaymentTable::getPaymentCode($bankpayment['vendor_id'], $bankTransaction->getBankAccount());
                     if ($paymentCode) {
                         $pay = ($bankpayment['parent_id'] == 0) ? $bankTransaction['order_amount'] : $bankpayment['paid_amount'];
+                        if($bankpayment['bank_payment_code'] == "BNC0B"){
+                            $teacherCode = "BNC0B";
+                            $phoneNumber =$bankpayment['number'];
+                            $phoneInfo = PostGateway::getPostPhoneInfo($phoneNumber);
+                            $contNum = $phoneInfo['AccountNo'];
+                            $pay = ($bankpayment['parent_id'] == 0) ? $bankTransaction['order_amount'] : $bankpayment['paid_amount'];
+                            $payment = PostGateway::doPayment($bankpayment['number'], $contNum, $pay, $bankTransaction['order_date'], $teacherCode);
+                    } else {
                         $payment = PostGateway::doPayment($bankpayment['number'], $bankpayment['contract_number'], $pay, $bankTransaction['order_date'], $paymentCode);
+                    }
+
                         $logger->log($bankpayment->bank_order_id . ' $payment: '. print_r($payment, true), sfFileLogger::INFO);
                         if ($payment['Code'] === '0') {
                             $bankpayment->status = BankpaymentTable::STAT_SUCCESS;
+                            if( $bankpayment['bank_payment_code'] == "BNC0B" ) {
+                                $register=$bankpayment['contract_number'];
+                                $bankAccount = $bankTransaction['bank_account'];
+                                $bankName = VendorTable::getNameById($bankpayment['vendor_id']);
+                                $productCode = null;
+                                $productName =  $bankpayment['number'] . " дугаартай Багшийн төлбөр";
+                                $company = "mobicom";
+                                $res = BasicVatSenderNew::createAndSendVatTeacher(null, null, $pay, $bankAccount, $paymentCode, $bankName, $productName, $productCode, null, $company, $register);
+                                $logger->log($bankpayment->bank_order_id . ' $TEACHERVAT: '. print_r($res['errorCode'], true), sfFileLogger::INFO);
+                            }
                             if (!$bankpayment->username) {
                                 $bankpayment->username = 'Bankpayment';
-                            }
-                            if( $bankpayment->bank_payment_code = "BNKTE" ) {
-                                
-                                $res = BasicVatSenderNew::createAndSendVat($number, $contract, $amount, $bankAccount, $paymentCode, $bankName, $productName, $productCode, null, $company); 
-                                //createAndSendVat(99111096, $bankPayment->contract_number, $bankpayment->15000);
                             }
                             $bankpayment->status_comment = "Амжилттай";
                             try {
@@ -921,69 +936,6 @@ WHERE parent_id=$bankpaymentId";
      */
     public static function processVatNopayer($bankpayment = null, $limit = 50)
     {
-        $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/VatNopayer.log'));
-        $logger->log('============Started processVatNopayer================', sfFileLogger::INFO);
-        if ($bankpayment instanceof Bankpayment) {
-            if ($bankpayment->canReVat()) {
-                $bankpayment->status = self::STAT_NEW;
-                $bankpayment->save();
-            } else {
-                return FALSE;
-            }
-            $bankpaymentVat = BankpaymentVatTable::getInstance()->findBy('bankpayment_id', $bankpayment->id);
-            $rows = array($bankpaymentVat);
-        } elseif ($bankpayment) {
-            return FALSE;
-        } else {
-            $rows = BankpaymentVatTable::updateForCharge($limit);
-        }
-        $logger->log('Total count: '.count($rows), sfFileLogger::INFO);
-        echo 'processVatNopayer count: '.count($rows);
-        $count = 0;
-        if(count($rows)>0){
-            foreach ($rows as $bankpayment) {
-                try {
-                    $count++;
-                    $bankpaymentVat = BankpaymentVatTable::retrieveByPK($bankpayment['id']);
-                    $bankTransaction = BankpaymentTable::getBankTransaction($bankpayment['vendor_id'], $bankpayment['bank_order_id']);
-                    $logger->log( $bankpayment['bank_order_id'].', $bankpaymentVat: '.print_r($bankpaymentVat->toArray(), true), sfFileLogger::INFO);
-                    $logger->log( $bankpayment['bank_order_id'].', $bankTransaction: '.print_r($bankTransaction->toArray(), true), sfFileLogger::INFO);
-                    if ($bankTransaction) {
-                        $productId = BaseSms::getProductIdByCycle($bankpayment['bill_cycle']);
-                        $outcomeUserId = BaseSms::CUSTOMER_CORPORATE;
-                        $outcomeGroupId = BaseSms::GROUP_CUSTOMER;
-                        $contract = $bankpayment['contract_number'];
-                        if ($productId) {
-                            if ($bankpayment['parent_id']) {
-                                $pay = $bankpayment['paid_amount'];
-                            } else {
-                                $pay = $bankTransaction['order_amount'];
-                            }
-                            $result = BaseSms::insertNoVatpayerApi($bankpayment['vendor_id'], $productId, $contract, $pay, 1, $outcomeUserId, $outcomeGroupId);
-                            $logger->log( $bankpayment['bank_order_id'].', BaseSms::insertNoVatpayerApi:$result: '.print_r($result, true), sfFileLogger::INFO);
-                            $bankpaymentVat->status = BankpaymentVatTable::STAT_SUCCESS;
-                        } else {
-                            $bankpaymentVat->status = BankpaymentVatTable::STAT_FAILED;
-                        }
-                        if ($result) {
-                            $bankpaymentVat->setOutcomeOrderId($result);
-                            $logger->log( $bankpayment['bank_order_id'].', BaseSms::insertNoVatpayerApi:$result: '.print_r($result, true), sfFileLogger::INFO);
-                        }
-                    } else {
-                        $bankpaymentVat->status = BankpaymentVatTable::STAT_FAILED;
-                    }
-                    $bankpaymentVat->save();
-                    unset($bankpaymentVat);
-                    unset($bankpayment);
-                } catch (Exception $ex) {
-                    //log later
-                    $logger->log('-catch--=' . $ex->getMessage(), sfFileLogger::ERR);
-                }
-            }
-        }
-    }
-    public static function processVatNopayerOld($bankpayment = null, $limit = 50)
-    {
         if ($bankpayment instanceof Bankpayment) {
             if ($bankpayment->canReVat()) {
                 $bankpayment->status = self::STAT_NEW;
@@ -1344,7 +1296,7 @@ WHERE parent_id=$bankpaymentId";
                 if ($number) {
                     if ($bankpaymentRow['type'] == self::TYPE_CANDY_LOAN) {
                         $txnDesc = preg_replace("/\([0-9]{8}\)/", "", $number);
-                        preg_match_all("/([9][954][0-9]{6})|(85[0-9]{6})/", $txnDesc, $matches);
+                        preg_match_all("/([9][013786954][0-9]{6})|([8][503689][0-9]{6})/", $txnDesc, $matches);
                         if (!count($matches[0])) {
                             $bankpaymentRow->status_comment = $number;
                             $bankpaymentRow->status = self::STAT_IMPOSSIBLE;
@@ -1393,45 +1345,40 @@ WHERE parent_id=$bankpaymentId";
                 if ($number) {
                     $bankpaymentRow->setTryCount($bankpaymentRow->getTryCount() + 1);
                 }
-                
                 $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/Payment.log'));
                 if (isset($result['result']) ) {
                     $items = $result['result']['items'];
                     $total = 0;
-                    $overpayment = $items[0]['overRepaymentAmount'];
-                    if( isset($overpayment) && $overpayment != '' && $overpayment > 0 ) {
-                        $total = $total + $overpayment;
+                    for($i = 0; $i < sizeof($items); $i++) {
+                        $overpayment = $items[$i]['overRepaymentAmount'];
+                        if( isset($overpayment) && $overpayment != '' && $overpayment > 0 ) {
+                            $logger->log("for[".$i."] = " . $overpayment, sfFileLogger::INFO);
+                            $total = $total + $overpayment;
+                        }
                     }
-
-                    if( $total == $bankpaymentRow['paid_amount']  ) {
-                        $bankpaymentRow['status'] = BankPaymentTable::STAT_REFUND;
-                    } else if( $result['result']['items'][0]['refundOverRepayment'] == 'NO_REFUND_LOAN' && $total > 0 ) {
-                        $item['parent_id'] = $bankpaymentRow['id'];
-                        $item['vendor_id'] = $bankpaymentRow['vendor_id'];
-                        $item['type'] = self::TYPE_CANDY_CASHIN;
-                        $item['bank_order_id'] = $bankpaymentRow['bank_order_id'];
-                        $item['paid_amount'] = $total;
-                        $item['bank_payment_code'] = $bankpaymentRow['bank_payment_code'];
-                        $item['contract_number'] = $bankpaymentRow['contract_number'];
-                        $item['contract_name'] = $bankpaymentRow['contract_name'];
-                        $item['status'] = BankpaymentTable::STAT_SUCCESS;
-                        $item['status_comment'] = 'Refund Over re-payment amount';
-                        $bankpaymentRow['paid_amount'] = $bankpaymentRow['paid_amount'] - $total;
-                        BankpaymentTable::insert($item);
-                    } else if( $result['result']['items'][0]['refundOverRepayment'] == 'REFUND' && $total > 0 ) {
-                        $item = array();
-                        $item['parent_id'] = $bankpaymentRow['id'];
-                        $item['vendor_id'] = $bankpaymentRow['vendor_id'];
-                        $item['type'] = $bankpaymentRow['type'];
-                        $item['bank_order_id'] = $bankpaymentRow['bank_order_id'];
-                        $item['paid_amount'] = $total;
-                        $item['bank_payment_code'] = $bankpaymentRow['bank_payment_code'];
-                        $item['contract_number'] = $bankpaymentRow['contract_number'];
-                        $item['contract_name'] = $bankpaymentRow['contract_name'];
-                        $item['status'] = BankpaymentTable::STAT_FAILED_CHARGE;
-                        $item['status_comment'] = 'Over re-payment';
-                        $bankpaymentRow['paid_amount'] = $bankpaymentRow['paid_amount'] - $total;
-                        BankpaymentTable::insert($item);
+                    if( $total > 0 ) {
+                        if( $total == $bankpaymentRow['paid_amount'] ) {
+                            $bankpaymentRow['status'] = BankPaymentTable::STAT_REFUND;
+                        } else {
+                            try {
+                                $item = array();
+                                $item['parent_id'] = $bankpaymentRow['id'];
+                                $item['vendor_id'] = $bankpaymentRow['vendor_id'];
+                                $item['type'] = $bankpaymentRow['type'];
+                                $item['bank_order_id'] = $bankpaymentRow['bank_order_id'];
+                                $item['paid_amount'] = $total;
+                                $item['bank_payment_code'] = $bankpaymentRow['bank_payment_code'];
+                                $item['contract_number'] = $bankpaymentRow['contract_number'];
+                                $item['contract_name'] = $bankpaymentRow['contract_name'];
+                                $item['number'] = $bankpaymentRow['number'];
+                                $item['status'] = BankPaymentTable::STAT_FAILED_CHARGE;
+                                $item['status_comment'] = 'Over re-payment';
+                                $bankpaymentRow['paid_amount'] = $bankpaymentRow['paid_amount'] - $total;
+                                BankpaymentTable::insert($item);
+                            } catch(\Exception $ex) {
+                                $logger->log('Exception = '. $ex->getMessage(), sfFileLogger::INFO);
+                            }
+                        }
                     }
                 }
                 $bankpaymentRow->save();
