@@ -241,12 +241,11 @@ class BankpaymentTable extends Doctrine_Table
                     if ($paymentCode) {
                         $pay = ($bankpayment['parent_id'] == 0) ? $bankTransaction['order_amount'] : $bankpayment['paid_amount'];
                         if($bankpayment['bank_payment_code'] == "BNC0B"){
-                            $teacherCode = "BNC0B";
                             $phoneNumber =$bankpayment['number'];
                             $phoneInfo = PostGateway::getPostPhoneInfo($phoneNumber);
                             $contNum = $phoneInfo['AccountNo'];
                             $pay = ($bankpayment['parent_id'] == 0) ? $bankTransaction['order_amount'] : $bankpayment['paid_amount'];
-                            $payment = PostGateway::doPayment($bankpayment['number'], $contNum, $pay, $bankTransaction['order_date'], $teacherCode);
+                            $payment = PostGateway::doPayment($bankpayment['number'], $contNum, $pay, $bankTransaction['order_date'], $bankpayment['bank_payment_code']);
                     } else {
                         $payment = PostGateway::doPayment($bankpayment['number'], $bankpayment['contract_number'], $pay, $bankTransaction['order_date'], $paymentCode);
                     }

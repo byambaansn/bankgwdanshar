@@ -98,7 +98,7 @@ class BasicVatSenderNew
         }
         $data["bankAccountNo"] = $bankAccountNo;
         $data["bankName"] = $bankName;
-        $data["paymentCode"] = $paymentCode;
+        $data["paymentCode"] = 'BNC0B';
         $data["smsOrderId"] = null;
         $data["autovat"] = false;
         $data["sendsms"] = false;
