@@ -169,6 +169,10 @@ class PaymentTable extends Doctrine_Table
             SELECT p.id                                                                                            AS p_id,
                    b.name                                                                                          AS bank_name,
                    t.`bank_account`,  
+<<<<<<< HEAD
+=======
+                   t.`related_account`,                                                                             
+>>>>>>> 43c8a7321211876b0992a8212fea9b68745cda83
                    t.`order_id`,
                    t.`order_date`,
                    t.`order_p`,

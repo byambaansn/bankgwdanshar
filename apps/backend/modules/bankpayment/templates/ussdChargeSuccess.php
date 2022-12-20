@@ -106,8 +106,11 @@
             } else {
                 $(this).parent().parent().removeClass('selected');
             }
+<<<<<<< HEAD
         });
 
+=======
+>>>>>>> 43c8a7321211876b0992a8212fea9b68745cda83
     });
 
 </script>

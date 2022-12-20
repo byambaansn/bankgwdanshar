@@ -189,7 +189,6 @@ class bankTransactionActions extends sfActions
             $data = "БАНК;";
             $data .= "№ ГҮЙЛГЭЭ;";
             $data .= "ДАНСНЫ ДУГААР;";
-            $data .= "ХАРЬЦСАН ДАНС;";
             $data .= "ТӨЛӨВ;";
             $data .= "ГҮЙЛГЭЭНИЙ ТӨРӨЛ;";
             $data .= "ГҮЙЛГЭЭНИЙ УТГА;";
@@ -202,8 +201,12 @@ class bankTransactionActions extends sfActions
                 $status = ($row['status'] == 1) ? 'N' : (($row['status'] == 2) ? 'D' : '' );
                 $data.='"' . $row['bank_name'] . '";';
                 $data.='"' . $row['order_id'] . '";';
+<<<<<<< HEAD
                 $data.='"' . $row['bank_account'] . '";';  
                 $data.='"' . $row['related_account'] . '";';     
+=======
+                $data.='"' . $row['bank_account'] . '";';       
+>>>>>>> 43c8a7321211876b0992a8212fea9b68745cda83
                 $data.='"' . $status . '";';
                 $data.='"' . $row['order_type'] . '";';
                 $data.='"' . $row['order_p'] . '";';
@@ -592,11 +595,9 @@ class bankTransactionActions extends sfActions
 
             $filename = 'transaction_payment';
 
-
             $data = "БАНК;";
             $data .= "№ ГҮЙЛГЭЭ;";
             $data .= "ДАНСНЫ ДУГААР;";
-        
             $data .= "ТӨЛӨВ;";
             $data .= "ГҮЙЛГЭЭНИЙ УТГА;";
             $data .= "ГҮЙЛГЭЭНИЙ ДҮН ;";
@@ -613,7 +614,6 @@ class bankTransactionActions extends sfActions
                 $data.='"' . $row['bank_name'] . '";';
                 $data.='"' . $row['order_id'] . '";';
                 $data.='"' . $row['bank_account'] . '";';
-              
                 $data.='"' . $row['status'] . '";';
                 $data.='"' . $row['order_p'] . '";';
                 if ($row['order_type'] == 'SUB') {
