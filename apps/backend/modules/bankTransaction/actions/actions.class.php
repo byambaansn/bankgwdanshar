@@ -201,12 +201,7 @@ class bankTransactionActions extends sfActions
                 $status = ($row['status'] == 1) ? 'N' : (($row['status'] == 2) ? 'D' : '' );
                 $data.='"' . $row['bank_name'] . '";';
                 $data.='"' . $row['order_id'] . '";';
-<<<<<<< HEAD
-                $data.='"' . $row['bank_account'] . '";';  
-                $data.='"' . $row['related_account'] . '";';     
-=======
                 $data.='"' . $row['bank_account'] . '";';       
->>>>>>> 43c8a7321211876b0992a8212fea9b68745cda83
                 $data.='"' . $status . '";';
                 $data.='"' . $row['order_type'] . '";';
                 $data.='"' . $row['order_p'] . '";';
