@@ -37,11 +37,7 @@ abstract class BaseBankTdbForm extends BaseFormDoctrine
       'try_count'      => new sfWidgetFormInputText(),
       'created_at'     => new sfWidgetFormDateTime(),
       'updated_at'     => new sfWidgetFormDateTime(),
-<<<<<<< HEAD
-      'related_account'=> new sfWidgetFormInputText(),
-=======
       'related_account'   => new sfWidgetFormInputText(),
->>>>>>> 43c8a7321211876b0992a8212fea9b68745cda83
     ));
 
     $this->setValidators(array(
@@ -67,11 +63,7 @@ abstract class BaseBankTdbForm extends BaseFormDoctrine
       'try_count'      => new sfValidatorInteger(array('required' => false)),
       'created_at'     => new sfValidatorDateTime(),
       'updated_at'     => new sfValidatorDateTime(),
-<<<<<<< HEAD
-      'related_account'=> new sfValidatorString(array('max_length' => 50)),
-=======
       'related_account'   => new sfValidatorString(array('max_length' => 50)),
->>>>>>> 43c8a7321211876b0992a8212fea9b68745cda83
     ));
 
     $this->widgetSchema->setNameFormat('bank_tdb[%s]');

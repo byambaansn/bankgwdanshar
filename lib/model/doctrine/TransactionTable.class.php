@@ -79,12 +79,10 @@ class TransactionTable extends Doctrine_Table
      * @param $orderAmount
      * @param $orderBranch
      * @param $relatedAccount
-     * @param $relatedAccount
      * @return object Transaction
      * @throws Doctrine_Connection_Exception
      * @throws Doctrine_Record_Exception
      */
-    public static function insert($bankId, $bankAccount, $orderId, $orderDate, $orderP, $orderType, $orderAmount, $orderBranch, $relatedAccount)
     public static function insert($bankId, $bankAccount, $orderId, $orderDate, $orderP, $orderType, $orderAmount, $orderBranch, $relatedAccount)
     {
         $transaction = new Transaction();
@@ -101,9 +99,6 @@ class TransactionTable extends Doctrine_Table
 //        ??
         $transaction->setUpdatedUserId(0);
         $transaction->setRelatedAccount($relatedAccount);
-        
-        $transaction->setRelatedAccount($relatedAccount);
-        
         $transaction->save();
         return $transaction;
     } 
@@ -230,13 +225,11 @@ class TransactionTable extends Doctrine_Table
      * @param int $orderAmount
      * @param int $orderValue
      * @param int $account
-     * @param int $relatedAccount
      * @param int $status
      * @param int $bankDate
      * @return \array
      * @throws Doctrine_Manager_Exception
      */
-    public static function getListCustom($dateFrom = 0, $dateTo = 0, $bankId = 0, $orderId = 0, $orderType = 0, $orderAmount = 0, $orderValue = 0, $account = 0, $status = 0, $bankDate = 0)
     public static function getListCustom($dateFrom = 0, $dateTo = 0, $bankId = 0, $orderId = 0, $orderType = 0, $orderAmount = 0, $orderValue = 0, $account = 0, $status = 0, $bankDate = 0)
     {
         $pdo = Doctrine_Manager::connection()->getDbh();
@@ -424,17 +417,14 @@ class TransactionTable extends Doctrine_Table
      * @param $orderAmount
      * @param $orderBranch
      * @param $relatedAccount
-     * @param $relatedAccount
      * @return \array
      * @throws Doctrine_Manager_Exception
      */
-    public static function setDealerAssignment($type, $bankId, $bankAccount, $orderId, $orderDate, $orderP, $orderType, $orderAmount, $orderBranch, $relatedAccount)
     public static function setDealerAssignment($type, $bankId, $bankAccount, $orderId, $orderDate, $orderP, $orderType, $orderAmount, $orderBranch, $relatedAccount)
     {
         $transaction = self::retrieveByBankAndOrderId($bankId, $orderId, $orderType, $orderAmount, $orderDate);
         if (!$transaction) {
             try {
-                $transaction = self::insert($bankId, $bankAccount, $orderId, $orderDate, $orderP, $orderType, $orderAmount, $orderBranch, $relatedAccount);
                 $transaction = self::insert($bankId, $bankAccount, $orderId, $orderDate, $orderP, $orderType, $orderAmount, $orderBranch, $relatedAccount);
             } catch (Exception $ex) {
 
@@ -482,11 +472,9 @@ class TransactionTable extends Doctrine_Table
      * @throws Exception
      */
     public static function setRechargeAssignment($type, $bankId, $bankAccount,$orderId, $orderDate, $orderP, $orderType, $orderAmount, $orderBranch, $relatedAccount)
-    public static function setRechargeAssignment($type, $bankId, $bankAccount,$orderId, $orderDate, $orderP, $orderType, $orderAmount, $orderBranch, $relatedAccount)
     {
         $transaction = self::retrieveByBankAndOrderId($bankId, $orderId, $orderType, $orderAmount, $orderDate);
         if (!$transaction) {
-            $transaction = self::setDealerAssignment($type, $bankId, $bankAccount, $orderId, $orderDate, $orderP, $orderType, $orderAmount, $orderBranch, $relatedAccount);
             $transaction = self::setDealerAssignment($type, $bankId, $bankAccount, $orderId, $orderDate, $orderP, $orderType, $orderAmount, $orderBranch, $relatedAccount);
             return TRUE;
         }
@@ -523,7 +511,6 @@ class TransactionTable extends Doctrine_Table
      * @param $orderAmount
      * @param $orderBranch
      * @param $relatedAccount
-     * @param $relatedAccount
      * @param string $comment
      * @param bool $isChild
      * @param int $childAmount
@@ -531,13 +518,11 @@ class TransactionTable extends Doctrine_Table
      * @throws Exception
      */
     public static function setAssignmentMain($type, $bankId, $bankAccount, $orderId, $orderDate, $orderP, $orderType, $orderAmount, $orderBranch, $relatedAccount, $comment = 'desc', $isChild = false, $childAmount = 0)
-    public static function setAssignmentMain($type, $bankId, $bankAccount, $orderId, $orderDate, $orderP, $orderType, $orderAmount, $orderBranch, $relatedAccount, $comment = 'desc', $isChild = false, $childAmount = 0)
     {
         $transaction = self::retrieveByBankAndOrderId($bankId, $orderId, $orderType, $orderAmount, $orderDate);
 
         if (!$transaction) {
-            $transaction = self::insert($bankId, $bankAccount, $orderId, $orderDate, $orderP, $orderType, $orderAmount, $orderBranch, $relatedAccount);
-            $transaction = self::insert($bankId, $bankAccount, $orderId, $orderDate, $orderP, $orderType, $orderAmount, $orderBranch, $relatedAccount);
+           $transaction = self::insert($bankId, $bankAccount, $orderId, $orderDate, $orderP, $orderType, $orderAmount, $orderBranch, $relatedAccount);
         }
 
         $checkPayment = false;
@@ -562,13 +547,11 @@ class TransactionTable extends Doctrine_Table
     }
 
     public static function setAssignmentCopy($type, $bankId, $bankAccount, $orderId, $orderDate, $orderP, $orderType, $orderAmount, $orderBranch, $relatedAccount, $comment = 'desc', $isChild = false, $childAmount = 0)
-    public static function setAssignmentCopy($type, $bankId, $bankAccount, $orderId, $orderDate, $orderP, $orderType, $orderAmount, $orderBranch, $relatedAccount, $comment = 'desc', $isChild = false, $childAmount = 0)
     {
         $transaction = self::retrieveByBankAndOrderId($bankId, $orderId, $orderType, $orderAmount, $orderDate);
 
         if (!$transaction) {
-            $transaction = self::insert($bankId, $bankAccount, $orderId, $orderDate, $orderP, $orderType, $orderAmount, $orderBranch, $relatedAccount);
-            $transaction = self::insert($bankId, $bankAccount, $orderId, $orderDate, $orderP, $orderType, $orderAmount, $orderBranch, $relatedAccount);
+           $transaction = self::insert($bankId, $bankAccount, $orderId, $orderDate, $orderP, $orderType, $orderAmount, $orderBranch, $relatedAccount);
         }
 
         $checkPayment = false;

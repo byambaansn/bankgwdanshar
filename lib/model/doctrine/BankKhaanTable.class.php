@@ -1505,19 +1505,11 @@ class BankKhaanTable extends Doctrine_Table
                                     if (isset($result) && isset($result['Code']) && $result['Code'] == 0) {
                                         $status = BankpaymentTable::STAT_SUCCESS;
                                         try {
-<<<<<<< HEAD
                                             TransactionTable::setAssignmentMain(PaymentTypeTable::AUTO_PREPAID, BankTable::getBankAndVendorMap($bankOrder['vendor_id']), $bankOrder['bank_account'], $bankOrder['order_id'], $bankOrder['order_date'], $bankOrder['order_p'], $bankOrder['order_type'], $bankOrder['order_amount'], $bankOrder['order_s'],  $bankOrder['related_account'], "BANKPAYMENT", false, 0);
                                         } catch (Exception $ex) {
                                             $bankPaymentLogger->log('setAssignmentMain error: '. $ex, sfFileLogger::ERR);
                                             try {
                                                 TransactionTable::setAssignmentMain(PaymentTypeTable::AUTO_PREPAID, BankTable::getBankAndVendorMap($bankOrder['vendor_id']), $bankOrder['bank_account'], $bankOrder['order_id'], $bankOrder['order_date'], $bankOrder['order_p'], $bankOrder['order_type'], $bankOrder['order_amount'], $bankOrder['order_s'], $bankOrder['related_account'], "BANKPAYMENT", false, 0);
-=======
-                                            TransactionTable::setAssignmentMain(PaymentTypeTable::AUTO_PREPAID, BankTable::getBankAndVendorMap($bankOrder['vendor_id']), $bankOrder['bank_account'], $bankOrder['order_id'], $bankOrder['order_date'], $bankOrder['order_p'], $bankOrder['order_type'], $bankOrder['order_amount'], $bankOrder['order_s'], $bankOrder['related_account'], "BANKPAYMENT", false, 0);
-                                        } catch (Exception $ex) {
-                                            $bankPaymentLogger->log('setAssignmentMain error: '. $ex, sfFileLogger::ERR);
-                                            try {
-                                                TransactionTable::setAssignmentMain(PaymentTypeTable::AUTO_PREPAID, BankTable::getBankAndVendorMap($bankOrder['vendor_id']), $bankOrder['bank_account'], $bankOrder['order_id'], $bankOrder['order_date'], $bankOrder['order_p'], $bankOrder['order_type'], $bankOrder['order_amount'], $bankOrder['order_s'],$bankOrder['related_account'], "BANKPAYMENT", false, 0);
->>>>>>> 43c8a7321211876b0992a8212fea9b68745cda83
                                             } catch (Exception $ex) {
                                                 $bankPaymentLogger->log('retry setAssignmentMain error: '. $ex, sfFileLogger::ERR);
                                             }
