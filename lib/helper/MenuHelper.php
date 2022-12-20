@@ -40,7 +40,7 @@ function getMenu()
         $menus['tdb']['main'] = array('TDB', '@bank_tdb_list');
         $menus['tdb']['sub']['dealer'] = array('Дилер цэнэглэлт', '@bank_tdb_list', 'list');
         // candy
-        $menus['candy']['main'] = array('MONPAY', '@bank_candy_dealer');
+        $menus['candy']['main'] = array('Monpay', '@bank_candy_dealer');
         $menus['candy']['sub']['dealer'] = array('Дилер цэнэглэлт', '@bank_candy_dealer', 'list');
     }
 

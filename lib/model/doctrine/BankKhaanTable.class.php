@@ -381,7 +381,6 @@ class BankKhaanTable extends Doctrine_Table
         $bankOrder->order_id = $trans['JournalNo'];
         $bankOrder->order_id_date = $trans['TxnDate'];
         $bankOrder->bank_account = $trans['Account'];
-        $bankOrder->related_account = $trans['relatedAccount'];
         $bankOrder->order_p = $trans['TxnDesc'];
         $bankOrder->order_type = $trans['TxnType'];
         $bankOrder->order_amount = $trans['Amount'];
@@ -390,6 +389,7 @@ class BankKhaanTable extends Doctrine_Table
         $bankOrder->status = self::STAT_NEW;
         $bankOrder->vendor_id = VendorTable::BANK_KHAAN;
         $bankOrder->created_at = date('Y-m-d H:i:s');
+        $bankOrder->related_account = $trans['relatedAccount'];
 
         # mobile bankaar shiljuulsen dugaariig hasah
         $txnDesc = preg_replace("/\([0-9]{8}\)/", "", $trans['TxnDesc']);
@@ -785,16 +785,16 @@ class BankKhaanTable extends Doctrine_Table
                             $bankOrder->save();
                             if ($customer) {
                                 if ($ADshop) {
-                                    TransactionTable::setRechargeAssignment(PaymentTypeTable::DEALER_AD, BankTable::KHAAN, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s);
+                                    TransactionTable::setRechargeAssignment(PaymentTypeTable::DEALER_AD, BankTable::KHAAN, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s, $bankOrder->related_account);
                                 } else {
-                                    TransactionTable::setRechargeAssignment(PaymentTypeTable::DEALER, BankTable::KHAAN, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s);
+                                    TransactionTable::setRechargeAssignment(PaymentTypeTable::DEALER, BankTable::KHAAN, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s, $bankOrder->related_account);
                                 }
                             } else {
                                 try {
                                     if ($ADshop) {
-                                        TransactionTable::setDealerAssignment(PaymentTypeTable::DEALER_AD, BankTable::KHAAN, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s);
+                                        TransactionTable::setDealerAssignment(PaymentTypeTable::DEALER_AD, BankTable::KHAAN, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s, $bankOrder->related_account);
                                     } else {
-                                        TransactionTable::setDealerAssignment(PaymentTypeTable::DEALER, BankTable::KHAAN, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s);
+                                        TransactionTable::setDealerAssignment(PaymentTypeTable::DEALER, BankTable::KHAAN, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s, $bankOrder->related_account);
                                     }
                                 } catch (\Exception $e) {
 
@@ -895,9 +895,9 @@ class BankKhaanTable extends Doctrine_Table
 
         if ($chargeResult['success'] == TRUE) {
             if ($type == "AD") {
-                TransactionTable::setRechargeAssignment(PaymentTypeTable::DEALER_AD, BankTable::KHAAN, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s);
+                TransactionTable::setRechargeAssignment(PaymentTypeTable::DEALER_AD, BankTable::KHAAN, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s, $bankOrder->related_account);
             } else {
-                TransactionTable::setRechargeAssignment(PaymentTypeTable::DEALER, BankTable::KHAAN, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s);
+                TransactionTable::setRechargeAssignment(PaymentTypeTable::DEALER, BankTable::KHAAN, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s, $bankOrder->related_account);
             }
             # Цэнэглэгдсэн мөнгөн дүн хадгалах
             $bankOrder->charge_amount = $bankOrder->order_amount;
@@ -1285,7 +1285,7 @@ class BankKhaanTable extends Doctrine_Table
         $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/transaction/khaan/transfer_'.date('Y-m-d').'.log'));
         $ids = array();
         foreach ($transactions as $transaction) {
-
+            
             if ($transaction->status == self::STAT_SUCCESS) {
                 # odoogoor zuvkhun dealer charge deer l sales uusgej abigaa uchir shalgav
                 if ($transaction->sales_order_id) {
@@ -1308,7 +1308,7 @@ class BankKhaanTable extends Doctrine_Table
             # assignment 
             try {
                 $ids[] = $transaction->id;
-                $result = TransactionTable::setDealerAssignment($dealerChargeType, BankTable::KHAAN, $transaction->bank_account, $transaction->order_id, $transaction->order_date, $transaction->order_p, $orderType, $transaction->order_amount, $transaction->order_s);
+                $result = TransactionTable::setDealerAssignment($dealerChargeType, BankTable::KHAAN, $transaction->bank_account, $transaction->order_id, $transaction->order_date, $transaction->order_p, $orderType, $transaction->order_amount, $transaction->order_s, $transaction->related_account);
                 $logger->log('KHAAN' . $transaction->order_id, sfFileLogger::INFO);
             } catch (\Exception $exc) {
                 $logger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/dealerTransaction.log'));
@@ -1330,7 +1330,7 @@ class BankKhaanTable extends Doctrine_Table
         }
     }
 
-    /**
+     /**
      * Гүйлгээний утгаас гэрээний дугаарыг олж,
      * Биллийн мэдээллийг татаж bankpayment table -д оруулах
      * CX рүү оруулах төлөлтүүд
@@ -1368,6 +1368,22 @@ class BankKhaanTable extends Doctrine_Table
                 if (in_array($bankOrder->status, array(self::STAT_FAILED_CHARGE, self::STAT_FAILED))) {
                     $bankOrder->status = self::STAT_PROCESS;
                     $bankOrder->save();
+                }
+                if(preg_match("/^(TEACHER)+(-)+([0-9]{8})+(-)+([0-9])+(-)+([0-9]{7})$/", $bankOrder->order_p)) {
+                    if(preg_match_all('/[0-9]{8}/', $bankOrder->order_p, $num)){
+                         $phoneNumber=$num[0][0];
+                    }
+                    if( preg_match_all('/([^-]*$)/', $bankOrder->order_p, $register)){
+                        $contractNumber = $register[0][0];
+                    }
+                    $bill = PostGateway::getBillInfo($phoneNumber);
+                    if( $bill['Code'] == 0 ) {
+                        $contractAmount = doubleval($bill['CurrentBalance']);
+                        $billCycle = $bill['BillCycleCode'];
+                        $teacherBNC0P ="BNC0B";
+                        self::insertPostpaidBankpaymentTeacher($bankOrder, BankPaymentTable::TYPE_CALL_PAYMENT, BankPaymentTable::STAT_NEW, "", $phoneNumber, $contractNumber, $contractNumber . " " . $phoneNumber, $billCycle, $contractAmount, $teacherBNC0P);
+                    }
+                    continue;
                 }
 
                 $numbers = array();
@@ -1506,11 +1522,11 @@ class BankKhaanTable extends Doctrine_Table
                                     if (isset($result) && isset($result['Code']) && $result['Code'] == 0) {
                                         $status = BankpaymentTable::STAT_SUCCESS;
                                         try {
-                                            TransactionTable::setAssignmentMain(PaymentTypeTable::AUTO_PREPAID, BankTable::getBankAndVendorMap($bankOrder['vendor_id']), $bankOrder['bank_account'], $bankOrder['order_id'], $bankOrder['order_date'], $bankOrder['order_p'], $bankOrder['order_type'], $bankOrder['order_amount'], $bankOrder['order_s'], "BANKPAYMENT", false, 0);
+                                            TransactionTable::setAssignmentMain(PaymentTypeTable::AUTO_PREPAID, BankTable::getBankAndVendorMap($bankOrder['vendor_id']), $bankOrder['bank_account'], $bankOrder['order_id'], $bankOrder['order_date'], $bankOrder['order_p'], $bankOrder['order_type'], $bankOrder['order_amount'], $bankOrder['order_s'],  $bankOrder['related_account'], "BANKPAYMENT", false, 0);
                                         } catch (Exception $ex) {
                                             $bankPaymentLogger->log('setAssignmentMain error: '. $ex, sfFileLogger::ERR);
                                             try {
-                                                TransactionTable::setAssignmentMain(PaymentTypeTable::AUTO_PREPAID, BankTable::getBankAndVendorMap($bankOrder['vendor_id']), $bankOrder['bank_account'], $bankOrder['order_id'], $bankOrder['order_date'], $bankOrder['order_p'], $bankOrder['order_type'], $bankOrder['order_amount'], $bankOrder['order_s'], "BANKPAYMENT", false, 0);
+                                                TransactionTable::setAssignmentMain(PaymentTypeTable::AUTO_PREPAID, BankTable::getBankAndVendorMap($bankOrder['vendor_id']), $bankOrder['bank_account'], $bankOrder['order_id'], $bankOrder['order_date'], $bankOrder['order_p'], $bankOrder['order_type'], $bankOrder['order_amount'], $bankOrder['order_s'], $bankOrder['related_account'], "BANKPAYMENT", false, 0);
                                             } catch (Exception $ex) {
                                                 $bankPaymentLogger->log('retry setAssignmentMain error: '. $ex, sfFileLogger::ERR);
                                             }
@@ -2766,4 +2782,44 @@ class BankKhaanTable extends Doctrine_Table
         }
 
     }
+
+    /**
+   * @param BankKhaan $bankOrder
+   * @param $type
+   * @param $status
+   * @param $statusComment
+   * @param $phoneNumber
+   * @param $contractNumber
+   * @param $contractName
+   * @param $billCycle
+   * @param $contractAmount
+   * @param $teacherBNC0B
+   * @throws Exception
+   */
+  public static function insertPostpaidBankpaymentTeacher(BankKhaan $bankOrder, $type, $status, $statusComment, $phoneNumber, $contractNumber, $contractName, $billCycle, $contractAmount, $teacherBNC0B)
+  {
+      try {
+          $data = array();
+          $data['vendor_id'] = VendorTable::BANK_KHAAN;
+          $data['bank_order_id'] = $bankOrder->id;
+          $data['type'] = $type;
+          $data['status'] = $status;
+          $data['status_comment'] = $statusComment;
+          $data['number'] = $phoneNumber;
+          $data['contract_number'] = $contractNumber;
+          $data['contract_name'] = $contractName;
+          $data['bill_cycle'] = $billCycle;
+          $data['contract_amount'] = $contractAmount;
+          $data['bank_payment_code'] = $teacherBNC0B;
+          $data['credit_control'] = 123;
+          BankpaymentTable::insert($data);
+          $bankOrder->status = BankpaymentTable::STAT_SUCCESS;
+          $bankOrder->save();
+          unset($bankOrder);
+      } catch (Exception $exc) {
+          $bankPaymentLogger = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/bankPaymentLog/khaan/bankPaymentTeacherLog_'.date('Y-m-d').'.log'));
+          $bankPaymentLogger->log('insertPostpaidBankpaymentTeacher Khaan Error: '.$bankOrder->order_id .' Error message: '.$exc->getMessage(), sfFileLogger::ERR);
+      }
+
+  }
 }

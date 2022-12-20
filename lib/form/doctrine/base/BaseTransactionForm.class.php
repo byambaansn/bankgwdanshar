@@ -18,7 +18,6 @@ abstract class BaseTransactionForm extends BaseFormDoctrine
       'id'              => new sfWidgetFormInputHidden(),
       'bank_id'         => new sfWidgetFormDoctrineChoice(array('model' => $this->getRelatedModelName('Bank'), 'add_empty' => false)),
       'bank_account'    => new sfWidgetFormInputText(),
-      'related_account' => new sfWidgetFormInputText(),
       'order_id'        => new sfWidgetFormInputText(),
       'order_date'      => new sfWidgetFormDateTime(),
       'order_p'         => new sfWidgetFormTextarea(),
@@ -29,13 +28,13 @@ abstract class BaseTransactionForm extends BaseFormDoctrine
       'updated_at'      => new sfWidgetFormDateTime(),
       'updated_user_id' => new sfWidgetFormInputText(),
       'created_at'      => new sfWidgetFormDateTime(),
+      'related_account' => new sfWidgetFormInputText(),
     ));
 
     $this->setValidators(array(
       'id'              => new sfValidatorChoice(array('choices' => array($this->getObject()->get('id')), 'empty_value' => $this->getObject()->get('id'), 'required' => false)),
       'bank_id'         => new sfValidatorDoctrineChoice(array('model' => $this->getRelatedModelName('Bank'))),
       'bank_account'    => new sfValidatorString(array('max_length' => 50)),
-      'related_account' => new sfValidatorString(array('max_length' => 50)),
       'order_id'        => new sfValidatorString(array('max_length' => 30)),
       'order_date'      => new sfValidatorDateTime(),
       'order_p'         => new sfValidatorString(array('max_length' => 500)),
@@ -46,6 +45,7 @@ abstract class BaseTransactionForm extends BaseFormDoctrine
       'updated_at'      => new sfValidatorDateTime(),
       'updated_user_id' => new sfValidatorInteger(),
       'created_at'      => new sfValidatorDateTime(),
+      'related_account' => new sfValidatorString(array('max_length' => 50)),
     ));
 
     $this->widgetSchema->setNameFormat('transaction[%s]');

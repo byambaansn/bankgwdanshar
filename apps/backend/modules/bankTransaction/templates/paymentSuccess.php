@@ -110,6 +110,10 @@
                     title: 'Данс',
                     edit: false
                 },
+                related_account: {
+                    title: 'Харьцсан Данс',
+                    edit: false
+                },
                 status: {
                     title: 'Төлөв',
                     width: '7%',

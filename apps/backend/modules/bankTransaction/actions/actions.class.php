@@ -141,7 +141,6 @@ class bankTransactionActions extends sfActions
         $this->getRequest()->setParameter('sub_tab', 'trans');
         $this->dateFrom = $request->getParameter('date_from', date('Y-m-d'));
         $this->dateTo = $request->getParameter('date_to', date('Y-m-d'));
-
         $this->status = (int) $request->getParameter('status', 1);
         $this->orderType = (int) $request->getParameter('type', 1);
         $bankDate = $request->getParameter('bank_date', '0');
@@ -152,12 +151,11 @@ class bankTransactionActions extends sfActions
         $this->orderAmount = $request->getParameter('order_amount');
         $this->orderValue = $request->getParameter('order_value');
         $this->accountNumber = $request->getParameter('account_number');
-
         $this->statuses = TransactionTable::getForSelectStatus();
         $this->banks = BankTable::getForSelect();
         $this->types = PaymentTypeTable::getForSelect();
         $this->accountNumbers = BankAccountTable::getForSelectWithType($this->bank);
-
+        
         if ($bankDate === "on") {
             $this->bankDate = 1;
         } else {
@@ -204,8 +202,8 @@ class bankTransactionActions extends sfActions
                 $status = ($row['status'] == 1) ? 'N' : (($row['status'] == 2) ? 'D' : '' );
                 $data.='"' . $row['bank_name'] . '";';
                 $data.='"' . $row['order_id'] . '";';
-                $data.='"' . $row['bank_account'] . '";';
-                $data.='"' . $row['related_account'] . '";';
+                $data.='"' . $row['bank_account'] . '";';  
+                $data.='"' . $row['related_account'] . '";';     
                 $data.='"' . $status . '";';
                 $data.='"' . $row['order_type'] . '";';
                 $data.='"' . $row['order_p'] . '";';

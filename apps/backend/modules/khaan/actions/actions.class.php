@@ -54,7 +54,6 @@ class khaanActions extends sfActions
 
         $data = "№ ГҮЙЛГЭЭ;";
         $data .= "ДАНСНЫ ДУГААР;";
-        $data .= "ХАРЬЦСАН ДАНС;";
         $data .= "ДУГААР/C/;";
         $data .= "ДУГААР/D/;";
         $data .= "ТӨРӨЛ;";
@@ -67,7 +66,6 @@ class khaanActions extends sfActions
         foreach ($khaanList as $khaan) {
             $data .= '"' . $khaan['order_id'] . '";';
             $data .= '"' . $khaan['bank_account'] . '";';
-            $data .= '"' . $khaan['related_account'] . '";';
             $data .= '"' . $khaan['charge_mobile'] . '";';
             $data .= '"' . $khaan['order_mobile'] . '";';
             $data .= '"' . $khaan['order_type'] . '";';

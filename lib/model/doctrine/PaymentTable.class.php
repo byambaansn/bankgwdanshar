@@ -168,7 +168,7 @@ class PaymentTable extends Doctrine_Table
         $query = "
             SELECT p.id                                                                                            AS p_id,
                    b.name                                                                                          AS bank_name,
-                   t.`bank_account`,
+                   t.`bank_account`,  
                    t.`order_id`,
                    t.`order_date`,
                    t.`order_p`,

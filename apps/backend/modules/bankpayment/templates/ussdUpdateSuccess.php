@@ -212,7 +212,7 @@ $('#btnChargeUnit').click(function() {
     if (confirm('Та цэнэглэхдээ итгэлтэй байна уу?')) {
     $.ajax({
         url: "<?php echo url_for('@bankpayment_ussd_chargeunit')?>",
-        data: "id="+<?php echo $bankpayment['id']; ?>+"&number="+$('#number1').val()+"&card="+$('#uType').val()+ "&order_amount="+ <?php echo $transaction['order_amount'];?>+"&bank="+<?php echo $bankpayment['vendor_id'];?>+"&bankAccount="+<?php echo $transaction['bank_account'];?>,
+        data: "id="+<?php echo $bankpayment['id']; ?>+"&number="+$('#number1').val()+"&card="+$('#uType').val(),
         type: "POST",
         success: function(data) {
 
@@ -234,7 +234,7 @@ $('#btnChargeData').click(function() {
     if (confirm('Та цэнэглэхдээ итгэлтэй байна уу?')) {
     $.ajax({
         url: "<?php echo url_for('@bankpayment_ussd_chargedata')?>",
-        data: "id="+<?php echo $bankpayment['id'];?>+"&number="+$('#number2').val()+"&card="+$('#dType').val() + "&order_amount="+ <?php echo $transaction['order_amount'];?>+"&bank="+<?php echo $bankpayment['vendor_id'];?>,
+        data: "id="+<?php echo $bankpayment['id'];?>+"&number="+$('#number2').val()+"&card="+$('#dType').val(),
         type: "POST",
         success: function(data) {
       
@@ -250,19 +250,19 @@ $('#btnChargeData').click(function() {
 
 $('#btnChargeSmall').click(function() {
      
-     $.ajax({
-         url: "<?php echo url_for('@bankpayment_ussd_chargesmall')?>",
-         data: "id=" + <?php echo $bankpayment['id']; ?> + "&number="+$('#number3').val()+"&amt="+$('#amt').val()+"&order_amount="+ <?php echo $transaction['order_amount'] ?>+"&bank="+<?php echo $bankpayment['vendor_id'];?>,
-         type: "POST",
-         success: function(data) {
-        
-             $('#btnChargeSmall').hide();
-             window.location.reload(true);
-         },
-         error: function(data) {
-             alert("Цэнэглэлт амжилтгүй");
-         }
-     });
- 
- });
+    $.ajax({
+        url: "<?php echo url_for('@bankpayment_ussd_chargesmall')?>",
+        data: "id=" + <?php echo $bankpayment['id']; ?> + "&number="+$('#number3').val()+"&amt="+$('#amt').val(),
+        type: "POST",
+        success: function(data) {
+       
+            $('#btnChargeSmall').hide();
+            window.location.reload(true);
+        },
+        error: function(data) {
+            alert("Цэнэглэлт амжилтгүй");
+        }
+    });
+
+});
 </script>

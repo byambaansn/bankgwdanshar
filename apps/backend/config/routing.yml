@@ -30,10 +30,10 @@ bankpayment_ussd:
   param: { module: bankpayment, action: ussdCharge }
 bankpayment_ussd_update:
   url: /manage/bankpayment/ussd/update
-  param: { module: bankpayment, action: ussdUpdate }
+  param: { module: bankpayment, action: ussdUpdate }  
 bankpayment_ussd_chargeunit:
   url: /manage/bankpayment/chargeunit
-  param: { module: bankpayment, action: chargeUnit }
+  param: { module: bankpayment, action: chargeUnit } 
 bankpayment_ussd_chargedata:
   url: /manage/bankpayment/chargedata
   param: { module: bankpayment, action: chargeData }
@@ -48,7 +48,7 @@ bankpayment_mobinet_payment:
   param: { module: bankpayment, action: mobinetPrepaidPayment }
 bankpayment_mobinet_prepaid_update:
   url: /manage/bankpayment/mobinet/prepaid/update
-  param: { module: bankpayment, action: mobinetPrepaidUpdate }
+  param: { module: bankpayment, action: mobinetPrepaidUpdate }  
 bankpayment_ulusnet:
   url: /manage/bankpayment/ulusnet/:page.html
   param: { module: bankpayment, action: ulusnet, page: 1 }
@@ -57,7 +57,7 @@ bankpayment_ulusnet_payment:
   param: { module: bankpayment, action: ulusnetPayment }
 bankpayment_ulusnet_update:
   url: /manage/bankpayment/ulusnet/update
-  param: { module: bankpayment, action: ulusnetUpdate }
+  param: { module: bankpayment, action: ulusnetUpdate }  
 bankpayment_ulusnet_card:
   url: /manage/bankpayment/ulusnet/card
   param: { module: bankpayment, action: ulusnetProduct }
@@ -73,22 +73,19 @@ bankpayment_do_payment:
 bankpayment_update:
   url: /manage/bankpayment/update
   param: { module: bankpayment, action: update }
-
+  
 bankpayment_update_make_payment:
   url: /manage/bankpayment/makepayment
   param: { module: bankpayment, action: makePayment }
-
+  
 bankpayment_update_copy:
   url: /manage/bankpayment/update/copy
   param: { module: bankpayment, action: copy }
-
-bankpayment_ussd_copy:
-  url: /manage/bankpayment/ussd/copy
-  param: { module: bankpayment, action: copyUssd }
+  
 bankpayment_return:
   url: /manage/bankpayment/return
   param: { module: bankpayment, action: return }
-
+  
 bankpayment_block_date:
   url: /manage/bankpayment/bankpayment-block-date
   param: { module: bankpayment, action: blockDate }
@@ -96,7 +93,7 @@ bankpayment_block_date:
 bankpayment_payment_report:
   url: /manage/bankpayment/bankpayment-payment-report
   param: { module: bankpayment, action: paymentReport }
-
+  
 # Transaction
 transaction_list:
   url: /manage/transaction/list/:page.html
@@ -138,16 +135,16 @@ transaction_config_assignment:
 to_bankpayment:
   url: /manage/transaction/to_bankpayment
   param: { module: bankTransaction, action: toBankpayment }
-
+  
 # Refund
 refund_list:
   url: /manage/refund/list
   param: { module: refund, action: list, page: 1 }
-
+  
 refund_list_excel:
   url: /manage/refund/list-excel.html
   param: { module: refund, action: listExcel }
-
+  
 # BANK Khaan
 bank_khaan_list:
   url: /manage/khaan/list/:page.html
@@ -216,7 +213,7 @@ bank_golomt_call_payment_status:
 bank_golomt_call_payment_excel:
   url: /manage/golomt/call/payment/excel
   param: { module: golomt, action: callPaymentExcel }
-
+ 
 # BANK MOBIXPRESS
 bank_mobixpress_list:
   url: /manage/mobixpress/list/:page.html
@@ -233,7 +230,7 @@ bank_mobixpress_recharge:
 bank_mobixpress_list_excel:
   url: /manage/mobixpress/list-excel.html
   param: { module: mobixpress, action: listExcel }
-
+  
 # BANK CANDY
 bank_candy_list:
   url: /manage/candy/list/:page.html
@@ -297,7 +294,7 @@ bank_savings_recharge:
   param: { module: savings, action: recharge }
 bank_savings_remx_charge:
   url: /manage/savings/remxcharge
-  param: { module: savings, action: reMxCharge }
+  param: { module: savings, action: reMxCharge }  
 bank_savings_recover:
   url: /manage/savings/recover
   param: { module: savings, action: recover }
@@ -353,7 +350,7 @@ bank_xac_call_payment_status:
   param: { module: xac, action: callPaymentStatus }
 bank_xac_call_payment_excel:
   url: /manage/xac/call/payment/excel
-  param: { module: xac, action: callPaymentExcel }
+  param: { module: xac, action: callPaymentExcel }  
 
 # BANK Capital
 bank_capital_list:
@@ -413,7 +410,7 @@ bank_tdb_reoutcome:
   param: { module: tdb, action: reoutcome }
 bank_tdb_outcome_success:
   url: /manage/tdb/outcomesuccess
-  param: { module: tdb, action: successOutcome }
+  param: { module: tdb, action: successOutcome }  
 bank_tdb_call_payment_list:
   url: /manage/tdb/call/payment/list
   param: { module: tdb, action: callPayment }
@@ -459,7 +456,7 @@ bank_capitron_call_payment_excel:
   url: /manage/capitron/call/payment/excel
   param: { module: capitron, action: callPaymentExcel }
 
-# buh bank dealer charge
+# buh bank dealer charge  
 bank_dealer_list:
   url: /manage/dealer/list/:page.html
   param: { module: dealer, action: list, page: 1 }
@@ -472,12 +469,12 @@ bank_dealer_merge_amount:
 bank_dealer_merge_report:
   url: /manage/dealer/merge/report
   param: { module: dealer, action: mergeReport }
-
+  
 # USER
 user_info:
   url: /manage/user/info.html
   param: { module: user, action: info }
-
+  
 login:
   url: /manage/user/login.html
   param: { module: user, action: login }

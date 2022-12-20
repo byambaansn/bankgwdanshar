@@ -11,7 +11,7 @@ class KhaanCorpgw
         $header[] = "Content-Type: application/json";
         $accountsDto = json_encode(self::getAccountListWithRecord());
         $a = self::sendPost($url,$header, $accountsDto);
-
+       
         LogTools::setLogKhaanInit($accountsDto, $a, null, null, null, null, null);
 
         $sortedResponse = json_decode($a);

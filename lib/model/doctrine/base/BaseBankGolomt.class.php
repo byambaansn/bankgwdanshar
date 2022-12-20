@@ -27,6 +27,7 @@ Doctrine_Manager::getInstance()->bindComponent('BankGolomt', 'doctrine');
  * @property integer $try_count
  * @property timestamp $created_at
  * @property timestamp $updated_at
+ * @property string $related_account
  * 
  * @method integer    getId()             Returns the current record's "id" value
  * @method integer    getVendorId()       Returns the current record's "vendor_id" value
@@ -48,6 +49,7 @@ Doctrine_Manager::getInstance()->bindComponent('BankGolomt', 'doctrine');
  * @method integer    getTryCount()       Returns the current record's "try_count" value
  * @method timestamp  getCreatedAt()      Returns the current record's "created_at" value
  * @method timestamp  getUpdatedAt()      Returns the current record's "updated_at" value
+ * @method string     getRelatedAccount() Returns the current record's "related_account" value
  * @method BankGolomt setId()             Sets the current record's "id" value
  * @method BankGolomt setVendorId()       Sets the current record's "vendor_id" value
  * @method BankGolomt setChargeMobile()   Sets the current record's "charge_mobile" value
@@ -68,6 +70,7 @@ Doctrine_Manager::getInstance()->bindComponent('BankGolomt', 'doctrine');
  * @method BankGolomt setTryCount()       Sets the current record's "try_count" value
  * @method BankGolomt setCreatedAt()      Sets the current record's "created_at" value
  * @method BankGolomt setUpdatedAt()      Sets the current record's "updated_at" value
+ * @method BankGolomt setRelatedAccount() Sets the current record's "related_account" value
  * 
  * @package    sf_sandbox
  * @subpackage model
@@ -260,6 +263,15 @@ abstract class BaseBankGolomt extends sfDoctrineRecord
              'notnull' => true,
              'autoincrement' => false,
              'length' => 25,
+             ));
+        $this->hasColumn('related_account', 'string', 50, array(
+             'type' => 'string',
+             'fixed' => 0,
+             'unsigned' => false,
+             'primary' => false,
+             'notnull' => true,
+             'autoincrement' => false,
+             'length' => 50,
              ));
     }
 

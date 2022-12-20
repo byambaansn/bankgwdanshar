@@ -130,7 +130,7 @@ class LoyaltyCharge
         $numbers = array();
         $number = false;
         //utasnii dugaar orson bol tanidag bolgov
-        preg_match("/.*((9[459]|8[5])\\d{6}).*/", strtoupper($transValue), $matches);
+        preg_match("/.*((9[013786459]|8[503689])\\d{6}).*/", strtoupper($transValue), $matches);
 
         foreach ($matches as $match) {
             if (strlen(trim($match)) == 8) {

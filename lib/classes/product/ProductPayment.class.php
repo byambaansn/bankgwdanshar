@@ -35,14 +35,13 @@ class ProductPayment
     public static function charge($params)
     {
         $pdo = self::getLogPDO();
-        $sql = "INSERT INTO bank_transaction.transaction(bank_id, bank_account, related_account, order_id, order_date, order_p, order_type, order_amount,  order_branch, status,created_at)
-                                            VALUES(:bank_id,:bank_account,:related_account,:order_id,:order_date,:order_p,:order_type,:order_amount,:order_branch,:status,:created_at)";
+        $sql = "INSERT INTO bank_transaction.transaction(bank_id, bank_account, order_id, order_date, order_p, order_type, order_amount,  order_branch, status,created_at)
+                                            VALUES(:bank_id,:bank_account,:order_id,:order_date,:order_p,:order_type,:order_amount,:order_branch,:status,:created_at)";
 
         $stmt = $pdo->prepare($sql);
         return $stmt->execute(array(
                     ':bank_id' => '9',
                     ':bank_account' => $params['transAccount'],
-                    ':related_account' => $params['relatedAccount'],
                     ':order_id' => $params['transNumber'],
                     ':order_date' => $params['transDate'],
                     ':order_p' => $params['transValue'],

@@ -21,7 +21,6 @@ abstract class BaseBankKhaanForm extends BaseFormDoctrine
       'charge_amount'  => new sfWidgetFormInputText(),
       'percent'        => new sfWidgetFormInputText(),
       'bank_account'   => new sfWidgetFormInputText(),
-      'related_account'=> new sfWidgetFormInputText(),
       'order_id'       => new sfWidgetFormInputText(),
       'order_id_date'  => new sfWidgetFormDate(),
       'sales_order_id' => new sfWidgetFormInputText(),
@@ -36,6 +35,7 @@ abstract class BaseBankKhaanForm extends BaseFormDoctrine
       'try_count'      => new sfWidgetFormInputText(),
       'created_at'     => new sfWidgetFormDateTime(),
       'updated_at'     => new sfWidgetFormDateTime(),
+      'related_account'=> new sfWidgetFormInputText(),
     ));
 
     $this->setValidators(array(
@@ -45,7 +45,7 @@ abstract class BaseBankKhaanForm extends BaseFormDoctrine
       'charge_amount'  => new sfValidatorInteger(),
       'percent'        => new sfValidatorInteger(),
       'bank_account'   => new sfValidatorString(array('max_length' => 50)),
-      'related_account'   => new sfValidatorString(array('max_length' => 50)),
+      
       'order_id'       => new sfValidatorString(array('max_length' => 30)),
       'order_id_date'  => new sfValidatorDate(),
       'sales_order_id' => new sfValidatorInteger(array('required' => false)),
@@ -60,6 +60,7 @@ abstract class BaseBankKhaanForm extends BaseFormDoctrine
       'try_count'      => new sfValidatorInteger(array('required' => false)),
       'created_at'     => new sfValidatorDateTime(),
       'updated_at'     => new sfValidatorDateTime(),
+      'related_account'   => new sfValidatorString(array('max_length' => 50)),
     ));
 
     $this->widgetSchema->setNameFormat('bank_khaan[%s]');

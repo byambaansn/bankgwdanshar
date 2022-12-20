@@ -352,7 +352,7 @@ class BankCapitalTable extends Doctrine_Table
         $bankOrder->status = self::STAT_NEW;
         $bankOrder->vendor_id = VendorTable::BANK_CAPITAL;
         $bankOrder->created_at = date('Y-m-d H:i:s');
-
+        $bankOrder->related_account = 0;
         $txnDesc = preg_replace("/\([0-9]{8}\)/", "", $trans['TxnDesc']);
 
         preg_match_all("/([9][954][0-9]{6})|(85[0-9]{6})/", $txnDesc, $matches);
@@ -559,16 +559,16 @@ class BankCapitalTable extends Doctrine_Table
                             $bankOrder->save();
                             if ($customer) {
                                 if ($ADshop) {
-                                    TransactionTable::setRechargeAssignment(PaymentTypeTable::DEALER_AD, BankTable::CAPITAL, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s);
+                                    TransactionTable::setRechargeAssignment(PaymentTypeTable::DEALER_AD, BankTable::CAPITAL, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s, $bankOrder->related_account);
                                 } else {
-                                    TransactionTable::setRechargeAssignment(PaymentTypeTable::DEALER, BankTable::CAPITAL, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s);
+                                    TransactionTable::setRechargeAssignment(PaymentTypeTable::DEALER, BankTable::CAPITAL, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s, $bankOrder->related_account);
                                 }
                             } else {
                                 try {
                                     if ($ADshop) {
-                                        TransactionTable::setDealerAssignment(PaymentTypeTable::DEALER_AD, BankTable::CAPITAL, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s);
+                                        TransactionTable::setDealerAssignment(PaymentTypeTable::DEALER_AD, BankTable::CAPITAL, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s, $bankOrder->related_account);
                                     } else {
-                                        TransactionTable::setDealerAssignment(PaymentTypeTable::DEALER, BankTable::CAPITAL, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s);
+                                        TransactionTable::setDealerAssignment(PaymentTypeTable::DEALER, BankTable::CAPITAL, $bankOrder->bank_account, $bankOrder->order_id, $bankOrder->order_date, $bankOrder->order_p, $bankOrder->order_type, $bankOrder->order_amount, $bankOrder->order_s, $bankOrder->related_account);
                                     }
                                 } catch (\Exception $e) {
 
@@ -997,7 +997,7 @@ class BankCapitalTable extends Doctrine_Table
             # assignment
             try {
                 $ids[] = $transaction->id;
-                $result = TransactionTable::setDealerAssignment($dealerChargeType, BankTable::CAPITAL, $transaction->bank_account, $transaction->order_id, $transaction->order_date, $transaction->order_p, $orderType, $transaction->order_amount, $transaction->order_s);
+                $result = TransactionTable::setDealerAssignment($dealerChargeType, BankTable::CAPITAL, $transaction->bank_account, $transaction->order_id, $transaction->order_date, $transaction->order_p, $orderType, $transaction->order_amount, $transaction->order_s, $transaction->related_account);
                 $logger->log('CAPITAL' . $transaction->order_id, sfFileLogger::INFO);
             } catch (\Exception $exc) {
                 $logger1 = new sfFileLogger(new sfEventDispatcher(), array('file' => sfConfig::get('sf_log_dir') . '/dealerTransaction.log'));

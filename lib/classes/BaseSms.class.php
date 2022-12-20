@@ -33,7 +33,7 @@ class BaseSms
     const BANK_CAPITAL = 8;
 
     #
-    const HOST_SMS = "http://sms/";
+    const HOST_SMS = "http://sms.api/";
     const HOST_SMS_API = "http://sms.api/api/";
     const HOST_SMS_USER_KHAAN = "BOT_KHAAN";
     const HOST_SMS_USER_KHAAN_PASSWORD = "123";
@@ -683,7 +683,7 @@ class BaseSms
                 foreach ($response['result'] as $product) {
                     if($product['code'] == $productCode){
                         return $product['name'];
-                    } 
+                    }
                 }
             }
             return 'Задгай нэгж';
